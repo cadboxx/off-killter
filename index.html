@@ -2,15 +2,112 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
+    <title>IMPOSTER SYNDROME</title>
     <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.1.0/dist/aframe-environment-component.min.js"></script>
+    <script>
+      let leftTriggerDown = false;
+      let rightTriggerDown = false;
+      AFRAME.registerComponent('left-rotation-reader', {
+        tick: function () {
+          var el = this.el; // `this.el` is the element.
+          var cube = document.getElementById("rightCube");
+          //console.log(el.object3D.position.y)
+
+          // when holding trigger
+          // record positions to object (timestamp positions?)
+          // when let go
+          // replay recording on top of new object spawned away from current player (like -5 in front) in relative space
+          
+          // if (leftTriggerDown) {
+            cube.object3D.position.x = el.object3D.position.x;
+            cube.object3D.position.y = el.object3D.position.y;
+            cube.object3D.position.z = el.object3D.position.z + -5;
+            cube.object3D.rotation.x = el.object3D.rotation.x;
+            cube.object3D.rotation.y = el.object3D.rotation.y;
+            cube.object3D.rotation.z = el.object3D.rotation.z;
+          // }
+
+        }
+      });
+      AFRAME.registerComponent('right-rotation-reader', {
+        tick: function () {
+          var el = this.el; // `this.el` is the element.
+          var cube = document.getElementById("leftCube");
+
+          // if (rightTriggerDown) {
+            cube.object3D.position.x = el.object3D.position.x;
+            cube.object3D.position.y = el.object3D.position.y;
+            cube.object3D.position.z = el.object3D.position.z + -5;
+            cube.object3D.rotation.x = el.object3D.rotation.x;
+            cube.object3D.rotation.y = el.object3D.rotation.y;
+            cube.object3D.rotation.z = el.object3D.rotation.z;
+          // }
+
+        }
+      });
+      AFRAME.registerComponent('left-trigger-down', {
+        init: function () {
+          var el = this.el; // The entity
+          console.log(el)
+          // Update to all controls..pointup?
+          el.addEventListener('triggerdown', function (evt) {
+            // el.setAttribute('visible', !el.getAttribute('visible'));
+            console.log("Started recording left!")
+            leftTriggerDown = true;
+          });
+          el.addEventListener('triggerup', function (evt) {
+            // el.setAttribute('visible', !el.getAttribute('visible'));
+            console.log("Stopped recording left.")
+            leftTriggerDown = false;
+          });
+        }
+      });
+      AFRAME.registerComponent('right-trigger-down', {
+        init: function () {
+          var el = this.el; // The entity
+          console.log(el)
+          // Update to all controls..pointup?
+          el.addEventListener('triggerdown', function (evt) {
+            // el.setAttribute('visible', !el.getAttribute('visible'));
+            console.log("Started recording right!")
+            rightTriggerDown = true;
+          });
+          el.addEventListener('triggerup', function (evt) {
+            // el.setAttribute('visible', !el.getAttribute('visible'));
+            console.log("Stopped recording right.")
+            rightTriggerDown = false;
+          });
+        }
+      });
+      AFRAME.registerComponent('camera-rotation-reader', {
+      tick: function () {
+        var el = this.el; // `this.el` is the element.
+          var cube = document.getElementById("headCube");
+
+          cube.object3D.position.x = el.object3D.position.x;
+          cube.object3D.position.y = el.object3D.position.y;
+          cube.object3D.position.z = el.object3D.position.z + -5;
+          cube.object3D.rotation.x = el.object3D.rotation.x;
+          cube.object3D.rotation.y = el.object3D.rotation.y;
+          cube.object3D.rotation.z = el.object3D.rotation.z;
+
+      }
+    });
+  </script>
   </head>
   <body>
     <a-scene>
-      <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
-      <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
-      <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
-      <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
-      <a-sky color="#ECECEC"></a-sky>
+      <a-entity id="leftCube" geometry="primitive: box; width: 0.1; height: 0.1; depth: 0.1" position="0 0 -5"></a-entity>
+      <a-entity id="rightCube" geometry="primitive: box; width: 0.1; height: 0.1; depth: 0.1" position="0 0 -5"></a-entity>
+      <a-entity id="headCube" geometry="primitive: box; width: 0.35; height: 0.35; depth: 0.35" position="0 0 -5"></a-entity>
+
+      <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: lowPoly; color: #ffcccc" left-trigger-down left-rotation-reader></a-entity>
+      <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly; color: #ffcccc" right-trigger-down right-rotation-reader></a-entity>
+
+      <a-entity camera look-controls wasd-controls position="0 2 0" camera-rotation-reader></a-entity>
+
+      <a-entity environment="preset: contact"></a-entity>
     </a-scene>
   </body>
 </html>
