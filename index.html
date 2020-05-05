@@ -8,10 +8,48 @@
     <script>
       let leftTriggerDown = false;
       let rightTriggerDown = false;
+      let recording = false;
+      let recordedPoses = [];
+      let recordedEvents = [];
+      let tick = 0;
+      AFRAME.registerComponent('record-positions', {
+        tick: function () {
+          var el = this.el; // The entity
+          // var position = new THREE.Vector3();
+          // var rotation = new THREE.Quaternion();
+          let time = Date.now();
+          let newPoint;
+          if (recording) {
+            newPoint = {
+              position: el.object3D.position,
+              rotation: el.object3D.rotation,
+              timestamp: time
+            };
+            recordedPoses.push(newPoint);
+            el.object3D.updateMatrixWorld();
+          }
+        }
+      });
+      // Do we need separate readers for each??
+      AFRAME.registerComponent('camera-rotation-reader', {
+        tick: function () {
+          var el = this.el; // `this.el` is the element.
+          var cube = document.getElementById("headCube");
+
+          cube.object3D.position.x = el.object3D.position.x;
+          cube.object3D.position.y = el.object3D.position.y;
+          cube.object3D.position.z = el.object3D.position.z + -5;
+          cube.object3D.rotation.x = el.object3D.rotation.x;
+          cube.object3D.rotation.y = el.object3D.rotation.y;
+          cube.object3D.rotation.z = el.object3D.rotation.z;
+
+        }
+    });
       AFRAME.registerComponent('left-rotation-reader', {
         tick: function () {
           var el = this.el; // `this.el` is the element.
           var cube = document.getElementById("rightCube");
+
           //console.log(el.object3D.position.y)
 
           // when holding trigger
@@ -35,14 +73,27 @@
           var el = this.el; // `this.el` is the element.
           var cube = document.getElementById("leftCube");
 
-          // if (rightTriggerDown) {
+          if (rightTriggerDown) {
+            var newPoint = {
+              oldPosition: AFRAME.utils.clone(this.el.getAttribute('position')),
+              position: AFRAME.utils.clone(this.el.getAttribute('position')),
+              rotation: AFRAME.utils.clone(this.el.getAttribute('rotation')),
+              timestamp: Date.now()
+            };
+            newPoint.position.z += -5;
+            recordedPoses.push(newPoint);
+            el.object3D.updateMatrixWorld();
+            moveCube();
+          }
+
+          function moveCube() {          
             cube.object3D.position.x = el.object3D.position.x;
             cube.object3D.position.y = el.object3D.position.y;
             cube.object3D.position.z = el.object3D.position.z + -5;
             cube.object3D.rotation.x = el.object3D.rotation.x;
             cube.object3D.rotation.y = el.object3D.rotation.y;
-            cube.object3D.rotation.z = el.object3D.rotation.z;
-          // }
+            cube.object3D.rotation.z = el.object3D.rotation.z; 
+          }
 
         }
       });
@@ -72,33 +123,43 @@
             // el.setAttribute('visible', !el.getAttribute('visible'));
             console.log("Started recording right!")
             rightTriggerDown = true;
+            recording = true;
+            recordedPoses = [];
+            tick = 0;
           });
           el.addEventListener('triggerup', function (evt) {
             // el.setAttribute('visible', !el.getAttribute('visible'));
             console.log("Stopped recording right.")
             rightTriggerDown = false;
+            recording = false;
+            console.log(recordedPoses)
           });
         }
       });
-      AFRAME.registerComponent('camera-rotation-reader', {
-      tick: function () {
-        var el = this.el; // `this.el` is the element.
-          var cube = document.getElementById("headCube");
-
-          cube.object3D.position.x = el.object3D.position.x;
-          cube.object3D.position.y = el.object3D.position.y;
-          cube.object3D.position.z = el.object3D.position.z + -5;
-          cube.object3D.rotation.x = el.object3D.rotation.x;
-          cube.object3D.rotation.y = el.object3D.rotation.y;
-          cube.object3D.rotation.z = el.object3D.rotation.z;
-
-      }
-    });
+      AFRAME.registerComponent('replay-positions', {
+        tick: function () {
+          var el = this.el; // The entity
+          if (!recording) {
+            // replay poses on cube
+            if (recordedPoses[tick]) {
+              el.object3D.position.x = recordedPoses[tick].position.x;
+              el.object3D.position.y = recordedPoses[tick].position.y;
+              el.object3D.position.z = recordedPoses[tick].position.z;
+              el.object3D.rotation.x = recordedPoses[tick].rotation.x;
+              el.object3D.rotation.y = recordedPoses[tick].rotation.y;
+              el.object3D.rotation.z = recordedPoses[tick].rotation.z;
+              tick += 1
+            } else {
+              console.log("finished replaying poses")
+            }
+          }
+        }
+      });
   </script>
   </head>
   <body>
     <a-scene>
-      <a-entity id="leftCube" geometry="primitive: box; width: 0.1; height: 0.1; depth: 0.1" position="0 0 -5"></a-entity>
+      <a-entity id="leftCube" geometry="primitive: box; width: 0.1; height: 0.1; depth: 0.1" position="0 0 -5" replay-positions></a-entity>
       <a-entity id="rightCube" geometry="primitive: box; width: 0.1; height: 0.1; depth: 0.1" position="0 0 -5"></a-entity>
       <a-entity id="headCube" geometry="primitive: box; width: 0.35; height: 0.35; depth: 0.35" position="0 0 -5"></a-entity>
 

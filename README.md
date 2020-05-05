@@ -5,4 +5,4 @@ A VR game relying on good memory and quick reactions. Record five animations and
 
 ### Libraries
 ---
-Built with A-Frame: https://aframe.io/
+Built with A-Frame: https://aframe.io/ (a magical VR web framework built on top of [three.js](https://threejs.org/))
