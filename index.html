@@ -18,10 +18,15 @@
       <a-entity id="rightCube" gltf-model="url(./assets/leftHand.glb)" visible="true"></a-entity>
       <a-entity id="headCube" obj-model="obj: #head; mtl: #head-mtl" scale="0.1 0.1 0.1"></a-entity>
 
-      <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: toon; color: #ffcccc" mirror-movement trigger-down></a-entity>
-      <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: toon; color: #ffcccc" mirror-movement trigger-down></a-entity>
+      <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: toon;" mirror-movement trigger-down></a-entity>
+      <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: toon;" mirror-movement trigger-down></a-entity>
 
-      <a-entity id="camera" camera look-controls wasd-controls position="0 2 0" mirror-movement replayer></a-entity>
+      <a-entity raycaster-listen laser-controls="hand: left; model: false;" raycaster="objects: .links; far: 5" line="color: blue; opacity: 0.25"></a-entity>
+      <a-entity raycaster-listen laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 5" line="color: blue; opacity: 0.25"></a-entity>
+
+      <a-entity id="camera" camera look-controls wasd-controls position="0 2 0" rotation="0 180 0" mirror-movement replayer></a-entity>
+
+      <a-text id="recordButton" class="links" value="START RECORDING" geometry="primitive:circle" position="-2 2 5" rotation="20 150 0" material="color: red" scale="0.7 0.7 0.7"></a-text>
 
       <a-entity environment="preset: contact"></a-entity>
     </a-scene>

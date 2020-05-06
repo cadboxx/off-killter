@@ -1,6 +1,7 @@
 let leftTriggerDown = false;
 let rightTriggerDown = false;
 let triggerDown = false;
+let recordButtonSelected = false;
 let recording = false;
 let replaying = false;
 let recordedPoses = [ [], [], [] ]; // Position & rotation
@@ -15,7 +16,6 @@ function recordEntity(el, index) {
   }
   newPoint.position.z += 5;
   recordedPoses[index].push(newPoint);
-  //el.updateMatrixWorld();
 }
 
 AFRAME.registerComponent('mirror-movement', {
@@ -41,7 +41,11 @@ AFRAME.registerComponent('mirror-movement', {
       console.log("not arm or head")
     }
 
-    if (triggerDown) {
+    if (triggerDown && recordButtonSelected) {
+      recording = true;
+      document.getElementById('recordButton').setAttribute('material', 'color:green')
+      document.getElementById('recordButton').setAttribute('color', 'black')
+      document.getElementById('recordButton').setAttribute('value', 'RECORDING')
       recordEntity(el, index);
     }
 
@@ -59,22 +63,24 @@ AFRAME.registerComponent('mirror-movement', {
 AFRAME.registerComponent('trigger-down', {
   init: function () {
     var el = this.el; // The entity
-    // var leftHand = document.getElementById("leftHand");
-    // var rightHand = document.getElementById("rightHand");
 
     // Update to all controls..pointup?
     el.addEventListener('triggerdown', function (evt) {
       console.log("Trigger down")
-      triggerDown = true;
-      replaying = false;
-      tick = 0;
-      recordedPoses = [ [], [], [] ];
+      if (!replaying) {
+        triggerDown = true;
+        tick = 0;
+        recordedPoses = [ [], [], [] ];
+      }
     });
 
     el.addEventListener('triggerup', function (evt) {
       console.log("Trigger up")
       triggerDown = false;
+      recordButtonSelected = false;
+      recording = false;
       console.log(recordedPoses)
+      document.getElementById('recordButton').setAttribute('material', 'color:red')
     });
   }
 });
@@ -89,6 +95,10 @@ AFRAME.registerComponent('replayer', {
     if (!triggerDown) {
       if (tick < recordedPoses[0].length) {
         replaying = true;
+        document.getElementById('recordButton').setAttribute('value', 'REPLAYING')
+        document.getElementById('recordButton').setAttribute('color', 'yellow')
+        document.getElementById('recordButton').setAttribute('geometry', 'primitive:plane')
+        document.getElementById('recordButton').setAttribute('material', 'color:blue')
         headCube.object3D.position.x = recordedPoses[0][tick].position.x;
         headCube.object3D.position.y = recordedPoses[0][tick].position.y;
         headCube.object3D.position.z = recordedPoses[0][tick].position.z;
@@ -113,7 +123,32 @@ AFRAME.registerComponent('replayer', {
         tick += 1;
       } else {
         replaying = false;
+        document.getElementById('recordButton').setAttribute('value', 'START RECORDING')
+        document.getElementById('recordButton').setAttribute('geometry', 'primitive:circle')
+        document.getElementById('recordButton').setAttribute('material', 'color:red')
       }
     }
+  }
+});
+
+AFRAME.registerComponent('raycaster-listen', {
+  dependencies: ['raycaster'],
+  init: function () {
+    this.el.addEventListener('raycaster-intersection', function () {
+      console.log('Intersecting button');
+      // This should be in the .els array...
+      if (!recording) {
+        document.getElementById('recordButton').setAttribute('color', 'yellow')
+      }
+      recordButtonSelected = true;
+    });
+    this.el.addEventListener('raycaster-intersection-cleared', function () {
+      console.log('Not intersecting button');
+      // This should be in the .els array...
+      if (!triggerDown) {
+        document.getElementById('recordButton').setAttribute('color', 'white')
+        recordButtonSelected = false;
+      }
+    });
   }
 });
