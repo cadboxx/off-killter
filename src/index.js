@@ -92,20 +92,24 @@ AFRAME.registerComponent('replayer', {
         headCube.object3D.position.x = recordedPoses[0][tick].position.x;
         headCube.object3D.position.y = recordedPoses[0][tick].position.y;
         headCube.object3D.position.z = recordedPoses[0][tick].position.z;
-        headCube.object3D.rotation.x = recordedPoses[0][tick].rotation.x;
-        headCube.object3D.rotation.y = recordedPoses[0][tick].rotation.y;
+        headCube.object3D.rotation.x = THREE.Math.degToRad(recordedPoses[0][tick].rotation.x);
+        headCube.object3D.rotation.y = THREE.Math.degToRad(recordedPoses[0][tick].rotation.y);
+        headCube.object3D.rotation.z = THREE.Math.degToRad(recordedPoses[0][tick].rotation.z);
+
+        rightCube.object3D.position.x = recordedPoses[1][tick].position.x;
+        rightCube.object3D.position.y = recordedPoses[1][tick].position.y;
+        rightCube.object3D.position.z = recordedPoses[1][tick].position.z;
+        rightCube.object3D.rotation.x = THREE.Math.degToRad(recordedPoses[1][tick].rotation.x);
+        rightCube.object3D.rotation.y = THREE.Math.degToRad(recordedPoses[1][tick].rotation.y);
+        rightCube.object3D.rotation.z = THREE.Math.degToRad(recordedPoses[1][tick].rotation.z);
       
-        leftCube.object3D.position.x = recordedPoses[1][tick].position.x;
-        leftCube.object3D.position.y = recordedPoses[1][tick].position.y;
-        leftCube.object3D.position.z = recordedPoses[1][tick].position.z;
-        leftCube.object3D.rotation.x = recordedPoses[1][tick].rotation.x;
-        leftCube.object3D.rotation.y = recordedPoses[1][tick].rotation.y;
-      
-        rightCube.object3D.position.x = recordedPoses[2][tick].position.x;
-        rightCube.object3D.position.y = recordedPoses[2][tick].position.y;
-        rightCube.object3D.position.z = recordedPoses[2][tick].position.z;
-        rightCube.object3D.rotation.x = recordedPoses[2][tick].rotation.x;
-        rightCube.object3D.rotation.y = recordedPoses[2][tick].rotation.y;
+        leftCube.object3D.position.x = recordedPoses[2][tick].position.x;
+        leftCube.object3D.position.y = recordedPoses[2][tick].position.y;
+        leftCube.object3D.position.z = recordedPoses[2][tick].position.z;
+        leftCube.object3D.rotation.x = THREE.Math.degToRad(recordedPoses[2][tick].rotation.x);
+        leftCube.object3D.rotation.y = THREE.Math.degToRad(recordedPoses[2][tick].rotation.y);
+        leftCube.object3D.rotation.z = THREE.Math.degToRad(recordedPoses[2][tick].rotation.z);
+
         tick += 1;
       } else {
         replaying = false;
