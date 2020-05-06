@@ -9,14 +9,19 @@
   </head>
   <body>
     <a-scene>
-      <a-entity id="leftCube" geometry="primitive: box; width: 0.1; height: 0.1; depth: 0.1" visible="true"></a-entity>
-      <a-entity id="rightCube" geometry="primitive: box; width: 0.1; height: 0.1; depth: 0.1" visible="true"></a-entity>
-      <a-entity id="headCube" geometry="primitive: box; width: 0.35; height: 0.35; depth: 0.35"></a-entity>
+      <a-assets>
+        <a-asset-item id="head" src="assets/Basehead.obj"></a-asset-item>
+        <a-asset-item id="head-mtl" src="assets/Basehead.mtl"></a-asset-item>
+      </a-assets>
 
-      <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: lowPoly; color: #ffcccc" mirror-movement trigger-down recorder></a-entity>
-      <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly; color: #ffcccc" mirror-movement trigger-down recorder></a-entity>
+      <a-entity id="leftCube" gltf-model="url(./assets/rightHand.glb)" visible="true"></a-entity>
+      <a-entity id="rightCube" gltf-model="url(./assets/leftHand.glb)" visible="true"></a-entity>
+      <a-entity id="headCube" obj-model="obj: #head; mtl: #head-mtl" scale="0.1 0.1 0.1"></a-entity>
 
-      <a-entity id="camera" camera look-controls wasd-controls position="0 2 0" mirror-movement recorder></a-entity>
+      <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: toon; color: #ffcccc" mirror-movement trigger-down></a-entity>
+      <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: toon; color: #ffcccc" mirror-movement trigger-down></a-entity>
+
+      <a-entity id="camera" camera look-controls wasd-controls position="0 2 0" mirror-movement replayer></a-entity>
 
       <a-entity environment="preset: contact"></a-entity>
     </a-scene>

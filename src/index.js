@@ -3,41 +3,22 @@ let rightTriggerDown = false;
 let triggerDown = false;
 let recording = false;
 let replaying = false;
-let recordedPoses = [ [], [], [], [] ]; // Position & rotation
+let recordedPoses = [ [], [], [] ]; // Position & rotation
 let recordedEvents = []; // Button presses
 let tick = 0;
 
-AFRAME.registerComponent('mirror-movement', {
-  tick: function () {
-    var el = this.el; // `this.el` is the element.
-    var headCube = document.getElementById("headCube");
-    var leftCube = document.getElementById("leftCube");
-    var rightCube = document.getElementById("rightCube");
-    var camera = document.getElementById("camera");
-    var leftHand = document.getElementById("leftHand");
-    var rightHand = document.getElementById("rightHand");
-
-    if (el.object3D == camera.object3D) {
-      var cube = headCube;
-    } else if (el.object3D == leftHand.object3D) {
-      var cube = rightCube;
-    } else if (el.object3D == rightHand.object3D) {
-      var cube = leftCube;
-    } else {
-      console.log("not arm or head")
-    }
-
-    if (!replaying) {
-      cube.object3D.position.x = el.object3D.position.x;
-      cube.object3D.position.y = el.object3D.position.y;
-      cube.object3D.position.z = el.object3D.position.z + 5;
-      cube.object3D.rotation.x = el.object3D.rotation.x;
-      cube.object3D.rotation.y = el.object3D.rotation.y;
-    }
+function recordEntity(el, index) {
+  var newPoint = {
+    position: AFRAME.utils.clone(el.getAttribute('position')),
+    rotation: AFRAME.utils.clone(el.getAttribute('rotation')),
+    timestamp: Date.now()
   }
-});
+  newPoint.position.z += 5;
+  recordedPoses[index].push(newPoint);
+  //el.updateMatrixWorld();
+}
 
-AFRAME.registerComponent('recorder', {
+AFRAME.registerComponent('mirror-movement', {
   tick: function () {
     var el = this.el; // `this.el` is the element.
     var headCube = document.getElementById("headCube");
@@ -58,53 +39,77 @@ AFRAME.registerComponent('recorder', {
       var index = 2;
     } else {
       console.log("not arm or head")
-      var index = 3;
     }
 
     if (triggerDown) {
-      var newPoint = {
-        position: AFRAME.utils.clone(this.el.getAttribute('position')),
-        rotation: AFRAME.utils.clone(this.el.getAttribute('rotation')),
-        timestamp: Date.now()
-      };
-      
-      newPoint.position.z += 5;
-      console.log(index)
-      console.log(newPoint)
-      console.log(recordedPoses)
-      recordedPoses[index].push(newPoint);
-      el.object3D.updateMatrixWorld();
-    } else {
-      if (tick < recordedPoses[index].length) {
-        replaying = true;
-        cube.object3D.position.x = recordedPoses[index][tick].position.x;
-        cube.object3D.position.y = recordedPoses[index][tick].position.y;
-        cube.object3D.position.z = recordedPoses[index][tick].position.z;
-        cube.object3D.rotation.x = recordedPoses[index][tick].rotation.x;
-        cube.object3D.rotation.y = recordedPoses[index][tick].rotation.y;
-        tick += 1;
-      } else {
-        replaying = false;
-      }
+      recordEntity(el, index);
     }
 
+    if (!replaying) {
+      cube.object3D.position.x = el.object3D.position.x;
+      cube.object3D.position.y = el.object3D.position.y;
+      cube.object3D.position.z = el.object3D.position.z + 5;
+      cube.object3D.rotation.x = el.object3D.rotation.x;
+      cube.object3D.rotation.y = el.object3D.rotation.y;
+      cube.object3D.rotation.z = el.object3D.rotation.z;
+    }
   }
 });
 
 AFRAME.registerComponent('trigger-down', {
   init: function () {
     var el = this.el; // The entity
-    console.log(el)
+    // var leftHand = document.getElementById("leftHand");
+    // var rightHand = document.getElementById("rightHand");
+
     // Update to all controls..pointup?
     el.addEventListener('triggerdown', function (evt) {
-      console.log("Started recording")
+      console.log("Trigger down")
       triggerDown = true;
-      recordedPoses = [ [], [], [], [] ];
+      replaying = false;
       tick = 0;
+      recordedPoses = [ [], [], [] ];
     });
+
     el.addEventListener('triggerup', function (evt) {
-      console.log("Stopped recording")
+      console.log("Trigger up")
       triggerDown = false;
+      console.log(recordedPoses)
     });
+  }
+});
+
+AFRAME.registerComponent('replayer', {
+  tick: function () {
+    var el = this.el; // The entity
+    var headCube = document.getElementById("headCube");
+    var leftCube = document.getElementById("leftCube");
+    var rightCube = document.getElementById("rightCube");
+
+    if (!triggerDown) {
+      if (tick < recordedPoses[0].length) {
+        replaying = true;
+        headCube.object3D.position.x = recordedPoses[0][tick].position.x;
+        headCube.object3D.position.y = recordedPoses[0][tick].position.y;
+        headCube.object3D.position.z = recordedPoses[0][tick].position.z;
+        headCube.object3D.rotation.x = recordedPoses[0][tick].rotation.x;
+        headCube.object3D.rotation.y = recordedPoses[0][tick].rotation.y;
+      
+        leftCube.object3D.position.x = recordedPoses[1][tick].position.x;
+        leftCube.object3D.position.y = recordedPoses[1][tick].position.y;
+        leftCube.object3D.position.z = recordedPoses[1][tick].position.z;
+        leftCube.object3D.rotation.x = recordedPoses[1][tick].rotation.x;
+        leftCube.object3D.rotation.y = recordedPoses[1][tick].rotation.y;
+      
+        rightCube.object3D.position.x = recordedPoses[2][tick].position.x;
+        rightCube.object3D.position.y = recordedPoses[2][tick].position.y;
+        rightCube.object3D.position.z = recordedPoses[2][tick].position.z;
+        rightCube.object3D.rotation.x = recordedPoses[2][tick].rotation.x;
+        rightCube.object3D.rotation.y = recordedPoses[2][tick].rotation.y;
+        tick += 1;
+      } else {
+        replaying = false;
+      }
+    }
   }
 });
