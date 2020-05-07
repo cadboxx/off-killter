@@ -1,12 +1,13 @@
+let gameStarted = false;
+let recording = false;
+let replaying = false;
 let leftTriggerDown = false;
 let rightTriggerDown = false;
 let triggerDown = false;
 let recordButtonSelected = false;
 let replayButtonSelected = false;
 let playbackSelected = false;
-let recording = false;
-let replaying = false;
-let savedRecordings = [];
+let savedRecordings = []; // Recordings saved in memory
 let selectedRecording = 0;
 let recordedPoses = [ [], [], [] ]; // Position & rotation
 let recordedEvents = []; // Button presses
@@ -41,8 +42,106 @@ function buttonEvent(button, event) {
   }
 }
 
+function gameStart() {
+  // clear screen of current shit/create new scene?? (easier to teleport to specific place in world/??)
+  console.log("Starting the game...")
+  gameStarted = true;
+  savedRecordings.forEach(function(element, index) {
+    // console.log(element)
+    // console.log(savedRecordings)
+    // console.log(savedRecordings[index])
+    var sceneEl = document.querySelector('a-scene');
+
+    // // spawn head model instance
+    var newHead = document.createElement('a-entity');
+    newHead.setAttribute('id', 'replayHead' + index)
+    newHead.setAttribute('obj-model', 'obj: #head; mtl: #head-mtl')
+    newHead.setAttribute('scale', '0.1 0.1 0.1')
+    newHead.setAttribute('new-replayer', '')
+    sceneEl.appendChild(newHead);
+
+    // // spawn hand models instance
+    var newLeftHand = document.createElement('a-entity');
+    newLeftHand.setAttribute('id', 'replayLeftHand' + index)
+    newLeftHand.setAttribute('gltf-model', 'url(./assets/rightHand.glb)')
+    newLeftHand.setAttribute('new-replayer', '')
+    sceneEl.appendChild(newLeftHand);
+
+    var newRightHand = document.createElement('a-entity');
+    newRightHand.setAttribute('id', 'replayRightHand' + index)
+    newRightHand.setAttribute('gltf-model', 'url(./assets/leftHand.glb)')
+    newRightHand.setAttribute('new-replayer', '')
+    sceneEl.appendChild(newRightHand);
+  })
+  console.log("Finished spawning bodies")
+}
+
+AFRAME.registerComponent('new-replayer', {
+  init: function () {
+    console.log('called init');
+  },
+
+  tick: function () {
+    console.log('helllo')
+    var el = this.el; // The entity
+    var index = parseInt(el.id[slice(el.id.length - 1)]);
+
+    // for each clone
+    var headCube = document.getElementById(('replayHead' + index));
+    var leftCube = document.getElementById(('replayLeftHand' + index));
+    var rightCube = document.getElementById(('replayRightHand' + index));
+    var currReplay = savedRecordings[index];
+
+    // rotate the clone body
+    if (tick < currReplay[index].length) {
+      rotateObject(headCube, currReplay[0][tick], index)
+      rotateObject(rightCube, currReplay[1][tick], index)
+      rotateObject(leftCube, currReplay[2][tick], index)
+      tick += 1;
+    }
+  }
+});
+
+function replayRecording(recording) {
+  if (tick < currReplay[0].length) {
+    document.getElementById('replayButton').setAttribute('material', 'color:lightgreen')
+    document.getElementById('replayButton').setAttribute('value', 'REPLAYING')
+
+    headCube.object3D.position.x = currReplay[0][tick].position.x;
+    headCube.object3D.position.y = currReplay[0][tick].position.y;
+    headCube.object3D.position.z = currReplay[0][tick].position.z;
+    headCube.object3D.rotation.x = THREE.Math.degToRad(currReplay[0][tick].rotation.x);
+    headCube.object3D.rotation.y = THREE.Math.degToRad(currReplay[0][tick].rotation.y);
+    headCube.object3D.rotation.z = THREE.Math.degToRad(currReplay[0][tick].rotation.z);
+
+    rightCube.object3D.position.x = currReplay[1][tick].position.x;
+    rightCube.object3D.position.y = currReplay[1][tick].position.y;
+    rightCube.object3D.position.z = currReplay[1][tick].position.z;
+    rightCube.object3D.rotation.x = THREE.Math.degToRad(currReplay[1][tick].rotation.x);
+    rightCube.object3D.rotation.y = THREE.Math.degToRad(currReplay[1][tick].rotation.y);
+    rightCube.object3D.rotation.z = THREE.Math.degToRad(currReplay[1][tick].rotation.z);
+
+    leftCube.object3D.position.x = currReplay[2][tick].position.x;
+    leftCube.object3D.position.y = currReplay[2][tick].position.y;
+    leftCube.object3D.position.z = currReplay[2][tick].position.z;
+    leftCube.object3D.rotation.x = THREE.Math.degToRad(currReplay[2][tick].rotation.x);
+    leftCube.object3D.rotation.y = THREE.Math.degToRad(currReplay[2][tick].rotation.y);
+    leftCube.object3D.rotation.z = THREE.Math.degToRad(currReplay[2][tick].rotation.z);
+
+    tick += 1;
+  } else {
+    replaying = false;
+    document.getElementById('replayButton').setAttribute('material', 'color:blue')
+    document.getElementById('replayButton').setAttribute('value', 'REPLAY RECORDING')
+    tick = 0;
+  }
+}
+
 // Draw planes representing each replay once recorded
 function addReplay(poses, index) {
+  if (savedRecordings.length > 0) {
+    selectedRecording += 1;
+  }
   savedRecordings.push(poses)
   var sceneEl = document.querySelector('a-scene');
   var entityEl = document.createElement('a-entity');
@@ -84,7 +183,7 @@ AFRAME.registerComponent('mirror-movement', {
     }
 
     if (recording) {
-      recordButton.setAttribute('material', 'color:green')
+      recordButton.setAttribute('material', 'color:lightgreen')
       recordButton.setAttribute('value', 'RECORDING')
       recordEntity(el, index);
     } else {
@@ -131,6 +230,14 @@ AFRAME.registerComponent('triggered', {
         if (replayButton.getAttribute('visible') == false) {
           buttonEvent(replayButton, 'toggle')
         }
+        if (savedRecordings.length >= 2) {
+          document.getElementById('startText').setAttribute('value', 'START!')
+          document.getElementById('startText').setAttribute('geometry', 'primitive:plane; height:0.5')
+          document.getElementById('startText').setAttribute('material', 'color: lightgreen')
+          gameStart(); // move to when start text clicked
+        } else {
+          document.getElementById('startText').setAttribute('value', 'Record ' + (2 - savedRecordings.length) + ' more animations to start...')
+        }
         addReplay(recordedPoses, savedRecordings.length)
       }
       recording = false;
@@ -139,6 +246,15 @@ AFRAME.registerComponent('triggered', {
     });
   }
 });
+
+function rotateObject(obj, ref, x = 0, y = 0, z = 0) {
+  obj.object3D.position.x = ref.position.x + x;
+  obj.object3D.position.y = ref.position.y + y;
+  obj.object3D.position.z = ref.position.z + z;
+  obj.object3D.rotation.x = THREE.Math.degToRad(ref.rotation.x);
+  obj.object3D.rotation.y = THREE.Math.degToRad(ref.rotation.y);
+  obj.object3D.rotation.z = THREE.Math.degToRad(ref.rotation.z);
+}
 
 AFRAME.registerComponent('replayer', {
   tick: function () {
@@ -151,29 +267,12 @@ AFRAME.registerComponent('replayer', {
       console.log('playing ' + selectedRecording)
       console.log(currReplay)
       if (tick < currReplay[0].length) {
-        document.getElementById('replayButton').setAttribute('material', 'color:green')
+        document.getElementById('replayButton').setAttribute('material', 'color:lightgreen')
         document.getElementById('replayButton').setAttribute('value', 'REPLAYING')
         
-        headCube.object3D.position.x = currReplay[0][tick].position.x;
-        headCube.object3D.position.y = currReplay[0][tick].position.y;
-        headCube.object3D.position.z = currReplay[0][tick].position.z;
-        headCube.object3D.rotation.x = THREE.Math.degToRad(currReplay[0][tick].rotation.x);
-        headCube.object3D.rotation.y = THREE.Math.degToRad(currReplay[0][tick].rotation.y);
-        headCube.object3D.rotation.z = THREE.Math.degToRad(currReplay[0][tick].rotation.z);
-
-        rightCube.object3D.position.x = currReplay[1][tick].position.x;
-        rightCube.object3D.position.y = currReplay[1][tick].position.y;
-        rightCube.object3D.position.z = currReplay[1][tick].position.z;
-        rightCube.object3D.rotation.x = THREE.Math.degToRad(currReplay[1][tick].rotation.x);
-        rightCube.object3D.rotation.y = THREE.Math.degToRad(currReplay[1][tick].rotation.y);
-        rightCube.object3D.rotation.z = THREE.Math.degToRad(currReplay[1][tick].rotation.z);
-      
-        leftCube.object3D.position.x = currReplay[2][tick].position.x;
-        leftCube.object3D.position.y = currReplay[2][tick].position.y;
-        leftCube.object3D.position.z = currReplay[2][tick].position.z;
-        leftCube.object3D.rotation.x = THREE.Math.degToRad(currReplay[2][tick].rotation.x);
-        leftCube.object3D.rotation.y = THREE.Math.degToRad(currReplay[2][tick].rotation.y);
-        leftCube.object3D.rotation.z = THREE.Math.degToRad(currReplay[2][tick].rotation.z);
+        rotateObject(headCube, currReplay[0][tick])
+        rotateObject(rightCube, currReplay[1][tick])
+        rotateObject(leftCube, currReplay[2][tick])
 
         tick += 1;
       } else {
