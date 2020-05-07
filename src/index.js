@@ -3,8 +3,11 @@ let rightTriggerDown = false;
 let triggerDown = false;
 let recordButtonSelected = false;
 let replayButtonSelected = false;
+let playbackSelected = false;
 let recording = false;
 let replaying = false;
+let savedRecordings = [];
+let selectedRecording = 0;
 let recordedPoses = [ [], [], [] ]; // Position & rotation
 let recordedEvents = []; // Button presses
 let tick = 0; // Counter for recording playback
@@ -36,6 +39,23 @@ function buttonEvent(button, event) {
       button.setAttribute('visible', false)
     }
   }
+}
+
+// Draw planes representing each replay once recorded
+function addReplay(poses, index) {
+  savedRecordings.push(poses)
+  var sceneEl = document.querySelector('a-scene');
+  var entityEl = document.createElement('a-entity');
+  var pos = (6 - index)
+  entityEl.setAttribute('id', 'replay' + index)
+  entityEl.setAttribute('geometry', 'primitive:plane; height:0.25; width:0.25;')
+  entityEl.setAttribute('material', 'color:grey; transparent:true; opacity:0.5;')
+  entityEl.setAttribute('position', pos + ' 1 5')
+  entityEl.setAttribute('rotation', '0 -150 0')
+  entityEl.setAttribute('text', 'color:white; align:center; width: 5; value:' + (index + 1))
+  entityEl.setAttribute('class', 'links')
+  entityEl.setAttribute('button-intersect', 'name:replay' + index)
+  sceneEl.appendChild(entityEl);
 }
 
 AFRAME.registerComponent('mirror-movement', {
@@ -107,8 +127,11 @@ AFRAME.registerComponent('triggered', {
 
     el.addEventListener('triggerup', function (evt) {
       //console.log("Trigger up")
-      if (recording && (replayButton.getAttribute('visible') == false)) {
-        buttonEvent(replayButton, 'toggle')
+      if (recording) {
+        if (replayButton.getAttribute('visible') == false) {
+          buttonEvent(replayButton, 'toggle')
+        }
+        addReplay(recordedPoses, savedRecordings.length)
       }
       recording = false;
       triggerDown = false
@@ -122,32 +145,35 @@ AFRAME.registerComponent('replayer', {
     var headCube = document.getElementById("headCube");
     var leftCube = document.getElementById("leftCube");
     var rightCube = document.getElementById("rightCube");
-
+    var currReplay = savedRecordings[selectedRecording]
+    
     if (replaying) {
-      if (tick < recordedPoses[0].length) {
+      console.log('playing ' + selectedRecording)
+      console.log(currReplay)
+      if (tick < currReplay[0].length) {
         document.getElementById('replayButton').setAttribute('material', 'color:green')
         document.getElementById('replayButton').setAttribute('value', 'REPLAYING')
         
-        headCube.object3D.position.x = recordedPoses[0][tick].position.x;
-        headCube.object3D.position.y = recordedPoses[0][tick].position.y;
-        headCube.object3D.position.z = recordedPoses[0][tick].position.z;
-        headCube.object3D.rotation.x = THREE.Math.degToRad(recordedPoses[0][tick].rotation.x);
-        headCube.object3D.rotation.y = THREE.Math.degToRad(recordedPoses[0][tick].rotation.y);
-        headCube.object3D.rotation.z = THREE.Math.degToRad(recordedPoses[0][tick].rotation.z);
+        headCube.object3D.position.x = currReplay[0][tick].position.x;
+        headCube.object3D.position.y = currReplay[0][tick].position.y;
+        headCube.object3D.position.z = currReplay[0][tick].position.z;
+        headCube.object3D.rotation.x = THREE.Math.degToRad(currReplay[0][tick].rotation.x);
+        headCube.object3D.rotation.y = THREE.Math.degToRad(currReplay[0][tick].rotation.y);
+        headCube.object3D.rotation.z = THREE.Math.degToRad(currReplay[0][tick].rotation.z);
 
-        rightCube.object3D.position.x = recordedPoses[1][tick].position.x;
-        rightCube.object3D.position.y = recordedPoses[1][tick].position.y;
-        rightCube.object3D.position.z = recordedPoses[1][tick].position.z;
-        rightCube.object3D.rotation.x = THREE.Math.degToRad(recordedPoses[1][tick].rotation.x);
-        rightCube.object3D.rotation.y = THREE.Math.degToRad(recordedPoses[1][tick].rotation.y);
-        rightCube.object3D.rotation.z = THREE.Math.degToRad(recordedPoses[1][tick].rotation.z);
+        rightCube.object3D.position.x = currReplay[1][tick].position.x;
+        rightCube.object3D.position.y = currReplay[1][tick].position.y;
+        rightCube.object3D.position.z = currReplay[1][tick].position.z;
+        rightCube.object3D.rotation.x = THREE.Math.degToRad(currReplay[1][tick].rotation.x);
+        rightCube.object3D.rotation.y = THREE.Math.degToRad(currReplay[1][tick].rotation.y);
+        rightCube.object3D.rotation.z = THREE.Math.degToRad(currReplay[1][tick].rotation.z);
       
-        leftCube.object3D.position.x = recordedPoses[2][tick].position.x;
-        leftCube.object3D.position.y = recordedPoses[2][tick].position.y;
-        leftCube.object3D.position.z = recordedPoses[2][tick].position.z;
-        leftCube.object3D.rotation.x = THREE.Math.degToRad(recordedPoses[2][tick].rotation.x);
-        leftCube.object3D.rotation.y = THREE.Math.degToRad(recordedPoses[2][tick].rotation.y);
-        leftCube.object3D.rotation.z = THREE.Math.degToRad(recordedPoses[2][tick].rotation.z);
+        leftCube.object3D.position.x = currReplay[2][tick].position.x;
+        leftCube.object3D.position.y = currReplay[2][tick].position.y;
+        leftCube.object3D.position.z = currReplay[2][tick].position.z;
+        leftCube.object3D.rotation.x = THREE.Math.degToRad(currReplay[2][tick].rotation.x);
+        leftCube.object3D.rotation.y = THREE.Math.degToRad(currReplay[2][tick].rotation.y);
+        leftCube.object3D.rotation.z = THREE.Math.degToRad(currReplay[2][tick].rotation.z);
 
         tick += 1;
       } else {
@@ -161,7 +187,11 @@ AFRAME.registerComponent('replayer', {
 });
 
 AFRAME.registerComponent('button-intersect', {
+  schema: {
+    name: {type: 'string', default: ''}
+  },
   init: function () {
+    var buttonName = this.data.name;
     var el = this.el; // The entity
     var recordButton = document.getElementById("recordButton");
     var replayButton = document.getElementById("replayButton");
@@ -173,13 +203,19 @@ AFRAME.registerComponent('button-intersect', {
           buttonEvent(recordButton, 'int')
           recordButtonSelected = true;
         }
-      }
-
-      if (el.object3D == replayButton.object3D) {
+      } else if (el.object3D == replayButton.object3D) {
         if (!recording) {
           buttonEvent(replayButton, 'int')
           replayButtonSelected = true;
         }
+      } else {
+        var button = document.getElementById(buttonName);
+        console.log(button)
+        buttonEvent(button, 'int')
+        playbackSelected = true;
+        console.log('hello mr replay down there')
+        console.log(buttonName.slice(6))
+        selectedRecording = parseInt(buttonName.slice(6), 10);
       }
     });
 
@@ -188,11 +224,13 @@ AFRAME.registerComponent('button-intersect', {
       if (el.object3D == recordButton.object3D) {
         buttonEvent(recordButton, 'noInt')
         recordButtonSelected = false;
-      }
-
-      if (el.object3D == replayButton.object3D) {
+      } else if (el.object3D == replayButton.object3D) {
         buttonEvent(replayButton, 'noInt')
         replayButtonSelected = false;
+      } else {
+        var button = document.getElementById(buttonName);
+        buttonEvent(button, 'noInt')
+        playbackSelected = false;
       }
     });
   }
