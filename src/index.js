@@ -78,25 +78,39 @@ function gameStart() {
     var randomColor = '#'+Math.floor(Math.random()*16777215).toString(16);
 
     // spawn head model instance
-    var newHead = document.createElement('a-entity');
+    var newHead = document.createElement('a-entity')
     newHead.setAttribute('id', 'replayHead' + index)
-    newHead.setAttribute('obj-model', 'obj: #head;')
-    newHead.setAttribute('material', 'color: ' + randomColor);
-    newHead.setAttribute('scale', '0.1 0.1 0.1')
     sceneEl.appendChild(newHead);
+    var newHeadModel = document.createElement('a-entity')
+    newHeadModel.setAttribute('obj-model', 'obj: #head;')
+    newHeadModel.setAttribute('material', 'color: ' + randomColor)
+    newHeadModel.setAttribute('scale', '0.1 0.1 0.1')
+    newHeadModel.setAttribute('rotation', '0 180 0')
+    newHead.appendChild(newHeadModel);
 
     // spawn hand model instances
-    var newLeftHand = document.createElement('a-entity');
+    var newLeftHand = document.createElement('a-entity')
     newLeftHand.setAttribute('id', 'replayLeftHand' + index)
-    newLeftHand.setAttribute('gltf-model', 'url(./assets/rightHand.glb)')
-    sceneEl.appendChild(newLeftHand);
+    sceneEl.appendChild(newLeftHand)
+    var newLeftHandModel = document.createElement('a-entity')
+    newLeftHandModel.setAttribute('gltf-model', 'url(./assets/leftHand.glb)')
+    newLeftHandModel.setAttribute('rotation', '0 0 90')
+    newLeftHand.appendChild(newLeftHandModel);
 
-    var newRightHand = document.createElement('a-entity');
+    var newRightHand = document.createElement('a-entity')
     newRightHand.setAttribute('id', 'replayRightHand' + index)
-    newRightHand.setAttribute('gltf-model', 'url(./assets/leftHand.glb)')
-    sceneEl.appendChild(newRightHand);
+    sceneEl.appendChild(newRightHand)
+    var newRightHandModel = document.createElement('a-entity')
+    newRightHandModel.setAttribute('gltf-model', 'url(./assets/rightHand.glb)')
+    newRightHandModel.setAttribute('rotation', '0 0 -90')
+    newRightHand.appendChild(newRightHandModel);
   })
-  console.log("Finished spawning bodies")
+  console.log("Finished spawning ghosts")
+
+  // Move player in front of ghosteses
+  // Need to setup delay and starting sequence.
+  document.getElementById('rig').setAttribute('position', '0 0 15')
+  document.getElementById('rig').setAttribute('rotation', '0 180 0')
 
   // We'll add the new-replayer to the camera so it can handle looping of all replays in a single entity tick
   document.getElementById('camera').setAttribute('new-replayer', '')
@@ -135,11 +149,17 @@ AFRAME.registerComponent('new-replayer', {
       randSecond = 1;
     }
 
+    var buffer = 2;
+    if (savedRecordings.length > 3) {
+      buffer += 1;
+    }
+
     savedRecordings.forEach(function(element, index) {
       var headCube = document.getElementById(('replayHead' + index));
       var leftCube = document.getElementById(('replayLeftHand' + index));
       var rightCube = document.getElementById(('replayRightHand' + index));
       var currReplay = savedRecordings[index];
+
 
       // rotate the clone body
       if (tick < currReplay[0].length) {
@@ -151,18 +171,18 @@ AFRAME.registerComponent('new-replayer', {
           }
           if (Date.now() >= randSecondBottom && Date.now() <= randSecondTop) {
             // Mutate object if all conditions met
-            rotateObject(headCube, currReplay[0][tick], index * 2, 3)
-            rotateObject(leftCube, currReplay[1][tick], index * 2, 3)
-            rotateObject(rightCube, currReplay[2][tick], index * 2, 3)
+            rotateObject(headCube, currReplay[0][tick], index * 2 - buffer, 3)
+            rotateObject(leftCube, currReplay[1][tick], index * 2 - buffer, 3)
+            rotateObject(rightCube, currReplay[2][tick], index * 2 - buffer, 3)
           } else {
-            rotateObject(headCube, currReplay[0][tick], index * 2)
-            rotateObject(leftCube, currReplay[1][tick], index * 2)
-            rotateObject(rightCube, currReplay[2][tick], index * 2)
+            rotateObject(headCube, currReplay[0][tick], index * 2 - buffer)
+            rotateObject(leftCube, currReplay[1][tick], index * 2 - buffer)
+            rotateObject(rightCube, currReplay[2][tick], index * 2 - buffer)
           }
         } else {
-          rotateObject(headCube, currReplay[0][tick], index * 2)
-          rotateObject(leftCube, currReplay[1][tick], index * 2)
-          rotateObject(rightCube, currReplay[2][tick], index * 2)
+          rotateObject(headCube, currReplay[0][tick], index * 2 - buffer)
+          rotateObject(leftCube, currReplay[1][tick], index * 2 - buffer)
+          rotateObject(rightCube, currReplay[2][tick], index * 2 - buffer)
         }
       }
     })
@@ -183,6 +203,7 @@ AFRAME.registerComponent('mirror-movement', {
     var replayButton = document.getElementById('replayButton');
     var recordButton = document.getElementById('recordButton');
     var startButton = document.getElementById('startText')
+    var mirrorBody = document.getElementById('mirrorBody');
 
     if (el.object3D == camera.object3D) {
       var cube = headCube;
@@ -247,7 +268,6 @@ AFRAME.registerComponent('mirror-movement', {
 AFRAME.registerComponent('triggered', {
   init: function () {
     var el = this.el; // The entity
-    var replayButton = document.getElementById('replayButton');
 
     // Ensure support for all controllers
     el.addEventListener('triggerdown', function (evt) {
@@ -256,6 +276,8 @@ AFRAME.registerComponent('triggered', {
 
       if (replayButtonSelected) {
         replaying = true;
+        document.getElementById('rig').setAttribute('position', '0 0 15')
+        document.getElementById('rig').setAttribute('rotation', '0 180 0')
       } else if (recordButtonSelected) {
         if (!replaying) {
           recording = true;
@@ -298,6 +320,8 @@ AFRAME.registerComponent('replayer', {
         replaying = false;
         document.getElementById('replayButton').setAttribute('material', 'color:blue')
         document.getElementById('replayButton').setAttribute('value', 'REPLAY RECORDING')
+        document.getElementById('rig').setAttribute('position', '0 0 0')
+        document.getElementById('rig').setAttribute('rotation', '0 0 0')
         tick = 0;
       }
     }
