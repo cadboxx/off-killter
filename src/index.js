@@ -16,7 +16,13 @@ let recordedEvents = []; // Button presses
 let tick = 0; // Counter for recording playback
 let currRecordingTime = 0;
 let endRecordingTime = 0;
-let maxRecordingTime = 5; // recording time in seconds for replays
+let maxRecordingTime = 3; // recording time in seconds for replays
+
+let randRecord;
+let randSecond;
+var startTime;
+var randSecondBottom = 0;
+var randSecondTop = 0;
 
 // Records pose of object on tick
 function recordEntity(el, index) {
@@ -120,6 +126,15 @@ function addReplay(poses, index) {
 // Multiple ghost replayer
 AFRAME.registerComponent('new-replayer', {
   tick: function () {
+    if (randRecord == undefined) {
+      randRecord = Math.floor(Math.random() * Math.floor(savedRecordings.length)); // Picks random replay to modify
+    }
+    if (randSecond == undefined) {
+      // Should update this to random float between 0.00 and N.00
+      // randSecond = maxRecordingTime.length;
+      randSecond = 1;
+    }
+
     savedRecordings.forEach(function(element, index) {
       var headCube = document.getElementById(('replayHead' + index));
       var leftCube = document.getElementById(('replayLeftHand' + index));
@@ -128,12 +143,29 @@ AFRAME.registerComponent('new-replayer', {
 
       // rotate the clone body
       if (tick < currReplay[0].length) {
-        rotateObject(headCube, currReplay[0][tick], index * 2)
-        rotateObject(leftCube, currReplay[1][tick], index * 2)
-        rotateObject(rightCube, currReplay[2][tick], index * 2)
+        if (savedRecordings.indexOf(currReplay) == randRecord) {
+          if (startTime == undefined) {
+            startTime = Date.now()
+            randSecondBottom = startTime + (randSecond * 1000);
+            randSecondTop = randSecondBottom + (randSecond * 1000);
+          }
+          if (Date.now() >= randSecondBottom && Date.now() <= randSecondTop) {
+            // Mutate object if all conditions met
+            rotateObject(headCube, currReplay[0][tick], index * 2, 3)
+            rotateObject(leftCube, currReplay[1][tick], index * 2, 3)
+            rotateObject(rightCube, currReplay[2][tick], index * 2, 3)
+          } else {
+            rotateObject(headCube, currReplay[0][tick], index * 2)
+            rotateObject(leftCube, currReplay[1][tick], index * 2)
+            rotateObject(rightCube, currReplay[2][tick], index * 2)
+          }
+        } else {
+          rotateObject(headCube, currReplay[0][tick], index * 2)
+          rotateObject(leftCube, currReplay[1][tick], index * 2)
+          rotateObject(rightCube, currReplay[2][tick], index * 2)
+        }
       }
     })
-
     tick += 1;
   }
 });
@@ -184,7 +216,6 @@ AFRAME.registerComponent('mirror-movement', {
 
         addReplay(recordedPoses, savedRecordings.length)
         recording = false;
-        currRecordingTime = 0;
       } else {
         recordButton.setAttribute('material', 'color:lightgreen')
         recordButton.setAttribute('value', 'RECORDING')
@@ -227,6 +258,7 @@ AFRAME.registerComponent('triggered', {
           recording = true;
           recordedPoses = [ [], [], [] ];
           tick = 0;
+          currRecordingTime = 0;
         }
       } else if (startButtonSelected) {
         if (savedRecordings.length >= numReqReplays) {
