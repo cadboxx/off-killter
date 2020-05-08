@@ -8,8 +8,11 @@ let recordButtonSelected = false;
 let replayButtonSelected = false;
 let startButtonSelected = false;
 let playbackSelected = false;
+let ghostSelected = false;
+let ghostName = undefined; // Ghost that was shot
+let mutatedGhostName = undefined; // Mutated ghost
 let savedRecordings = []; // Recordings saved in memory
-let numReqReplays = 3; // Recordings required to start game
+let numReqReplays = 2; // Recordings required to start game...it's 1 off somehow?
 let selectedRecording = 0; // Recording selected for playback
 let recordedPoses = [ [], [], [] ]; // Position & rotation
 let recordedEvents = []; // Button presses
@@ -86,6 +89,8 @@ function gameStart() {
     newHeadModel.setAttribute('material', 'color: ' + randomColor)
     newHeadModel.setAttribute('scale', '0.1 0.1 0.1')
     newHeadModel.setAttribute('rotation', '0 180 0')
+    newHeadModel.setAttribute('button-intersect', 'name: replayHead' + index)
+    newHeadModel.setAttribute('class', 'links')
     newHead.appendChild(newHeadModel);
 
     // spawn hand model instances
@@ -109,7 +114,7 @@ function gameStart() {
 
   // Move player in front of ghosteses
   // Need to setup delay and starting sequence.
-  document.getElementById('rig').setAttribute('position', '0 0 15')
+  document.getElementById('rig').setAttribute('position', '0 0 10')
   document.getElementById('rig').setAttribute('rotation', '0 180 0')
 
   // We'll add the new-replayer to the camera so it can handle looping of all replays in a single entity tick
@@ -138,10 +143,16 @@ function addReplay(poses, index) {
 }
 
 // Multiple ghost replayer
+// Handles mutations
 AFRAME.registerComponent('new-replayer', {
   tick: function () {
     if (randRecord == undefined) {
       randRecord = Math.floor(Math.random() * Math.floor(savedRecordings.length)); // Picks random replay to modify
+      mutatedGhostName = 'replayHead' + randRecord
+      // document.getElementById('replayHead' + randRecord).setAttribute('mutated', true)
+      // var headRecord = document.getElementById('replayHead' + randRecord)
+      console.log(mutatedGhostName + ' is the guy who is mutated')
+      // headRecord.setAttribute('button-intersect', 'name: replayHead' + randRecord + '; mutated: true')
     }
     if (randSecond == undefined) {
       // Should update this to random float between 0.00 and N.00
@@ -160,7 +171,6 @@ AFRAME.registerComponent('new-replayer', {
       var rightCube = document.getElementById(('replayRightHand' + index));
       var currReplay = savedRecordings[index];
 
-
       // rotate the clone body
       if (tick < currReplay[0].length) {
         if (savedRecordings.indexOf(currReplay) == randRecord) {
@@ -171,9 +181,9 @@ AFRAME.registerComponent('new-replayer', {
           }
           if (Date.now() >= randSecondBottom && Date.now() <= randSecondTop) {
             // Mutate object if all conditions met
-            rotateObject(headCube, currReplay[0][tick], index * 2 - buffer, 3)
-            rotateObject(leftCube, currReplay[1][tick], index * 2 - buffer, 3)
-            rotateObject(rightCube, currReplay[2][tick], index * 2 - buffer, 3)
+            rotateObject(headCube, currReplay[0][tick], index * 2 - buffer, 0.03)
+            rotateObject(leftCube, currReplay[1][tick], index * 2 - buffer, 0.08)
+            rotateObject(rightCube, currReplay[2][tick], index * 2 - buffer, 0.08)
           } else {
             rotateObject(headCube, currReplay[0][tick], index * 2 - buffer)
             rotateObject(leftCube, currReplay[1][tick], index * 2 - buffer)
@@ -228,12 +238,12 @@ AFRAME.registerComponent('mirror-movement', {
           buttonEvent(replayButton, 'toggle')
         }
 
-        if (savedRecordings.length >= 2) {
+        if (savedRecordings.length >= numReqReplays) {
           startButton.setAttribute('value', 'START!')
           startButton.setAttribute('geometry', 'primitive:plane; height:0.5')
           startButton.setAttribute('material', 'color: lightgreen')
         } else {
-          startButton.setAttribute('value', 'Record ' + (2 - savedRecordings.length) + ' more animations to start...')
+          startButton.setAttribute('value', 'Record ' + (numReqReplays - savedRecordings.length) + ' more animations to start...')
         }
 
         addReplay(recordedPoses, savedRecordings.length)
@@ -268,6 +278,7 @@ AFRAME.registerComponent('mirror-movement', {
 AFRAME.registerComponent('triggered', {
   init: function () {
     var el = this.el; // The entity
+    var startButton = document.getElementById('startText')
 
     // Ensure support for all controllers
     el.addEventListener('triggerdown', function (evt) {
@@ -276,7 +287,7 @@ AFRAME.registerComponent('triggered', {
 
       if (replayButtonSelected) {
         replaying = true;
-        document.getElementById('rig').setAttribute('position', '0 0 15')
+        document.getElementById('rig').setAttribute('position', '0 0 10')
         document.getElementById('rig').setAttribute('rotation', '0 180 0')
       } else if (recordButtonSelected) {
         if (!replaying) {
@@ -288,6 +299,19 @@ AFRAME.registerComponent('triggered', {
       } else if (startButtonSelected) {
         if (savedRecordings.length >= numReqReplays) {
           gameStart();
+        }
+      } else if (ghostName) {
+        if (ghostName == mutatedGhostName) {
+          console.log("you win!!!!!!!!!!!! you shot " + ghostName)
+          startButton.setAttribute('value', 'YOU WIN! You shot ' + ghostName)
+          startButton.setAttribute('material', 'color: lightgreen')
+          startButton.setAttribute('rotation', '0 0 0')
+          startButton.setAttribute('position', '0 2 6')
+        } else {
+          console.log('you shot an innocent man! he was named ' + ghostName)
+          startButton.setAttribute('value', 'YOU SHOT AN INNOCENT GHOST! His name was ' + ghostName)
+          startButton.setAttribute('material', 'color: red')
+          startButton.setAttribute('rotation', '0 2 6')
         }
       }
     });
@@ -331,7 +355,8 @@ AFRAME.registerComponent('replayer', {
 // Floating button interaction
 AFRAME.registerComponent('button-intersect', {
   schema: {
-    name: {type: 'string', default: ''}
+    name: {type: 'string', default: ''},
+    mutated: {type: 'boolean', default: false}
   },
   init: function () {
     var buttonName = this.data.name;
@@ -358,11 +383,17 @@ AFRAME.registerComponent('button-intersect', {
           startButtonSelected = true;
         }
       } else {
-        console.log('didnt match named button')
-        var button = document.getElementById(buttonName);
-        buttonEvent(button, 'int')
-        playbackSelected = true;
-        selectedRecording = parseInt(buttonName.slice(6), 10);
+        if (buttonName.slice(0, 10) == 'replayHead') {
+          console.log('selected head')
+          ghostSelected = true;
+          ghostName = buttonName;
+        } else {
+          console.log('didnt match named button')
+          var button = document.getElementById(buttonName);
+          buttonEvent(button, 'int')
+          playbackSelected = true;
+          selectedRecording = parseInt(buttonName.slice(6), 10);
+        }
       }
     });
 
@@ -376,12 +407,18 @@ AFRAME.registerComponent('button-intersect', {
         replayButtonSelected = false;
       } else if (el.object3D == startButton.object3D) {
         buttonEvent(startButton, 'noInt')
-        startButtonSelected = true;
+        startButtonSelected = false;
       } else {
-        console.log('didnt match named button')
-        var button = document.getElementById(buttonName);
-        buttonEvent(button, 'noInt')
-        playbackSelected = false;
+        if (buttonName.slice(0, 10) == 'replayHead') {
+          console.log('left head')
+          ghostSelected = false;
+          ghostName = undefined;
+        } else {
+          console.log('didnt match named button')
+          var button = document.getElementById(buttonName);
+          buttonEvent(button, 'noInt')
+          playbackSelected = false;
+        }
       }
     });
   }

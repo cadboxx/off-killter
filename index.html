@@ -21,6 +21,12 @@
 
       <a-entity id="rig">
         <a-entity id="camera" camera look-controls wasd-controls rotation="0 0 0" mirror-movement replayer></a-entity>
+        <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: lowPoly;" mirror-movement></a-entity>
+        <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement triggered></a-entity>
+
+        <!-- NOTE: For something to be intersected, needs to have class="links"!
+        <a-entity laser-controls="hand: left; model: false;" raycaster="objects: .links; far: 10" line="color: blue; opacity: 0.25"></a-entity> -->
+        <a-entity laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 10" line="color: blue; opacity: 0.25"></a-entity>
       </a-entity>
 
       <a-entity id="mirrorBody">
@@ -36,13 +42,6 @@
           <a-entity obj-model="obj: #head; mtl: #head-mtl" scale="0.1 0.1 0.1" rotation="0 180 0"></a-entity>
         </a-entity>
       </a-entity>
-
-
-      <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: lowPoly;" mirror-movement></a-entity>
-      <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement triggered></a-entity>
-
-      <!-- <a-entity laser-controls="hand: left; model: false;" raycaster="objects: .links; far: 10" line="color: blue; opacity: 0.25"></a-entity> -->
-      <a-entity laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 10" line="color: blue; opacity: 0.25"></a-entity>
 
       <a-text id="recordButton" class="links" value="START RECORDING" geometry="primitive:circle" position="-3 2 5" rotation="0 150 0" material="color: red" scale="0.7 0.7 0.7" button-intersect></a-text>
       <a-text id="replayButton" class="links" value="REPLAY RECORDING" geometry="primitive:plane" position="3 2 5" rotation="0 -150 0" material="color: grey" scale="0.7 0.7 0.7" align="right" visible="false" button-intersect></a-text>
