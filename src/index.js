@@ -182,6 +182,7 @@ AFRAME.registerComponent('mirror-movement', {
     var rightHand = document.getElementById("rightHand");
     var replayButton = document.getElementById('replayButton');
     var recordButton = document.getElementById('recordButton');
+    var startButton = document.getElementById('startText')
 
     if (el.object3D == camera.object3D) {
       var cube = headCube;
@@ -207,11 +208,11 @@ AFRAME.registerComponent('mirror-movement', {
         }
 
         if (savedRecordings.length >= 2) {
-          document.getElementById('startText').setAttribute('value', 'START!')
-          document.getElementById('startText').setAttribute('geometry', 'primitive:plane; height:0.5')
-          document.getElementById('startText').setAttribute('material', 'color: lightgreen')
+          startButton.setAttribute('value', 'START!')
+          startButton.setAttribute('geometry', 'primitive:plane; height:0.5')
+          startButton.setAttribute('material', 'color: lightgreen')
         } else {
-          document.getElementById('startText').setAttribute('value', 'Record ' + (2 - savedRecordings.length) + ' more animations to start...')
+          startButton.setAttribute('value', 'Record ' + (2 - savedRecordings.length) + ' more animations to start...')
         }
 
         addReplay(recordedPoses, savedRecordings.length)
@@ -219,6 +220,8 @@ AFRAME.registerComponent('mirror-movement', {
       } else {
         recordButton.setAttribute('material', 'color:lightgreen')
         recordButton.setAttribute('value', 'RECORDING')
+        let timeFormat = endRecordingTime - currRecordingTime
+        startButton.setAttribute('value', timeFormat.toString() + 'ms left')
         recordEntity(el, index);
         currRecordingTime = Date.now()
       }
