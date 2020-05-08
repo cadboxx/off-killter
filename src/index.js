@@ -14,6 +14,9 @@ let selectedRecording = 0;
 let recordedPoses = [ [], [], [] ]; // Position & rotation
 let recordedEvents = []; // Button presses
 let tick = 0; // Counter for recording playback
+let currRecordingTime = 0;
+let endRecordingTime = 0;
+let maxRecordingTime = 5; // recording time in seconds for replays
 
 function recordEntity(el, index) {
   var newPoint = {
@@ -157,9 +160,33 @@ AFRAME.registerComponent('mirror-movement', {
     }
 
     if (recording) {
-      recordButton.setAttribute('material', 'color:lightgreen')
-      recordButton.setAttribute('value', 'RECORDING')
-      recordEntity(el, index);
+      if (currRecordingTime == 0) {
+        currRecordingTime = Date.now(); // get current time
+        let seconds = maxRecordingTime * 1000; // convert to milliseconds
+        endRecordingTime = currRecordingTime + seconds; // set time to end recording
+      } else if (currRecordingTime >= endRecordingTime) {
+        if (replayButton.getAttribute('visible') == false) {
+          buttonEvent(replayButton, 'toggle')
+        }
+
+        if (savedRecordings.length >= 2) {
+          document.getElementById('startText').setAttribute('value', 'START!')
+          document.getElementById('startText').setAttribute('geometry', 'primitive:plane; height:0.5')
+          document.getElementById('startText').setAttribute('material', 'color: lightgreen')
+        } else {
+          document.getElementById('startText').setAttribute('value', 'Record ' + (2 - savedRecordings.length) + ' more animations to start...')
+        }
+
+        addReplay(recordedPoses, savedRecordings.length)
+        recording = false;
+        currRecordingTime = 0;
+      } else {
+        recordButton.setAttribute('material', 'color:lightgreen')
+        recordButton.setAttribute('value', 'RECORDING')
+        recordEntity(el, index);
+        currRecordingTime = Date.now()
+      }
+
     } else {
       recordButton.setAttribute('material', 'color:red')
       recordButton.setAttribute('value', 'START RECORDING')
@@ -203,23 +230,7 @@ AFRAME.registerComponent('triggered', {
     });
 
     el.addEventListener('triggerup', function (evt) {
-      //console.log("Trigger up")
-      if (recording) {
-        if (replayButton.getAttribute('visible') == false) {
-          buttonEvent(replayButton, 'toggle')
-        }
-        if (savedRecordings.length >= 2) {
-          document.getElementById('startText').setAttribute('value', 'START!')
-          document.getElementById('startText').setAttribute('geometry', 'primitive:plane; height:0.5')
-          document.getElementById('startText').setAttribute('material', 'color: lightgreen')
-        } else {
-          document.getElementById('startText').setAttribute('value', 'Record ' + (2 - savedRecordings.length) + ' more animations to start...')
-        }
-        addReplay(recordedPoses, savedRecordings.length)
-      }
-      recording = false;
       triggerDown = false
-      //console.log(recordedPoses)
     });
   }
 });
@@ -232,8 +243,6 @@ AFRAME.registerComponent('replayer', {
     var currReplay = savedRecordings[selectedRecording]
     
     if (replaying) {
-      //console.log('playing ' + selectedRecording)
-      //console.log(currReplay)
       if (tick < currReplay[0].length) {
         document.getElementById('replayButton').setAttribute('material', 'color:lightgreen')
         document.getElementById('replayButton').setAttribute('value', 'REPLAYING')
