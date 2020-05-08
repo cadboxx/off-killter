@@ -9,8 +9,8 @@ let replayButtonSelected = false;
 let startButtonSelected = false;
 let playbackSelected = false;
 let savedRecordings = []; // Recordings saved in memory
-let numReqReplays = 3;
-let selectedRecording = 0;
+let numReqReplays = 3; // Recordings required to start game
+let selectedRecording = 0; // Recording selected for playback
 let recordedPoses = [ [], [], [] ]; // Position & rotation
 let recordedEvents = []; // Button presses
 let tick = 0; // Counter for recording playback
@@ -18,27 +18,26 @@ let currRecordingTime = 0;
 let endRecordingTime = 0;
 let maxRecordingTime = 5; // recording time in seconds for replays
 
+// Records pose of object on tick
 function recordEntity(el, index) {
   var newPoint = {
     position: AFRAME.utils.clone(el.getAttribute('position')),
     rotation: AFRAME.utils.clone(el.getAttribute('rotation')),
-    timestamp: Date.now()
+    timestamp: Date.now() // Record timestamp of tick for grouping
   }
-  newPoint.position.z += 5;
+  newPoint.position.z += 5; // Add offset so that recording is in front of player
   recordedPoses[index].push(newPoint);
 }
 
+// Floating button helper
 function buttonEvent(button, event) {
   if (event == 'int') {
-    // change text color to yellow
-    button.setAttribute('color', 'yellow')
+    button.setAttribute('color', 'yellow') // text color
   }
   if (event == 'noInt') {
-    // change text color to white
-    button.setAttribute('color', 'white')
+    button.setAttribute('color', 'white') // text color
   }
   if (event == 'toggle') {
-    // toggle visiblity
     if (button.getAttribute('visible') == false) {
       button.setAttribute('visible', true)
     } else {
@@ -47,6 +46,7 @@ function buttonEvent(button, event) {
   }
 }
 
+// Translate object to anther object's position with optional offsets
 function rotateObject(obj, ref, x = 0, y = 0, z = 0) {
   obj.object3D.position.x = ref.position.x + x;
   obj.object3D.position.y = ref.position.y + y;
@@ -61,22 +61,25 @@ function gameStart() {
   console.log("Starting the game...")
   gameStarted = true;
 
-  // hide mirror replay 
+  // hide mirror replay
   document.getElementById('leftCube').setAttribute('visible', false)
   document.getElementById('rightCube').setAttribute('visible', false)
   document.getElementById('headCube').setAttribute('visible', false)
 
   savedRecordings.forEach(function(element, index) {
     var sceneEl = document.querySelector('a-scene');
+    // New random color
+    var randomColor = '#'+Math.floor(Math.random()*16777215).toString(16);
 
-    // // spawn head model instance
+    // spawn head model instance
     var newHead = document.createElement('a-entity');
     newHead.setAttribute('id', 'replayHead' + index)
-    newHead.setAttribute('obj-model', 'obj: #head; mtl: #head-mtl')
+    newHead.setAttribute('obj-model', 'obj: #head;')
+    newHead.setAttribute('material', 'color: ' + randomColor);
     newHead.setAttribute('scale', '0.1 0.1 0.1')
     sceneEl.appendChild(newHead);
 
-    // // spawn hand models instance
+    // spawn hand model instances
     var newLeftHand = document.createElement('a-entity');
     newLeftHand.setAttribute('id', 'replayLeftHand' + index)
     newLeftHand.setAttribute('gltf-model', 'url(./assets/rightHand.glb)')
@@ -93,33 +96,13 @@ function gameStart() {
   document.getElementById('camera').setAttribute('new-replayer', '')
 }
 
-AFRAME.registerComponent('new-replayer', {
-  tick: function () {    
-    savedRecordings.forEach(function(element, index) {
-      var headCube = document.getElementById(('replayHead' + index));
-      var leftCube = document.getElementById(('replayLeftHand' + index));
-      var rightCube = document.getElementById(('replayRightHand' + index));
-      var currReplay = savedRecordings[index];
-
-      // rotate the clone body
-      if (tick < currReplay[0].length) {
-        rotateObject(headCube, currReplay[0][tick], index)
-        rotateObject(leftCube, currReplay[1][tick], index)
-        rotateObject(rightCube, currReplay[2][tick], index)
-        // console.log(tick)
-      }
-    })
-
-    tick += 1;
-  }
-});
-
+// Saves given replay to memory and displays it for playback
 function addReplay(poses, index) {
   if (savedRecordings.length > 0) {
     selectedRecording += 1;
   }
   savedRecordings.push(poses)
-  // Draw planes representing each replay once recorded
+  // Draw planes representing new replay once saved
   var sceneEl = document.querySelector('a-scene');
   var entityEl = document.createElement('a-entity');
   var pos = (6 - index)
@@ -134,6 +117,28 @@ function addReplay(poses, index) {
   sceneEl.appendChild(entityEl);
 }
 
+// Multiple ghost replayer
+AFRAME.registerComponent('new-replayer', {
+  tick: function () {
+    savedRecordings.forEach(function(element, index) {
+      var headCube = document.getElementById(('replayHead' + index));
+      var leftCube = document.getElementById(('replayLeftHand' + index));
+      var rightCube = document.getElementById(('replayRightHand' + index));
+      var currReplay = savedRecordings[index];
+
+      // rotate the clone body
+      if (tick < currReplay[0].length) {
+        rotateObject(headCube, currReplay[0][tick], index * 2)
+        rotateObject(leftCube, currReplay[1][tick], index * 2)
+        rotateObject(rightCube, currReplay[2][tick], index * 2)
+      }
+    })
+
+    tick += 1;
+  }
+});
+
+// Mirror user movement while idle
 AFRAME.registerComponent('mirror-movement', {
   tick: function () {
     var el = this.el; // `this.el` is the element.
@@ -204,6 +209,7 @@ AFRAME.registerComponent('mirror-movement', {
   }
 });
 
+// Handle controller trigger down
 AFRAME.registerComponent('triggered', {
   init: function () {
     var el = this.el; // The entity
@@ -235,6 +241,7 @@ AFRAME.registerComponent('triggered', {
   }
 });
 
+// Single playback replayer
 AFRAME.registerComponent('replayer', {
   tick: function () {
     var headCube = document.getElementById("headCube");
@@ -262,6 +269,7 @@ AFRAME.registerComponent('replayer', {
   }
 });
 
+// Floating button interaction
 AFRAME.registerComponent('button-intersect', {
   schema: {
     name: {type: 'string', default: ''}
