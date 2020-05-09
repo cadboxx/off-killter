@@ -34,7 +34,6 @@ function recordEntity(el, index) {
     rotation: AFRAME.utils.clone(el.getAttribute('rotation')),
     timestamp: Date.now() // Record timestamp of tick for grouping
   }
-  newPoint.position.z += 5; // Add offset so that recording is in front of player
   recordedPoses[index].push(newPoint);
 }
 
@@ -47,26 +46,25 @@ function buttonEvent(button, event) {
     button.setAttribute('color', 'white') // text color
   }
   if (event == 'toggle') {
-    if (button.getAttribute('visible') == false) {
-      button.setAttribute('visible', true)
-    } else {
+    if (button.getAttribute('visible')) {
       button.setAttribute('visible', false)
+    } else {
+      button.setAttribute('visible', true)
     }
   }
 }
 
 // Translate object to anther object's position with optional offsets
-function rotateObject(obj, ref, x = 0, y = 0, z = 0) {
-  obj.object3D.position.x = ref.position.x + x;
-  obj.object3D.position.y = ref.position.y + y;
-  obj.object3D.position.z = ref.position.z + z;
-  obj.object3D.rotation.x = THREE.Math.degToRad(ref.rotation.x);
-  obj.object3D.rotation.y = THREE.Math.degToRad(ref.rotation.y);
-  obj.object3D.rotation.z = THREE.Math.degToRad(ref.rotation.z);
+function rotateObject(obj, ref, px = 0, py = 0, pz = 0, rx = 0, ry = 0, rz = 0) {
+  obj.object3D.position.x = ref.position.x + px;
+  obj.object3D.position.y = ref.position.y + py;
+  obj.object3D.position.z = ref.position.z + pz;
+  obj.object3D.rotation.x = THREE.Math.degToRad(ref.rotation.x + rx);
+  obj.object3D.rotation.y = THREE.Math.degToRad(ref.rotation.y + ry);
+  obj.object3D.rotation.z = THREE.Math.degToRad(ref.rotation.z + rz);
 }
 
 function gameStart() {
-  // clear screen of current shit/create new scene?? (easier to teleport to specific place in world/??)
   console.log("Starting the game...")
   gameStarted = true;
 
@@ -113,8 +111,7 @@ function gameStart() {
   console.log("Finished spawning ghosts")
 
   // Move player in front of ghosteses
-  // Need to setup delay and starting sequence.
-  document.getElementById('rig').setAttribute('position', '0 0 10')
+  document.getElementById('rig').setAttribute('position', '-1 0 10')
   document.getElementById('rig').setAttribute('rotation', '0 180 0')
 
   // We'll add the new-replayer to the camera so it can handle looping of all replays in a single entity tick
@@ -149,14 +146,10 @@ AFRAME.registerComponent('new-replayer', {
     if (randRecord == undefined) {
       randRecord = Math.floor(Math.random() * Math.floor(savedRecordings.length)); // Picks random replay to modify
       mutatedGhostName = 'replayHead' + randRecord
-      // document.getElementById('replayHead' + randRecord).setAttribute('mutated', true)
-      // var headRecord = document.getElementById('replayHead' + randRecord)
-      console.log(mutatedGhostName + ' is the guy who is mutated')
-      // headRecord.setAttribute('button-intersect', 'name: replayHead' + randRecord + '; mutated: true')
+      console.log(mutatedGhostName + ' is the mutated ghost')
     }
     if (randSecond == undefined) {
-      // Should update this to random float between 0.00 and N.00
-      // randSecond = maxRecordingTime.length;
+      // TODO: update this to random float between 0.00 and maxRecordingTime
       randSecond = 1;
     }
 
@@ -244,6 +237,12 @@ AFRAME.registerComponent('mirror-movement', {
           startButton.setAttribute('value', 'START!')
           startButton.setAttribute('geometry', 'primitive:plane; height:0.5')
           startButton.setAttribute('material', 'color: lightgreen')
+
+          recordButton.setAttribute('visible', false)
+          recordButton.setAttribute('class', '') // Make unclickable
+
+          // TODO: Move replay buttons.
+          // replayButton.setAttribute('position', '0 2 5')
         } else {
           startButton.setAttribute('value', 'Record ' + (numReqReplays - savedRecordings.length) + ' more animations to start...')
         }
@@ -260,10 +259,15 @@ AFRAME.registerComponent('mirror-movement', {
 
     } else {
       recordButton.setAttribute('material', 'color:red')
-      recordButton.setAttribute('value', 'START RECORDING')
+      if (savedRecordings.length < numReqReplays) {
+        recordButton.setAttribute('value', 'START RECORDING')
+      }
     }
 
     if (!replaying) {
+      // Need to add a loaded/gameStart function to use this
+      // rotateObject(cube, el, 0, 0, 5)
+
       // mirror current player actions
       cube.object3D.position.x = el.object3D.position.x;
       cube.object3D.position.y = el.object3D.position.y;
@@ -288,7 +292,7 @@ AFRAME.registerComponent('triggered', {
 
       if (replayButtonSelected) {
         replaying = true;
-        document.getElementById('rig').setAttribute('position', '0 0 10')
+        document.getElementById('rig').setAttribute('position', '0 0 5')
         document.getElementById('rig').setAttribute('rotation', '0 180 0')
       } else if (recordButtonSelected) {
         if (!replaying) {
@@ -302,17 +306,17 @@ AFRAME.registerComponent('triggered', {
           gameStart();
         }
       } else if (ghostName) {
+        console.log("you shot " + ghostName)
         if (ghostName == mutatedGhostName) {
-          console.log("you win!!!!!!!!!!!! you shot " + ghostName)
-          startButton.setAttribute('value', 'YOU WIN! You shot ' + ghostName)
+          startButton.setAttribute('value', 'YOU SHOT THE IMPOSTER!')
           startButton.setAttribute('material', 'color: lightgreen')
           startButton.setAttribute('rotation', '0 0 0')
-          startButton.setAttribute('position', '0 2 6')
+          startButton.setAttribute('position', '0 2 -1')
         } else {
-          console.log('you shot an innocent man! he was named ' + ghostName)
-          startButton.setAttribute('value', 'YOU SHOT AN INNOCENT GHOST! His name was ' + ghostName)
+          startButton.setAttribute('value', 'YOU SHOT AN INNOCENT GHOST!')
           startButton.setAttribute('material', 'color: red')
-          startButton.setAttribute('rotation', '0 2 6')
+          startButton.setAttribute('rotation', '0 0 0')
+          startButton.setAttribute('position', '0 2 -1')
         }
       }
     });
