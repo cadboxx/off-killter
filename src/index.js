@@ -111,7 +111,7 @@ function gameStart() {
   console.log("Finished spawning ghosts")
 
   // Move player in front of ghosteses
-  document.getElementById('rig').setAttribute('position', '-1 0 10')
+  document.getElementById('rig').setAttribute('position', '1 0 -10')
   document.getElementById('rig').setAttribute('rotation', '0 180 0')
 
   // We'll add the new-replayer to the camera so it can handle looping of all replays in a single entity tick
@@ -127,12 +127,12 @@ function addReplay(poses, index) {
   // Draw planes representing new replay once saved
   var sceneEl = document.querySelector('a-scene');
   var entityEl = document.createElement('a-entity');
-  var pos = (6 - index)
+  var pos = (2 + (index / 2))
   entityEl.setAttribute('id', 'replay' + index)
   entityEl.setAttribute('geometry', 'primitive:plane; height:0.25; width:0.25;')
   entityEl.setAttribute('material', 'color:grey; transparent:true; opacity:0.5;')
-  entityEl.setAttribute('position', pos + ' 1 5')
-  entityEl.setAttribute('rotation', '0 -150 0')
+  entityEl.setAttribute('position', pos + ' 1 -10')
+  entityEl.setAttribute('rotation', '0 -30 0')
   entityEl.setAttribute('text', 'color:white; align:center; width: 5; value:' + (index + 1))
   entityEl.setAttribute('class', 'links')
   entityEl.setAttribute('button-intersect', 'name:replay' + index)
@@ -271,7 +271,7 @@ AFRAME.registerComponent('mirror-movement', {
       // mirror current player actions
       cube.object3D.position.x = el.object3D.position.x;
       cube.object3D.position.y = el.object3D.position.y;
-      cube.object3D.position.z = el.object3D.position.z + 5;
+      cube.object3D.position.z = el.object3D.position.z - 5;
       cube.object3D.rotation.x = el.object3D.rotation.x;
       cube.object3D.rotation.y = el.object3D.rotation.y;
       cube.object3D.rotation.z = el.object3D.rotation.z;
@@ -292,7 +292,7 @@ AFRAME.registerComponent('triggered', {
 
       if (replayButtonSelected) {
         replaying = true;
-        document.getElementById('rig').setAttribute('position', '0 0 5')
+        document.getElementById('rig').setAttribute('position', '0 0 -10')
         document.getElementById('rig').setAttribute('rotation', '0 180 0')
       } else if (recordButtonSelected) {
         if (!replaying) {
@@ -310,13 +310,13 @@ AFRAME.registerComponent('triggered', {
         if (ghostName == mutatedGhostName) {
           startButton.setAttribute('value', 'YOU SHOT THE IMPOSTER!')
           startButton.setAttribute('material', 'color: lightgreen')
-          startButton.setAttribute('rotation', '0 0 0')
-          startButton.setAttribute('position', '0 2 -1')
+          startButton.setAttribute('rotation', '0 180 0')
+          startButton.setAttribute('position', '-1 3 5')
         } else {
           startButton.setAttribute('value', 'YOU SHOT AN INNOCENT GHOST!')
           startButton.setAttribute('material', 'color: red')
-          startButton.setAttribute('rotation', '0 0 0')
-          startButton.setAttribute('position', '0 2 -1')
+          startButton.setAttribute('rotation', '-1 180 0')
+          startButton.setAttribute('position', '0 3 5')
         }
       }
     });
