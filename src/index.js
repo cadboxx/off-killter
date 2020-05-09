@@ -12,7 +12,7 @@ let ghostSelected = false;
 let ghostName = undefined; // Ghost that was shot
 let mutatedGhostName = undefined; // Mutated ghost
 let savedRecordings = []; // Recordings saved in memory
-let numReqReplays = 2; // Recordings required to start game...it's 1 off somehow?
+let numReqReplays = 3;
 let selectedRecording = 0; // Recording selected for playback
 let recordedPoses = [ [], [], [] ]; // Position & rotation
 let recordedEvents = []; // Button presses
@@ -238,6 +238,8 @@ AFRAME.registerComponent('mirror-movement', {
           buttonEvent(replayButton, 'toggle')
         }
 
+        addReplay(recordedPoses, savedRecordings.length)
+
         if (savedRecordings.length >= numReqReplays) {
           startButton.setAttribute('value', 'START!')
           startButton.setAttribute('geometry', 'primitive:plane; height:0.5')
@@ -246,7 +248,6 @@ AFRAME.registerComponent('mirror-movement', {
           startButton.setAttribute('value', 'Record ' + (numReqReplays - savedRecordings.length) + ' more animations to start...')
         }
 
-        addReplay(recordedPoses, savedRecordings.length)
         recording = false;
       } else {
         recordButton.setAttribute('material', 'color:lightgreen')
