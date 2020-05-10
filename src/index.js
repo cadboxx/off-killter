@@ -21,11 +21,28 @@ let currRecordingTime = 0;
 let endRecordingTime = 0;
 let maxRecordingTime = 3; // recording time in seconds for replays
 
+let startTime;
 let randRecord;
 let randSecond;
-var startTime;
-var randSecondBottom = 0;
-var randSecondTop = 0;
+let randSecondBottom;
+let randSecondTop;
+let randBodyParts;
+let defParts = ['head', 'leftHand', 'rightHand'];
+
+// https://stackoverflow.com/questions/19269545/how-to-get-n-no-elements-randomly-from-an-array
+function getRandom(arr, n) {
+  var result = new Array(n),
+      len = arr.length,
+      taken = new Array(len);
+  if (n > len)
+      throw new RangeError("getRandom: more elements taken than available");
+  while (n--) {
+      var x = Math.floor(Math.random() * len);
+      result[n] = arr[x in taken ? taken[x] : x];
+      taken[x] = --len in taken ? taken[len] : len;
+  }
+  return result;
+}
 
 // Records pose of object on tick
 function recordEntity(el, index) {
@@ -110,6 +127,9 @@ function gameStart() {
   })
   console.log("Finished spawning ghosts")
 
+  // Randomize which body parts are mutated
+  randBodyParts = getRandom(defParts, (Math.ceil(Math.random() * defParts.length)))
+
   // Move player in front of ghosteses
   document.getElementById('rig').setAttribute('position', '1 0 -10')
   document.getElementById('rig').setAttribute('rotation', '0 180 0')
@@ -149,8 +169,8 @@ AFRAME.registerComponent('new-replayer', {
       console.log(mutatedGhostName + ' is the mutated ghost')
     }
     if (randSecond == undefined) {
-      // TODO: update this to random float between 0.00 and maxRecordingTime
-      randSecond = 1;
+      // Get random float between 0.000 and (maxRecordingTime - 1)
+      var randSecond = Math.floor(Math.random() * ((maxRecordingTime - 1) * 1000 - 1 * 1000) + 1 * 1000) / (1 * 1000); // 1000 = 3 decimal points
     }
 
     var buffer = 2;
@@ -174,9 +194,15 @@ AFRAME.registerComponent('new-replayer', {
           }
           if (Date.now() >= randSecondBottom && Date.now() <= randSecondTop) {
             // Mutate object if all conditions met
-            rotateObject(headCube, currReplay[0][tick], index * 2 - buffer, 0.03)
-            rotateObject(leftCube, currReplay[1][tick], index * 2 - buffer, 0.08)
-            rotateObject(rightCube, currReplay[2][tick], index * 2 - buffer, 0.08)
+            for (i = 0; i < randBodyParts.length; i++) {
+              if (randBodyParts[i] == 'head') {
+                rotateObject(headCube, currReplay[0][tick], index * 2 - buffer, 0.3)
+              } else if (randBodyParts[i] == 'leftHand') {
+                rotateObject(leftCube, currReplay[1][tick], index * 2 - buffer, 0.8)
+              } else if (randBodyParts[i] == 'rightHand') {
+                rotateObject(rightCube, currReplay[2][tick], index * 2 - buffer, 0.8)
+              }
+            }
           } else {
             rotateObject(headCube, currReplay[0][tick], index * 2 - buffer)
             rotateObject(leftCube, currReplay[1][tick], index * 2 - buffer)
