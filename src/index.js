@@ -384,12 +384,12 @@ AFRAME.registerComponent('mirror-movement', {
       // rotateObject(cube, el, 0, 0, 5)
 
       // mirror current player actions
-      cube.object3D.position.x = el.object3D.position.x;
+      cube.object3D.position.x = el.object3D.position.x * -1
       cube.object3D.position.y = el.object3D.position.y;
-      cube.object3D.position.z = el.object3D.position.z - 5;
+      cube.object3D.position.z = el.object3D.position.z;
       cube.object3D.rotation.x = el.object3D.rotation.x;
-      cube.object3D.rotation.y = el.object3D.rotation.y;
-      cube.object3D.rotation.z = el.object3D.rotation.z;
+      cube.object3D.rotation.y = el.object3D.rotation.y * -1;
+      cube.object3D.rotation.z = el.object3D.rotation.z * -1;
       if (el.object3D == camera.object3D) {
         bodyCube.object3D.position.x = el.object3D.position.x;
         bodyCube.object3D.position.y = el.object3D.position.y - 0.5;
@@ -415,8 +415,8 @@ AFRAME.registerComponent('triggered', {
 
       if (replayButtonSelected) {
         replaying = true;
-        document.getElementById('rig').setAttribute('position', '0 0 -10')
-        document.getElementById('rig').setAttribute('rotation', '0 180 0')
+        // document.getElementById('rig').setAttribute('position', '0 0 -10')
+        // document.getElementById('rig').setAttribute('rotation', '0 180 0')
       } else if (recordButtonSelected) {
         if (!replaying) {
           recording = true;
@@ -478,8 +478,8 @@ AFRAME.registerComponent('replayer', {
         replaying = false;
         document.getElementById('replayButton').setAttribute('material', 'color:blue')
         document.getElementById('replayButton').setAttribute('value', 'REPLAY RECORDING')
-        document.getElementById('rig').setAttribute('position', '0 0 0')
-        document.getElementById('rig').setAttribute('rotation', '0 0 0')
+        // document.getElementById('rig').setAttribute('position', '0 0 0')
+        // document.getElementById('rig').setAttribute('rotation', '0 0 0')
         tick = 0;
       }
     }

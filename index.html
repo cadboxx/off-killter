@@ -30,13 +30,13 @@
         <a-entity laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 20" line="color: blue; opacity: 0.25"></a-entity>
       </a-entity>
 
-      <a-entity id="mirrorBody">
+      <a-entity id="mirrorBody" position="0 0 -10" rotation="0 180 0">
         <a-entity id="leftCube">
-          <a-entity rotation="0 0 -90" gltf-model="#rightHandModel"></a-entity>
+          <a-entity rotation="0 0 90" gltf-model="#leftHandModel"></a-entity>
         </a-entity>
 
         <a-entity id="rightCube">
-          <a-entity rotation="0 0 90" gltf-model="#leftHandModel"></a-entity>
+          <a-entity rotation="0 0 -90" gltf-model="#rightHandModel"></a-entity>
         </a-entity>
 
         <a-entity id="headCube">
