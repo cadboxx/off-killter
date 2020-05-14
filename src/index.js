@@ -114,7 +114,7 @@ function gameStart() {
     sceneEl.appendChild(newHead);
     var newHeadModel = document.createElement('a-entity')
     newHeadModel.setAttribute('geometry', 'primitive: tetrahedron; radius: 0.15; detail: 2;')
-    newHeadModel.setAttribute('material', 'color: ' + randomColor)
+    newHeadModel.setAttribute('material', 'src: #face-texture; flatshading: true;')
     newHeadModel.setAttribute('rotation', '0 180 0')
     newHeadModel.setAttribute('button-intersect', 'name: replayHead' + index)
     newHeadModel.setAttribute('class', 'replay links')
@@ -391,12 +391,9 @@ AFRAME.registerComponent('mirror-movement', {
       cube.object3D.rotation.y = el.object3D.rotation.y * -1;
       cube.object3D.rotation.z = el.object3D.rotation.z * -1;
       if (el.object3D == camera.object3D) {
-        bodyCube.object3D.position.x = el.object3D.position.x;
+        bodyCube.object3D.position.x = el.object3D.position.x * -1;
         bodyCube.object3D.position.y = el.object3D.position.y - 0.5;
-        bodyCube.object3D.position.z = el.object3D.position.z - 5;
-        bodyCube.object3D.rotation.x = el.object3D.rotation.x;
-        bodyCube.object3D.rotation.y = el.object3D.rotation.y;
-        bodyCube.object3D.rotation.z = el.object3D.rotation.z;
+        bodyCube.object3D.position.z = el.object3D.position.z;
       }
     }
   }
@@ -415,8 +412,6 @@ AFRAME.registerComponent('triggered', {
 
       if (replayButtonSelected) {
         replaying = true;
-        // document.getElementById('rig').setAttribute('position', '0 0 -10')
-        // document.getElementById('rig').setAttribute('rotation', '0 180 0')
       } else if (recordButtonSelected) {
         if (!replaying) {
           recording = true;
@@ -463,6 +458,7 @@ AFRAME.registerComponent('replayer', {
     var leftCube = document.getElementById("leftCube");
     var rightCube = document.getElementById("rightCube");
     var currReplay = savedRecordings[selectedRecording]
+    var bodyCube = document.getElementById("bodyCube");
     
     if (replaying) {
       if (tick < currReplay[0].length) {
@@ -472,14 +468,15 @@ AFRAME.registerComponent('replayer', {
         rotateObject(headCube, currReplay[0][tick])
         rotateObject(rightCube, currReplay[2][tick])
         rotateObject(leftCube, currReplay[1][tick])
+        bodyCube.object3D.position.x = headCube.object3D.position.x;
+        bodyCube.object3D.position.y = headCube.object3D.position.y - 0.5;
+        bodyCube.object3D.position.z = headCube.object3D.position.z;
 
         tick += 1;
       } else {
         replaying = false;
         document.getElementById('replayButton').setAttribute('material', 'color:blue')
         document.getElementById('replayButton').setAttribute('value', 'REPLAY RECORDING')
-        // document.getElementById('rig').setAttribute('position', '0 0 0')
-        // document.getElementById('rig').setAttribute('rotation', '0 0 0')
         tick = 0;
       }
     }
