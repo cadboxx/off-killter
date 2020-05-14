@@ -25,7 +25,7 @@ let endRecordingTime = 0;
 let maxRecordingTime = 3; // recording time in seconds for replays
 
 let startTime = 0;
-let randRecord;
+let randRecord; // Ghost that is modified during game
 let randSecond;
 let randSecondBottom = 0;
 let randSecondTop = 0;
@@ -114,7 +114,7 @@ function gameStart() {
     sceneEl.appendChild(newHead);
     var newHeadModel = document.createElement('a-entity')
     newHeadModel.setAttribute('geometry', 'primitive: tetrahedron; radius: 0.15; detail: 2;')
-    newHeadModel.setAttribute('material', 'src: #face-texture; flatshading: true;')
+    newHeadModel.setAttribute('material', 'src: #face-texture; flatShading: true; color: ' + randomColor)
     newHeadModel.setAttribute('rotation', '0 -90 0')
     newHeadModel.setAttribute('button-intersect', 'name: replayHead' + index)
     newHeadModel.setAttribute('class', 'replay links')
@@ -163,17 +163,18 @@ function gameStart() {
   }
 
   // Move player in front of ghosteses
-  document.getElementById('rig').setAttribute('position', '1 0 -5')
+  document.getElementById('rig').setAttribute('position', '1 0 -8')
   document.getElementById('rig').setAttribute('rotation', '0 180 0')
 }
 
 function gameEnd() {
+  var sceneEl = document.querySelector('a-scene');
+
   // create replay button
   if (!document.getElementById('restartButton')) {
-    var sceneEl = document.querySelector('a-scene');
     var restartButton = document.createElement('a-entity');
     restartButton.setAttribute('id', 'restartButton')
-    restartButton.setAttribute('geometry', 'primitive:plane; height:2; width:5;')
+    restartButton.setAttribute('geometry', 'primitive:plane; height:1; width:2;')
     restartButton.setAttribute('material', 'color:lightgreen; transparent:true; opacity:0.5;')
     restartButton.setAttribute('position', '0 5 2')
     restartButton.setAttribute('rotation', '0 180 0')
@@ -183,6 +184,42 @@ function gameEnd() {
   }
   document.getElementById('restartButton').setAttribute('class', 'links')
   document.getElementById('restartButton').setAttribute('visible', true)
+
+  // Highlight mutated ghost
+  if (!document.getElementById('ghostRing')) {
+    var mutatedGhostIndicator = document.createElement('a-entity');
+  } else {
+    mutatedGhostIndicator = document.getElementById('ghostRing')
+  }
+  mutatedGhostIndicator.setAttribute('geometry', 'primitive:ring; radius-inner:0.9; radius-outer:1')
+  mutatedGhostIndicator.setAttribute('material', 'color:yellow')
+  mutatedGhostIndicator.setAttribute('rotation', '0 180 0')
+  mutatedGhostIndicator.setAttribute('class', 'replay')
+  mutatedGhostIndicator.setAttribute('id', 'ghostRing')
+  sceneEl.appendChild(mutatedGhostIndicator)
+  document.getElementById('ghostRing').object3D.position.x = document.getElementById(('replayHead' + randRecord)).object3D.position.x;
+  document.getElementById('ghostRing').object3D.position.y = document.getElementById(('replayHead' + randRecord)).object3D.position.y;
+  document.getElementById('ghostRing').object3D.position.z = document.getElementById(('replayHead' + randRecord)).object3D.position.z;
+
+  // make heads unclickable -- doesn't work for some reason...
+  // for (i=0; i < numReqReplays; i++) {
+  //   document.getElementById(('replayHead' + i)).removeAttribute('class')
+  //   document.getElementById(('replayHead' + i)).setAttribute('class', 'replay')
+  // }
+  //
+  // Color doesn't actually update...unsure why
+  // for (i=0; i < randBodyParts.length; i++) {
+  //   if (randBodyParts[i] == 'head') {
+  //     document.getElementById(('replayHead' + randRecord)).setAttribute('material', 'color: yellow')
+  //     document.getElementById(('replayHead' + randRecord)).material.needsUpdate = true;
+    // } else if (randBodyParts[i] == 'leftHand') {
+    //   document.getElementById(('replayLeftHand' + randRecord)).setAttribute('material', 'color: yellow')
+    //   document.getElementById(('replayLeftHand' + randRecord)).material.needsUpdate = true;
+    // } else if (randBodyParts[i] == 'rightHand') {
+    //   document.getElementById(('replayRightHand' + randRecord)).setAttribute('material', 'color: yellow')
+    //   document.getElementById(('replayRightHand' + randRecord)).material.needsUpdate = true;
+    // }
+  // }
 }
 
 function restartGame() {

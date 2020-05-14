@@ -31,7 +31,7 @@
         <a-entity laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 20" line="color: blue; opacity: 0.25"></a-entity>
       </a-entity>
 
-      <a-entity id="mirrorBody" position="0 0 -5" rotation="0 180 0">
+      <a-entity id="mirrorBody" position="0 0 -8" rotation="0 180 0">
         <a-entity id="leftCube">
           <a-entity rotation="0 0 90" gltf-model="#leftHandModel"></a-entity>
         </a-entity>
@@ -41,7 +41,7 @@
         </a-entity>
 
         <a-entity id="headCube">
-          <a-tetrahedron rotation="0 -90 0" material="src: #face-texture; flatshading: true;" radius="0.15" detail="2"></a-tetrahedron>
+          <a-tetrahedron rotation="0 -90 0" material="src: #face-texture; flatShading: true;" radius="0.15" detail="2"></a-tetrahedron>
         </a-entity>
 
         <a-entity id="bodyCube">
