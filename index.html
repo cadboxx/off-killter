@@ -12,39 +12,46 @@
       <a-assets>
         <a-asset-item id="head" src="assets/Basehead.obj"></a-asset-item>
         <a-asset-item id="head-mtl" src="assets/Basehead.mtl"></a-asset-item>
+        <a-asset-item id="leftHandModel" src="assets/leftHand.glb"></a-asset-item>
+        <a-asset-item id="rightHandModel" src="assets/rightHand.glb"></a-asset-item>
       </a-assets>
 
-      <a-entity environment="preset: yavapai;"></a-entity>
-      <a-text scale="5 5 5" value="Off-Killter" color="black" position="0 5 -9" rotation="0 -5 0" align="center" visible="true"></a-text>
+      <a-entity environment="preset: egypt;"></a-entity>
+      <a-text scale="5 5 5" value="Off-Killter" color="black" position="0 5 -9" rotation="0 0 0" align="center" visible="true"></a-text>
 
-      <a-text id="startText" class="links" scale="1 1 1" value="Record 3 animations to start!" color="white" position="0 4 -10" rotation="0 -4 0" align="center" visible="true" button-intersect></a-text>
+      <a-text id="startText" class="links" scale="1 1 1" value="Record 3 animations to start!" color="white" position="0 4 -10" rotation="0 0 0" align="center" visible="true" button-intersect></a-text>
 
       <a-entity id="rig">
-        <a-entity id="camera" camera look-controls wasd-controls rotation="0 0 0" mirror-movement replayer></a-entity>
+        <a-entity id="camera" camera look-controls wasd-controls rotation="0 0 0" mirror-movement replayer new-replayer></a-entity>
         <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: lowPoly;" mirror-movement></a-entity>
         <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement triggered></a-entity>
 
-        <!-- NOTE: For something to be intersected, needs to have class="links"!
-        <a-entity laser-controls="hand: left; model: false;" raycaster="objects: .links; far: 20" line="color: blue; opacity: 0.25"></a-entity> -->
+        <!-- NOTE: For something to be intersected, needs to have class="links"! -->
         <a-entity laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 20" line="color: blue; opacity: 0.25"></a-entity>
       </a-entity>
 
       <a-entity id="mirrorBody">
         <a-entity id="leftCube">
-          <a-entity rotation="0 0 -90" gltf-model="url(./assets/rightHand.glb)"></a-entity>
+          <a-entity rotation="0 0 -90" gltf-model="#rightHandModel"></a-entity>
         </a-entity>
 
         <a-entity id="rightCube">
-          <a-entity rotation="0 0 90" gltf-model="url(./assets/leftHand.glb)"></a-entity>
+          <a-entity rotation="0 0 90" gltf-model="#leftHandModel"></a-entity>
         </a-entity>
 
         <a-entity id="headCube">
-          <a-entity obj-model="obj: #head; mtl: #head-mtl" scale="0.1 0.1 0.1" rotation="0 180 0"></a-entity>
+          <!-- <a-entity obj-model="obj: #head; mtl: #head-mtl" scale="0.1 0.1 0.1" rotation="0 180 0"></a-entity> -->
+          <!-- //<a-sphere color="#FFFFFF" radius="0.1"></a-sphere> -->
+          <a-tetrahedron color="#FFFFFF" radius="0.15" detail="2"></a-tetrahedron>
+        </a-entity>
+
+        <a-entity id="bodyCube">
+          <a-cylinder color="#FFFFFF" height="0.5" radius="0.1" visible="false"></a-cylinder>
         </a-entity>
       </a-entity>
 
-      <a-text id="recordButton" class="links" value="START RECORDING" geometry="primitive:circle" position="-3 2 -10" rotation="0 30 0" material="color: red" scale="0.7 0.7 0.7" button-intersect></a-text>
-      <a-text id="replayButton" class="links" value="REPLAY RECORDING" geometry="primitive:plane" position="3 2 -10" rotation="0 -30 0" material="color: grey" scale="0.7 0.7 0.7" align="right" visible="false" button-intersect></a-text>
+      <a-text id="recordButton" class="links" value="START RECORDING" geometry="primitive:circle" position="-3 2 -10" rotation="0 25 0" material="color: red" scale="0.7 0.7 0.7" button-intersect></a-text>
+      <a-text id="replayButton" class="links" value="REPLAY RECORDING" geometry="primitive:plane" position="3 2 -10" rotation="0 -25 0" material="color: grey" scale="0.7 0.7 0.7" align="right" visible="false" button-intersect></a-text>
     </a-scene>
   </body>
 </html>

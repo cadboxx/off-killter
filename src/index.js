@@ -1,4 +1,5 @@
 let gameStarted = false;
+let gameOver = false;
 let recording = false;
 let replaying = false;
 let leftTriggerDown = false;
@@ -7,14 +8,16 @@ let triggerDown = false;
 let recordButtonSelected = false;
 let replayButtonSelected = false;
 let startButtonSelected = false;
-let playbackSelected = false;
-let ghostSelected = false;
+let restartButtonSelected = false;
+let playbackSelected = false; // Cursor over replay
+let ghostSelected = false; // Cursor over spawned ghost
 let ghostName = undefined; // Ghost that was shot
 let mutatedGhostName = undefined; // Mutated ghost
 let savedRecordings = []; // Recordings saved in memory
-let numReqReplays = 3;
+let numReqReplays = 3; // Replays required to start game
 let selectedRecording = 0; // Recording selected for playback
-let recordedPoses = [ [], [], [] ]; // Position & rotation
+const recordedPosesArr = [ [], [], [] ];
+let recordedPoses = recordedPosesArr; // Position & rotation
 let recordedEvents = []; // Button presses
 let tick = 0; // Counter for recording playback
 let currRecordingTime = 0;
@@ -26,7 +29,8 @@ let randRecord;
 let randSecond;
 let randSecondBottom;
 let randSecondTop;
-let randBodyParts;
+let randBodyParts; // Body parts chosen to modify during replay
+let spaceBuffer = 2; // This is the temporary space buffer beween pieces
 let defParts = ['head', 'leftHand', 'rightHand'];
 
 // https://stackoverflow.com/questions/19269545/how-to-get-n-no-elements-randomly-from-an-array
@@ -56,17 +60,19 @@ function recordEntity(el, index) {
 
 // Floating button helper
 function buttonEvent(button, event) {
-  if (event == 'int') {
-    button.setAttribute('color', 'yellow') // text color
-  }
-  if (event == 'noInt') {
-    button.setAttribute('color', 'white') // text color
-  }
-  if (event == 'toggle') {
-    if (button.getAttribute('visible')) {
-      button.setAttribute('visible', false)
-    } else {
-      button.setAttribute('visible', true)
+  if (button) {
+    if (event == 'int') {
+      button.setAttribute('color', 'yellow') // text color
+    }
+    if (event == 'noInt') {
+      button.setAttribute('color', 'white') // text color
+    }
+    if (event == 'toggle') {
+      if (button.getAttribute('visible')) {
+        button.setAttribute('visible', false)
+      } else {
+        button.setAttribute('visible', true)
+      }
     }
   }
 }
@@ -85,57 +91,152 @@ function gameStart() {
   console.log("Starting the game...")
   gameStarted = true;
 
+  // Make start button unclickable
+  document.getElementById('startText').removeAttribute('class')
+
   // hide mirror replay
-  document.getElementById('leftCube').setAttribute('visible', false)
-  document.getElementById('rightCube').setAttribute('visible', false)
-  document.getElementById('headCube').setAttribute('visible', false)
+  buttonEvent(document.getElementById('leftCube'), 'toggle')
+  buttonEvent(document.getElementById('rightCube'), 'toggle')
+  buttonEvent(document.getElementById('headCube'), 'toggle')
 
   savedRecordings.forEach(function(element, index) {
     var sceneEl = document.querySelector('a-scene');
-    // New random color
+    // New random color -- buggy
     var randomColor = '#'+Math.floor(Math.random()*16777215).toString(16);
 
     // spawn head model instance
-    var newHead = document.createElement('a-entity')
+    if (!document.getElementById(('replayHead' + index))) {
+      var newHead = document.createElement('a-entity')
+    } else {
+      var newHead = document.getElementById(('replayHead' + index))
+    }
     newHead.setAttribute('id', 'replayHead' + index)
     sceneEl.appendChild(newHead);
     var newHeadModel = document.createElement('a-entity')
-    newHeadModel.setAttribute('obj-model', 'obj: #head;')
+    newHeadModel.setAttribute('geometry', 'primitive: tetrahedron; radius: 0.15; detail: 2;')
     newHeadModel.setAttribute('material', 'color: ' + randomColor)
-    newHeadModel.setAttribute('scale', '0.1 0.1 0.1')
     newHeadModel.setAttribute('rotation', '0 180 0')
     newHeadModel.setAttribute('button-intersect', 'name: replayHead' + index)
-    newHeadModel.setAttribute('class', 'links')
+    newHeadModel.setAttribute('class', 'replay links')
     newHead.appendChild(newHeadModel);
 
     // spawn hand model instances
-    var newLeftHand = document.createElement('a-entity')
+    if (!document.getElementById(('replayLeftHand' + index))) {
+      var newLeftHand = document.createElement('a-entity')
+    } else {
+      var newLeftHand = document.getElementById(('replayLeftHand' + index))
+    }
     newLeftHand.setAttribute('id', 'replayLeftHand' + index)
     sceneEl.appendChild(newLeftHand)
     var newLeftHandModel = document.createElement('a-entity')
-    newLeftHandModel.setAttribute('gltf-model', 'url(./assets/leftHand.glb)')
+    newLeftHandModel.setAttribute('gltf-model', '#leftHandModel')
     newLeftHandModel.setAttribute('rotation', '0 0 90')
+    newLeftHandModel.setAttribute('class', 'replay')
     newLeftHand.appendChild(newLeftHandModel);
 
-    var newRightHand = document.createElement('a-entity')
+    if (!document.getElementById(('replayRightHand' + index))) {
+      var newRightHand = document.createElement('a-entity')
+    } else {
+      var newRightHand = document.getElementById(('replayRightHand' + index))
+    }
     newRightHand.setAttribute('id', 'replayRightHand' + index)
     sceneEl.appendChild(newRightHand)
     var newRightHandModel = document.createElement('a-entity')
-    newRightHandModel.setAttribute('gltf-model', 'url(./assets/rightHand.glb)')
+    newRightHandModel.setAttribute('gltf-model', '#rightHandModel')
     newRightHandModel.setAttribute('rotation', '0 0 -90')
+    newRightHandModel.setAttribute('class', 'replay')
     newRightHand.appendChild(newRightHandModel);
   })
   console.log("Finished spawning ghosts")
 
   // Randomize which body parts are mutated
   randBodyParts = getRandom(defParts, (Math.ceil(Math.random() * defParts.length)))
+  randRecord = Math.floor(Math.random() * Math.floor(savedRecordings.length)); // Picks random replay to modify
+  mutatedGhostName = 'replayHead' + randRecord
+  // Get random float between 0.000 and (maxRecordingTime - 1)
+  var randSecond = Math.floor(Math.random() * ((maxRecordingTime - 1) * 1000 - 1 * 1000) + 1 * 1000) / (1 * 1000); // 1000 = 3 decimal points
+
+  console.log('Mutated replay: ' + mutatedGhostName + '; randsecond: ' + randSecond + '; randBodyParts:' + randBodyParts)
+
+  if (savedRecordings.length > 3) {
+    spaceBuffer += 1;
+  }
 
   // Move player in front of ghosteses
   document.getElementById('rig').setAttribute('position', '1 0 -10')
   document.getElementById('rig').setAttribute('rotation', '0 180 0')
+}
 
-  // We'll add the new-replayer to the camera so it can handle looping of all replays in a single entity tick
-  document.getElementById('camera').setAttribute('new-replayer', '')
+function gameEnd() {
+  // create replay button
+  if (!document.getElementById('restartButton')) {
+    var sceneEl = document.querySelector('a-scene');
+    var restartButton = document.createElement('a-entity');
+    restartButton.setAttribute('id', 'restartButton')
+    restartButton.setAttribute('geometry', 'primitive:plane; height:2; width:5;')
+    restartButton.setAttribute('material', 'color:lightgreen; transparent:true; opacity:0.5;')
+    restartButton.setAttribute('position', '0 8 0')
+    restartButton.setAttribute('rotation', '0 180 0')
+    restartButton.setAttribute('text', 'color:white; align:center; width: 5; value: RESTART')
+    restartButton.setAttribute('button-intersect', 'name:restart')
+    sceneEl.appendChild(restartButton);
+  }
+  document.getElementById('restartButton').setAttribute('class', 'links')
+  document.getElementById('restartButton').setAttribute('visible', true)
+}
+
+function restartGame() {
+  // restore mirror body
+  buttonEvent(document.getElementById('leftCube'), 'toggle')
+  buttonEvent(document.getElementById('rightCube'), 'toggle')
+  buttonEvent(document.getElementById('headCube'), 'toggle')
+
+  // reset player positon
+  document.getElementById('rig').setAttribute('position', '0 0 0')
+  document.getElementById('rig').setAttribute('rotation', '0 0 0')
+
+  // delete everything in the 'replay' class
+  var replayObjects = document.querySelectorAll(".replay");
+  for (i = 0; i < replayObjects.length; i++) {
+    replayObjects[i].parentNode.removeChild(replayObjects[i])
+  }
+
+  // reset all vars
+  gameStarted = false;
+  recording = false;
+  replaying = false;
+  leftTriggerDown = false;
+  rightTriggerDown = false;
+  triggerDown = false;
+  recordButtonSelected = false;
+  replayButtonSelected = false;
+  startButtonSelected = false;
+  restartButtonSelected = false;
+  playbackSelected = false;
+  ghostSelected = false;
+  recordedPoses = recordedPosesArr;
+  selectedRecording = 0;
+  savedRecordings = [];
+  spaceBuffer = 2;
+  tick = 0;
+
+  // reset buttons
+  document.getElementById('restartButton').setAttribute('class', '')
+  document.getElementById('restartButton').setAttribute('visible', false)
+
+  document.getElementById('recordButton').setAttribute('visible', true)
+  document.getElementById('recordButton').setAttribute('class', 'links')
+  document.getElementById('replayButton').setAttribute('visible', false)
+
+  document.getElementById('startText').setAttribute('value', 'Record ' + numReqReplays + ' animations to start!')
+  document.getElementById('startText').setAttribute('class', 'links')
+  document.getElementById('startText').setAttribute('rotation', '0 0 0')
+  document.getElementById('startText').setAttribute('position', '0 4 -10')
+  document.getElementById('startText').setAttribute('color', 'white')
+  document.getElementById('startText').removeAttribute('geometry')
+  document.getElementById('startText').removeAttribute('material')
+
+  console.log("restarted game")
 }
 
 // Saves given replay to memory and displays it for playback
@@ -152,9 +253,9 @@ function addReplay(poses, index) {
   entityEl.setAttribute('geometry', 'primitive:plane; height:0.25; width:0.25;')
   entityEl.setAttribute('material', 'color:grey; transparent:true; opacity:0.5;')
   entityEl.setAttribute('position', pos + ' 1 -10')
-  entityEl.setAttribute('rotation', '0 -30 0')
+  entityEl.setAttribute('rotation', '0 -25 0')
   entityEl.setAttribute('text', 'color:white; align:center; width: 5; value:' + (index + 1))
-  entityEl.setAttribute('class', 'links')
+  entityEl.setAttribute('class', 'replay links')
   entityEl.setAttribute('button-intersect', 'name:replay' + index)
   sceneEl.appendChild(entityEl);
 }
@@ -163,59 +264,46 @@ function addReplay(poses, index) {
 // Handles mutations
 AFRAME.registerComponent('new-replayer', {
   tick: function () {
-    if (randRecord == undefined) {
-      randRecord = Math.floor(Math.random() * Math.floor(savedRecordings.length)); // Picks random replay to modify
-      mutatedGhostName = 'replayHead' + randRecord
-      console.log(mutatedGhostName + ' is the mutated ghost')
-    }
-    if (randSecond == undefined) {
-      // Get random float between 0.000 and (maxRecordingTime - 1)
-      var randSecond = Math.floor(Math.random() * ((maxRecordingTime - 1) * 1000 - 1 * 1000) + 1 * 1000) / (1 * 1000); // 1000 = 3 decimal points
-    }
+    if (gameStarted) {
+      savedRecordings.forEach(function(element, index) {
+        var headCube = document.getElementById(('replayHead' + index));
+        var leftCube = document.getElementById(('replayLeftHand' + index));
+        var rightCube = document.getElementById(('replayRightHand' + index));
+        var currReplay = savedRecordings[index];
 
-    var buffer = 2;
-    if (savedRecordings.length > 3) {
-      buffer += 1;
-    }
-
-    savedRecordings.forEach(function(element, index) {
-      var headCube = document.getElementById(('replayHead' + index));
-      var leftCube = document.getElementById(('replayLeftHand' + index));
-      var rightCube = document.getElementById(('replayRightHand' + index));
-      var currReplay = savedRecordings[index];
-
-      // rotate the clone body
-      if (tick < currReplay[0].length) {
-        if (savedRecordings.indexOf(currReplay) == randRecord) {
-          if (startTime == undefined) {
-            startTime = Date.now()
-            randSecondBottom = startTime + (randSecond * 1000);
-            randSecondTop = randSecondBottom + (randSecond * 1000);
-          }
-          if (Date.now() >= randSecondBottom && Date.now() <= randSecondTop) {
-            // Mutate object if all conditions met
-            for (i = 0; i < randBodyParts.length; i++) {
-              if (randBodyParts[i] == 'head') {
-                rotateObject(headCube, currReplay[0][tick], index * 2 - buffer, 0.3)
-              } else if (randBodyParts[i] == 'leftHand') {
-                rotateObject(leftCube, currReplay[1][tick], index * 2 - buffer, 0.8)
-              } else if (randBodyParts[i] == 'rightHand') {
-                rotateObject(rightCube, currReplay[2][tick], index * 2 - buffer, 0.8)
+        // rotate the clone body
+        if (tick < currReplay[0].length) {
+          if (savedRecordings.indexOf(currReplay) == randRecord) {
+            if (startTime == undefined) {
+              startTime = Date.now()
+              randSecondBottom = startTime + (randSecond * 1000);
+              randSecondTop = randSecondBottom + (randSecond * 1000);
+            }
+            if (Date.now() >= randSecondBottom && Date.now() <= randSecondTop) {
+              // Mutate object if all conditions met
+              for (i = 0; i < randBodyParts.length; i++) {
+                if (randBodyParts[i] == 'head') {
+                  rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer, 0.3)
+                } else if (randBodyParts[i] == 'leftHand') {
+                  rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer, 0.3)
+                } else if (randBodyParts[i] == 'rightHand') {
+                  rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer, 0.3)
+                }
               }
+            } else {
+              rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer)
+              rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer)
+              rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer)
             }
           } else {
-            rotateObject(headCube, currReplay[0][tick], index * 2 - buffer)
-            rotateObject(leftCube, currReplay[1][tick], index * 2 - buffer)
-            rotateObject(rightCube, currReplay[2][tick], index * 2 - buffer)
+            rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer)
+            rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer)
+            rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer)
           }
-        } else {
-          rotateObject(headCube, currReplay[0][tick], index * 2 - buffer)
-          rotateObject(leftCube, currReplay[1][tick], index * 2 - buffer)
-          rotateObject(rightCube, currReplay[2][tick], index * 2 - buffer)
         }
-      }
-    })
-    tick += 1;
+      })
+      tick += 1;
+    }
   }
 });
 
@@ -233,6 +321,7 @@ AFRAME.registerComponent('mirror-movement', {
     var recordButton = document.getElementById('recordButton');
     var startButton = document.getElementById('startText')
     var mirrorBody = document.getElementById('mirrorBody');
+    var bodyCube = document.getElementById('bodyCube');
 
     if (el.object3D == camera.object3D) {
       var cube = headCube;
@@ -301,6 +390,14 @@ AFRAME.registerComponent('mirror-movement', {
       cube.object3D.rotation.x = el.object3D.rotation.x;
       cube.object3D.rotation.y = el.object3D.rotation.y;
       cube.object3D.rotation.z = el.object3D.rotation.z;
+      if (el.object3D == camera.object3D) {
+        bodyCube.object3D.position.x = el.object3D.position.x;
+        bodyCube.object3D.position.y = el.object3D.position.y - 0.5;
+        bodyCube.object3D.position.z = el.object3D.position.z - 5;
+        bodyCube.object3D.rotation.x = el.object3D.rotation.x;
+        bodyCube.object3D.rotation.y = el.object3D.rotation.y;
+        bodyCube.object3D.rotation.z = el.object3D.rotation.z;
+      }
     }
   }
 });
@@ -331,18 +428,24 @@ AFRAME.registerComponent('triggered', {
         if (savedRecordings.length >= numReqReplays) {
           gameStart();
         }
+      } else if (restartButtonSelected) {
+        restartGame();
       } else if (ghostName) {
         console.log("you shot " + ghostName)
         if (ghostName == mutatedGhostName) {
           startButton.setAttribute('value', 'YOU SHOT THE IMPOSTER!')
           startButton.setAttribute('material', 'color: lightgreen')
           startButton.setAttribute('rotation', '0 180 0')
-          startButton.setAttribute('position', '-1 3 5')
+          startButton.setAttribute('position', '-1 4 5')
+          gameOver = true;
+          gameEnd();
         } else {
           startButton.setAttribute('value', 'YOU SHOT AN INNOCENT GHOST!')
           startButton.setAttribute('material', 'color: red')
           startButton.setAttribute('rotation', '-1 180 0')
-          startButton.setAttribute('position', '0 3 5')
+          startButton.setAttribute('position', '0 4 5')
+          gameOver = true;
+          gameEnd();
         }
       }
     });
@@ -414,7 +517,9 @@ AFRAME.registerComponent('button-intersect', {
           startButtonSelected = true;
         }
       } else {
-        if (buttonName.slice(0, 10) == 'replayHead') {
+        if (buttonName == 'restart') {
+          restartButtonSelected = true;
+        } else if (buttonName.slice(0, 10) == 'replayHead') {
           console.log('selected head')
           ghostSelected = true;
           ghostName = buttonName;
