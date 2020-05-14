@@ -24,11 +24,11 @@ let currRecordingTime = 0;
 let endRecordingTime = 0;
 let maxRecordingTime = 3; // recording time in seconds for replays
 
-let startTime;
+let startTime = 0;
 let randRecord;
 let randSecond;
-let randSecondBottom;
-let randSecondTop;
+let randSecondBottom = 0;
+let randSecondTop = 0;
 let randBodyParts; // Body parts chosen to modify during replay
 let spaceBuffer = 2; // This is the temporary space buffer beween pieces
 let defParts = ['head', 'leftHand', 'rightHand'];
@@ -115,7 +115,7 @@ function gameStart() {
     var newHeadModel = document.createElement('a-entity')
     newHeadModel.setAttribute('geometry', 'primitive: tetrahedron; radius: 0.15; detail: 2;')
     newHeadModel.setAttribute('material', 'src: #face-texture; flatshading: true;')
-    newHeadModel.setAttribute('rotation', '0 180 0')
+    newHeadModel.setAttribute('rotation', '0 -90 0')
     newHeadModel.setAttribute('button-intersect', 'name: replayHead' + index)
     newHeadModel.setAttribute('class', 'replay links')
     newHead.appendChild(newHeadModel);
@@ -154,7 +154,7 @@ function gameStart() {
   randRecord = Math.floor(Math.random() * Math.floor(savedRecordings.length)); // Picks random replay to modify
   mutatedGhostName = 'replayHead' + randRecord
   // Get random float between 0.000 and (maxRecordingTime - 1)
-  var randSecond = Math.floor(Math.random() * ((maxRecordingTime - 1) * 1000 - 1 * 1000) + 1 * 1000) / (1 * 1000); // 1000 = 3 decimal points
+  randSecond = Math.floor(Math.random() * ((maxRecordingTime - 1) * 1000 - 1 * 1000) + 1 * 1000) / (1 * 1000); // 1000 = 3 decimal points
 
   console.log('Mutated replay: ' + mutatedGhostName + '; randsecond: ' + randSecond + '; randBodyParts:' + randBodyParts)
 
@@ -163,7 +163,7 @@ function gameStart() {
   }
 
   // Move player in front of ghosteses
-  document.getElementById('rig').setAttribute('position', '1 0 -10')
+  document.getElementById('rig').setAttribute('position', '1 0 -5')
   document.getElementById('rig').setAttribute('rotation', '0 180 0')
 }
 
@@ -175,7 +175,7 @@ function gameEnd() {
     restartButton.setAttribute('id', 'restartButton')
     restartButton.setAttribute('geometry', 'primitive:plane; height:2; width:5;')
     restartButton.setAttribute('material', 'color:lightgreen; transparent:true; opacity:0.5;')
-    restartButton.setAttribute('position', '0 8 0')
+    restartButton.setAttribute('position', '0 5 2')
     restartButton.setAttribute('rotation', '0 180 0')
     restartButton.setAttribute('text', 'color:white; align:center; width: 5; value: RESTART')
     restartButton.setAttribute('button-intersect', 'name:restart')
@@ -208,6 +208,9 @@ function restartGame() {
   leftTriggerDown = false;
   rightTriggerDown = false;
   triggerDown = false;
+  startTime = 0;
+  randSecondBottom = 0;
+  randSecondTop = 0;
   recordButtonSelected = false;
   replayButtonSelected = false;
   startButtonSelected = false;
@@ -265,6 +268,13 @@ function addReplay(poses, index) {
 AFRAME.registerComponent('new-replayer', {
   tick: function () {
     if (gameStarted) {
+      if (startTime == 0) {
+        startTime = Date.now()
+
+        randSecondBottom = startTime + (randSecond * 1000);
+        randSecondTop = randSecondBottom + (randSecond * 1000);
+      }
+
       savedRecordings.forEach(function(element, index) {
         var headCube = document.getElementById(('replayHead' + index));
         var leftCube = document.getElementById(('replayLeftHand' + index));
@@ -274,21 +284,23 @@ AFRAME.registerComponent('new-replayer', {
         // rotate the clone body
         if (tick < currReplay[0].length) {
           if (savedRecordings.indexOf(currReplay) == randRecord) {
-            if (startTime == undefined) {
-              startTime = Date.now()
-              randSecondBottom = startTime + (randSecond * 1000);
-              randSecondTop = randSecondBottom + (randSecond * 1000);
-            }
             if (Date.now() >= randSecondBottom && Date.now() <= randSecondTop) {
               // Mutate object if all conditions met
               for (i = 0; i < randBodyParts.length; i++) {
                 if (randBodyParts[i] == 'head') {
-                  rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer, 0.3)
+                  rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer, 0.1)
                 } else if (randBodyParts[i] == 'leftHand') {
-                  rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer, 0.3)
+                  rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer, 0.1)
                 } else if (randBodyParts[i] == 'rightHand') {
-                  rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer, 0.3)
+                  rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer, 0.1)
                 }
+              }
+              if (!randBodyParts.indexOf('head')) {
+                rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer)
+              } else if (!randBodyParts.indexOf('leftHand')) {
+                rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer)
+              } else if (!randBodyParts.indexOf('rightHand')) {
+                rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer)
               }
             } else {
               rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer)
@@ -390,11 +402,15 @@ AFRAME.registerComponent('mirror-movement', {
       cube.object3D.rotation.x = el.object3D.rotation.x;
       cube.object3D.rotation.y = el.object3D.rotation.y * -1;
       cube.object3D.rotation.z = el.object3D.rotation.z * -1;
-      if (el.object3D == camera.object3D) {
-        bodyCube.object3D.position.x = el.object3D.position.x * -1;
-        bodyCube.object3D.position.y = el.object3D.position.y - 0.5;
-        bodyCube.object3D.position.z = el.object3D.position.z;
-      }
+      // Move body cube
+      // if (el.object3D == camera.object3D) {
+      //   bodyCube.object3D.position.x = cube.object3D.position.x;
+      //   bodyCube.object3D.position.y = cube.object3D.position.y - 0.5;
+      //   bodyCube.object3D.position.z = cube.object3D.position.z;
+      //   bodyCube.object3D.rotation.x = cube.object3D.rotation.x;
+      //   bodyCube.object3D.rotation.y = cube.object3D.rotation.y;
+      //   bodyCube.object3D.rotation.z = cube.object3D.rotation.z;
+      // }
     }
   }
 });
