@@ -14,6 +14,7 @@
         <a-asset-item id="head-mtl" src="assets/Basehead.mtl"></a-asset-item>
         <a-asset-item id="leftHandModel" src="assets/leftHand.glb"></a-asset-item>
         <a-asset-item id="rightHandModel" src="assets/rightHand.glb"></a-asset-item>
+        <img id="face-texture" src="assets/facetext.jpg">
       </a-assets>
 
       <a-entity environment="preset: egypt;"></a-entity>
@@ -30,7 +31,7 @@
         <a-entity laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 20" line="color: blue; opacity: 0.25"></a-entity>
       </a-entity>
 
-      <a-entity id="mirrorBody" position="0 0 -10" rotation="0 180 0">
+      <a-entity id="mirrorBody" position="0 0 -5" rotation="0 180 0">
         <a-entity id="leftCube">
           <a-entity rotation="0 0 90" gltf-model="#leftHandModel"></a-entity>
         </a-entity>
@@ -42,7 +43,7 @@
         <a-entity id="headCube">
           <!-- <a-entity obj-model="obj: #head; mtl: #head-mtl" scale="0.1 0.1 0.1" rotation="0 180 0"></a-entity> -->
           <!-- //<a-sphere color="#FFFFFF" radius="0.1"></a-sphere> -->
-          <a-tetrahedron color="#FFFFFF" radius="0.15" detail="2"></a-tetrahedron>
+          <a-tetrahedron rotation="0 -90 0" material="src: #face-texture; flatshading: true;" radius="0.15" detail="2"></a-tetrahedron>
         </a-entity>
 
         <a-entity id="bodyCube">

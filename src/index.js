@@ -470,8 +470,8 @@ AFRAME.registerComponent('replayer', {
         document.getElementById('replayButton').setAttribute('value', 'REPLAYING')
         
         rotateObject(headCube, currReplay[0][tick])
-        rotateObject(rightCube, currReplay[1][tick])
-        rotateObject(leftCube, currReplay[2][tick])
+        rotateObject(rightCube, currReplay[2][tick])
+        rotateObject(leftCube, currReplay[1][tick])
 
         tick += 1;
       } else {
