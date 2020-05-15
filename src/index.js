@@ -345,16 +345,17 @@ AFRAME.registerComponent('new-replayer', {
               var randRZ = 0;
               for (i = 0; i < randAxes.length; i++) {
                 if (randAxes[i] == 'x') {
-                  var randPX = index * 2 - spaceBuffer + 0.1;
-                  var randRX = THREE.Math.degToRad(20)
+                  randPX = index * 2 - spaceBuffer + 0.1;
+                  randRX = THREE.Math.degToRad(20)
                 } else if (randAxes[i] == 'y') {
-                  var randPY = 0.1;
-                  var randRY = THREE.Math.degToRad(20);
+                  randPY = 0.1;
+                  randRY = THREE.Math.degToRad(20);
                 } else if (randAxes[i] == 'z') {
-                  var randPZ = 0.1;
-                  var randRZ = THREE.Math.degToRad(20);
+                  randPZ = 0.1;
+                  randRZ = THREE.Math.degToRad(20);
                 }
               }
+
               for (i = 0; i < randBodyParts.length; i++) {
                 if (randBodyParts[i] == 'head') {
                   rotateObject(headCube, currReplay[0][tick], randPX, randPY, randPZ, randRX, randRY, randRZ)
@@ -364,11 +365,14 @@ AFRAME.registerComponent('new-replayer', {
                   rotateObject(rightCube, currReplay[2][tick], randPX, randPY, randPZ, randRX, randRY, randRZ)
                 }
               }
-              if (!randBodyParts.indexOf('head')) {
+
+              if (!randBodyParts.some((element) => element === 'head')) {
                 rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer)
-              } else if (!randBodyParts.indexOf('leftHand')) {
+              }
+              if (!randBodyParts.some((element) => element === 'leftHand')) {
                 rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer)
-              } else if (!randBodyParts.indexOf('rightHand')) {
+              }
+              if (!randBodyParts.some((element) => element === 'rightHand')) {
                 rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer)
               }
             } else {
