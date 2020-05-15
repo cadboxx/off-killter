@@ -9,7 +9,6 @@ let recordButtonSelected = false;
 let replayButtonSelected = false;
 let startButtonSelected = false;
 let restartButtonSelected = false;
-let playbackSelected = false; // Cursor over replay
 let ghostSelected = false; // Cursor over spawned ghost
 let ghostName = undefined; // Ghost that was shot
 let mutatedGhostName = undefined; // Mutated ghost
@@ -33,6 +32,7 @@ let randBodyParts; // Body parts chosen to modify during replay
 let spaceBuffer = 2; // This is the temporary space buffer beween pieces
 let defParts = ['head', 'leftHand', 'rightHand'];
 let randAxes = ['x', 'y', 'z'];
+let cursorOverRecording;
 
 // https://stackoverflow.com/questions/19269545/how-to-get-n-no-elements-randomly-from-an-array
 function getRandom(arr, n) {
@@ -257,7 +257,6 @@ function restartGame() {
   replayButtonSelected = false;
   startButtonSelected = false;
   restartButtonSelected = false;
-  playbackSelected = false;
   ghostSelected = false;
   recordedPoses = recordedPosesArr;
   selectedRecording = 0;
@@ -287,9 +286,6 @@ function restartGame() {
 
 // Saves given replay to memory and displays it for playback
 function addReplay(poses, index) {
-  if (savedRecordings.length > 0) {
-    selectedRecording += 1;
-  }
   savedRecordings.push(poses)
   // Draw planes representing new replay once saved
   var sceneEl = document.querySelector('a-scene');
@@ -300,10 +296,16 @@ function addReplay(poses, index) {
   entityEl.setAttribute('material', 'color:grey; transparent:true; opacity:0.5;')
   entityEl.setAttribute('position', pos + ' 1 -10')
   entityEl.setAttribute('rotation', '0 -25 0')
-  entityEl.setAttribute('text', 'color:white; align:center; width: 5; value:' + (index + 1))
+  entityEl.setAttribute('text', 'color:yellow; align:center; width: 5; value:' + (index + 1))
   entityEl.setAttribute('class', 'replay links')
   entityEl.setAttribute('button-intersect', 'name:replay' + index)
   sceneEl.appendChild(entityEl);
+  selectedRecording = savedRecordings.length - 1;
+  for (i = 0; i < savedRecordings.length; i++) {
+    if (i != selectedRecording) {
+      document.getElementById('replay' + i).setAttribute('text', 'color: white')
+    }
+  }
 }
 
 // Multiple ghost replayer
@@ -521,6 +523,16 @@ AFRAME.registerComponent('triggered', {
           gameOver = true;
           gameEnd();
         }
+      } else {
+        if (cursorOverRecording) {
+          selectedRecording = parseInt(cursorOverRecording.slice(6), 10);
+          document.getElementById('replay' + selectedRecording).setAttribute('text', 'color: yellow');
+          for (i = 0; i < savedRecordings.length; i++) {
+            if (i != selectedRecording) {
+              document.getElementById('replay' + i).setAttribute('text', 'color: white')
+            }
+          }
+        }
       }
     });
 
@@ -596,21 +608,18 @@ AFRAME.registerComponent('button-intersect', {
         if (buttonName == 'restart') {
           restartButtonSelected = true;
         } else if (buttonName.slice(0, 10) == 'replayHead') {
-          console.log('selected head')
+          // console.log('selected head')
           ghostSelected = true;
           ghostName = buttonName;
         } else {
-          console.log('didnt match named button')
-          var button = document.getElementById(buttonName);
-          buttonEvent(button, 'int')
-          playbackSelected = true;
-          selectedRecording = parseInt(buttonName.slice(6), 10);
+          // console.log('didnt match named button')
+          cursorOverRecording = buttonName;
         }
       }
     });
 
     this.el.addEventListener('raycaster-intersected-cleared', function () {
-      //console.log('stopped intersecting button')
+      // console.log('stopped intersecting button')
       if (el.object3D == recordButton.object3D) {
         buttonEvent(recordButton, 'noInt')
         recordButtonSelected = false;
@@ -622,14 +631,15 @@ AFRAME.registerComponent('button-intersect', {
         startButtonSelected = false;
       } else {
         if (buttonName.slice(0, 10) == 'replayHead') {
-          console.log('left head')
+          // console.log('left head')
           ghostSelected = false;
           ghostName = undefined;
+        } else if (buttonName == 'restart') {
+          restartButtonSelected = false;
+          buttonEvent(restartButton, 'noInt')
         } else {
-          console.log('didnt match named button')
-          var button = document.getElementById(buttonName);
-          buttonEvent(button, 'noInt')
-          playbackSelected = false;
+          // console.log('didnt match named button')
+          cursorOverRecording = undefined;
         }
       }
     });
