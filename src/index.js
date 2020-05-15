@@ -92,8 +92,21 @@ function gameStart() {
   console.log("Starting the game...")
   gameStarted = true;
 
-  // Make start button unclickable
+  // Move title
+  buttonEvent(document.getElementById('titleText'), 'toggle')
+  document.getElementById('titleText').setAttribute('position', '0 7 3')
+  document.getElementById('titleText').setAttribute('rotation', '30 180 0')
+
+  // Make buttons unclickable
   document.getElementById('startText').removeAttribute('class')
+  document.getElementById('replayButton').removeAttribute('class')
+
+  // Hide buttons
+  buttonEvent(document.getElementById('startText'), 'toggle')
+  buttonEvent(document.getElementById('replayButton'), 'toggle')
+  for (i = 0; i < savedRecordings.length; i++) {
+    buttonEvent(document.getElementById('replay' + i), 'toggle')
+  }
 
   // hide mirror replay
   buttonEvent(document.getElementById('leftCube'), 'toggle')
@@ -175,13 +188,13 @@ function gameStart() {
 function gameEnd() {
   var sceneEl = document.querySelector('a-scene');
 
-  // create replay button
+  // create restart button
   if (!document.getElementById('restartButton')) {
     var restartButton = document.createElement('a-entity');
     restartButton.setAttribute('id', 'restartButton')
     restartButton.setAttribute('geometry', 'primitive:plane; height:1; width:2;')
     restartButton.setAttribute('material', 'color:lightgreen; transparent:true; opacity:0.5;')
-    restartButton.setAttribute('position', '0 5 2')
+    restartButton.setAttribute('position', '0 4 2')
     restartButton.setAttribute('rotation', '0 180 0')
     restartButton.setAttribute('text', 'color:white; align:center; width: 5; value: RESTART')
     restartButton.setAttribute('button-intersect', 'name:restart')
@@ -206,12 +219,6 @@ function gameEnd() {
   document.getElementById('ghostRing').object3D.position.y = document.getElementById(('replayHead' + randRecord)).object3D.position.y;
   document.getElementById('ghostRing').object3D.position.z = document.getElementById(('replayHead' + randRecord)).object3D.position.z;
 
-  // make heads unclickable -- doesn't work for some reason...
-  // for (i=0; i < numReqReplays; i++) {
-  //   document.getElementById(('replayHead' + i)).removeAttribute('class')
-  //   document.getElementById(('replayHead' + i)).setAttribute('class', 'replay')
-  // }
-  //
   // Color doesn't actually update...unsure why
   // for (i=0; i < randBodyParts.length; i++) {
   //   if (randBodyParts[i] == 'head') {
@@ -228,6 +235,10 @@ function gameEnd() {
 }
 
 function restartGame() {
+  // Move title
+  document.getElementById('titleText').setAttribute('position', '0 5 -9')
+  document.getElementById('titleText').setAttribute('rotation', '30 0 0')
+
   // restore mirror body
   buttonEvent(document.getElementById('leftCube'), 'toggle')
   buttonEvent(document.getElementById('rightCube'), 'toggle')
@@ -245,6 +256,7 @@ function restartGame() {
 
   // reset all vars
   gameStarted = false;
+  gameOver = false;
   recording = false;
   replaying = false;
   leftTriggerDown = false;
@@ -271,6 +283,7 @@ function restartGame() {
 
   document.getElementById('recordButton').setAttribute('visible', true)
   document.getElementById('recordButton').setAttribute('class', 'links')
+
   document.getElementById('replayButton').setAttribute('visible', false)
 
   document.getElementById('startText').setAttribute('value', 'Record ' + numReqReplays + ' animations to start!')
@@ -425,6 +438,7 @@ AFRAME.registerComponent('mirror-movement', {
       } else if (currRecordingTime >= endRecordingTime) {
         if (replayButton.getAttribute('visible') == false) {
           buttonEvent(replayButton, 'toggle')
+          document.getElementById('replayButton').setAttribute('class', 'links')
         }
 
         addReplay(recordedPoses, savedRecordings.length)
@@ -436,13 +450,9 @@ AFRAME.registerComponent('mirror-movement', {
 
           recordButton.setAttribute('visible', false)
           recordButton.setAttribute('class', '') // Make unclickable
-
-          // TODO: Move replay buttons.
-          // replayButton.setAttribute('position', '0 2 5')
         } else {
           startButton.setAttribute('value', 'Record ' + (numReqReplays - savedRecordings.length) + ' more animations to start...')
         }
-
         recording = false;
       } else {
         recordButton.setAttribute('material', 'color:lightgreen')
@@ -512,20 +522,26 @@ AFRAME.registerComponent('triggered', {
         restartGame();
       } else if (ghostName) {
         console.log("you shot " + ghostName)
-        if (ghostName == mutatedGhostName) {
-          startButton.setAttribute('value', 'YOU SHOT THE IMPOSTER!')
-          startButton.setAttribute('material', 'color: lightgreen')
-          startButton.setAttribute('rotation', '0 180 0')
-          startButton.setAttribute('position', '-1 4 5')
-          gameOver = true;
-          gameEnd();
-        } else {
-          startButton.setAttribute('value', 'YOU SHOT AN INNOCENT GHOST!')
-          startButton.setAttribute('material', 'color: red')
-          startButton.setAttribute('rotation', '-1 180 0')
-          startButton.setAttribute('position', '0 4 5')
-          gameOver = true;
-          gameEnd();
+        if (!gameOver) {
+          buttonEvent(document.getElementById('startText'), 'toggle')
+          buttonEvent(document.getElementById('titleText'), 'toggle')
+          if (ghostName == mutatedGhostName) {
+            startButton.setAttribute('value', 'YOU SHOT THE IMPOSTER!')
+            startButton.setAttribute('material', 'color: green')
+            startButton.setAttribute('rotation', '-50 180 0')
+            startButton.setAttribute('position', '0 0.5 -2')
+            startButton.setAttribute('geometry', 'primitive:plane; height:1; width:4;')
+            gameOver = true;
+            gameEnd();
+          } else {
+            startButton.setAttribute('value', 'YOU SHOT AN INNOCENT GHOST!')
+            startButton.setAttribute('material', 'color: red')
+            startButton.setAttribute('rotation', '-50 180 0')
+            startButton.setAttribute('position', '0 0.5 -2')
+            startButton.setAttribute('geometry', 'primitive:plane; height:1; width:4;')
+            gameOver = true;
+            gameEnd();
+          }
         }
       } else {
         if (cursorOverRecording) {
