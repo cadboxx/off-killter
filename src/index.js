@@ -1,3 +1,5 @@
+let toggleDebug = false;
+
 let gameStarted = false;
 let gameOver = false;
 let recording = false;
@@ -285,6 +287,9 @@ function restartGame() {
   document.getElementById('recordButton').setAttribute('class', 'links')
 
   document.getElementById('replayButton').setAttribute('visible', false)
+  document.getElementById('replayButton').setAttribute('position', '3 2 -10')
+  document.getElementById('replayButton').setAttribute('rotation', '0 -25 0')
+  document.getElementById('replayButton').setAttribute('value', 'REPLAY RECORDING')
 
   document.getElementById('startText').setAttribute('value', 'Record ' + numReqReplays + ' animations to start!')
   document.getElementById('startText').setAttribute('class', 'links')
@@ -325,6 +330,9 @@ function addReplay(poses, index) {
 // Handles mutations
 AFRAME.registerComponent('new-replayer', {
   tick: function () {
+    var scene = document.querySelector('a-scene');
+    var replayButton = document.getElementById('replayButton');
+
     if (gameStarted) {
       if (startTime == 0) {
         startTime = Date.now()
@@ -397,6 +405,20 @@ AFRAME.registerComponent('new-replayer', {
         }
       })
       tick += 1;
+    }
+
+    if (gameOver) {
+      // update replay button for mutation
+      if (replayButton.getAttribute('visible') == false) {
+        replayButton.setAttribute('position', '5 2 1')
+        replayButton.setAttribute('rotation', '0 -155 0')
+        replayButton.setAttribute('value', 'REPLAY IMPOSTER')
+        replayButton.setAttribute('class', 'links')
+        buttonEvent(replayButton, 'toggle')
+      }
+      // plays original recording and mutated recording side by side.
+      // highlights the moving pieces on the mutated model
+      // add button to half speed replay???
     }
   }
 });
@@ -665,3 +687,11 @@ AFRAME.registerComponent('button-intersect', {
     });
   }
 });
+
+AFRAME.registerComponent('toggle-debug', {
+  init: function() {
+    if (toggleDebug) {
+      document.querySelector('a-scene').setAttribute('stats', '')
+    }
+  }
+})
