@@ -32,6 +32,7 @@ let randSecondTop = 0;
 let randBodyParts; // Body parts chosen to modify during replay
 let spaceBuffer = 2; // This is the temporary space buffer beween pieces
 let defParts = ['head', 'leftHand', 'rightHand'];
+let randAxes = ['x', 'y', 'z'];
 
 // https://stackoverflow.com/questions/19269545/how-to-get-n-no-elements-randomly-from-an-array
 function getRandom(arr, n) {
@@ -151,7 +152,11 @@ function gameStart() {
 
   // Randomize which body parts are mutated
   randBodyParts = getRandom(defParts, (Math.ceil(Math.random() * defParts.length)))
-  randRecord = Math.floor(Math.random() * Math.floor(savedRecordings.length)); // Picks random replay to modify
+  // Randomize which axes are mutated
+  randAxes = getRandom(randAxes, (Math.ceil(Math.random() * randAxes.length)))
+  console.log(randAxes)
+  // Picks random replay to modify
+  randRecord = Math.floor(Math.random() * Math.floor(savedRecordings.length));
   mutatedGhostName = 'replayHead' + randRecord
   // Get random float between 0.000 and (maxRecordingTime - 1)
   randSecond = Math.floor(Math.random() * ((maxRecordingTime - 1) * 1000 - 1 * 1000) + 1 * 1000) / (1 * 1000); // 1000 = 3 decimal points
@@ -259,6 +264,7 @@ function restartGame() {
   savedRecordings = [];
   spaceBuffer = 2;
   tick = 0;
+  randAxes = ['x', 'y', 'z'];
 
   // reset buttons
   document.getElementById('restartButton').setAttribute('class', '')
@@ -318,18 +324,42 @@ AFRAME.registerComponent('new-replayer', {
         var rightCube = document.getElementById(('replayRightHand' + index));
         var currReplay = savedRecordings[index];
 
+        function move() {
+          rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer)
+          rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer)
+          rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer)
+        }
+
         // rotate the clone body
         if (tick < currReplay[0].length) {
           if (savedRecordings.indexOf(currReplay) == randRecord) {
             if (Date.now() >= randSecondBottom && Date.now() <= randSecondTop) {
               // Mutate object if all conditions met
+              var randPX = index * 2 - spaceBuffer;
+              var randPY = 0;
+              var randPZ = 0;
+              var randRX = 0;
+              var randRY = 0;
+              var randRZ = 0;
+              for (i = 0; i < randAxes.length; i++) {
+                if (randAxes[i] == 'x') {
+                  var randPX = index * 2 - spaceBuffer + 0.1;
+                  var randRX = THREE.Math.degToRad(20)
+                } else if (randAxes[i] == 'y') {
+                  var randPY = 0.1;
+                  var randRY = THREE.Math.degToRad(20);
+                } else if (randAxes[i] == 'z') {
+                  var randPZ = 0.1;
+                  var randRZ = THREE.Math.degToRad(20);
+                }
+              }
               for (i = 0; i < randBodyParts.length; i++) {
                 if (randBodyParts[i] == 'head') {
-                  rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer, 0.1)
+                  rotateObject(headCube, currReplay[0][tick], randPX, randPY, randPZ, randRX, randRY, randRZ)
                 } else if (randBodyParts[i] == 'leftHand') {
-                  rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer, 0.1)
+                  rotateObject(leftCube, currReplay[1][tick], randPX, randPY, randPZ, randRX, randRY, randRZ)
                 } else if (randBodyParts[i] == 'rightHand') {
-                  rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer, 0.1)
+                  rotateObject(rightCube, currReplay[2][tick], randPX, randPY, randPZ, randRX, randRY, randRZ)
                 }
               }
               if (!randBodyParts.indexOf('head')) {
@@ -340,14 +370,10 @@ AFRAME.registerComponent('new-replayer', {
                 rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer)
               }
             } else {
-              rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer)
-              rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer)
-              rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer)
+              move();
             }
           } else {
-            rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer)
-            rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer)
-            rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer)
+            move();
           }
         }
       })
