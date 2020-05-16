@@ -1,3 +1,4 @@
+// Dev tools
 let toggleDebug = false;
 
 let gameStarted = false;
@@ -24,6 +25,8 @@ let tick = 0; // Counter for recording playback
 let currRecordingTime = 0;
 let endRecordingTime = 0;
 let maxRecordingTime = 3; // recording time in seconds for replays
+let fadeTime = 0;
+let endFadeTime = 0;
 
 let startTime = 0;
 let randRecord; // Ghost that is modified during game
@@ -443,81 +446,83 @@ AFRAME.registerComponent('replayer', {
 // Mirror user movement while idle
 AFRAME.registerComponent('mirror-movement', {
   tick: function () {
-    var el = this.el; // `this.el` is the element.
-    var headCube = document.getElementById("headCube");
-    var leftCube = document.getElementById("leftCube");
-    var rightCube = document.getElementById("rightCube");
-    var camera = document.getElementById("camera");
-    var leftHand = document.getElementById("leftHand");
-    var rightHand = document.getElementById("rightHand");
-    var replayButton = document.getElementById('replayButton');
-    var recordButton = document.getElementById('recordButton');
-    var startButton = document.getElementById('startText')
+    if (!gameStarted) {
+      var el = this.el; // `this.el` is the element.
+      var headCube = document.getElementById("headCube");
+      var leftCube = document.getElementById("leftCube");
+      var rightCube = document.getElementById("rightCube");
+      var camera = document.getElementById("camera");
+      var leftHand = document.getElementById("leftHand");
+      var rightHand = document.getElementById("rightHand");
+      var replayButton = document.getElementById('replayButton');
+      var recordButton = document.getElementById('recordButton');
+      var startButton = document.getElementById('startText')
 
-    if (el.object3D == camera.object3D) {
-      var cube = headCube;
-      var index = 0;
-    } else if (el.object3D == leftHand.object3D) {
-      var cube = rightCube;
-      var index = 1;
-    } else if (el.object3D == rightHand.object3D) {
-      var cube = leftCube;
-      var index = 2;
-    } else {
-      console.log("Error: not arm or head.")
-    }
-
-    if (recording) {
-      if (currRecordingTime == 0) {
-        currRecordingTime = Date.now(); // get current time
-        let seconds = maxRecordingTime * 1000; // convert to milliseconds
-        endRecordingTime = currRecordingTime + seconds; // set time to end recording
-      } else if (currRecordingTime >= endRecordingTime) {
-        if (replayButton.getAttribute('visible') == false) {
-          buttonEvent(replayButton, 'toggle')
-          document.getElementById('replayButton').setAttribute('class', 'links')
-        }
-
-        addReplay(recordedPoses, savedRecordings.length)
-
-        if (savedRecordings.length >= numReqReplays) {
-          startButton.setAttribute('value', 'START!')
-          startButton.setAttribute('geometry', 'primitive:plane; height:0.5')
-          startButton.setAttribute('material', 'color: lightgreen')
-
-          recordButton.setAttribute('visible', false)
-          recordButton.setAttribute('class', '') // Make unclickable
-        } else {
-          startButton.setAttribute('value', 'Record ' + (numReqReplays - savedRecordings.length) + ' more animations to start...')
-        }
-        recording = false;
+      if (el.object3D == camera.object3D) {
+        var cube = headCube;
+        var index = 0;
+      } else if (el.object3D == leftHand.object3D) {
+        var cube = rightCube;
+        var index = 1;
+      } else if (el.object3D == rightHand.object3D) {
+        var cube = leftCube;
+        var index = 2;
       } else {
-        recordButton.setAttribute('material', 'color:lightgreen')
-        recordButton.setAttribute('value', 'RECORDING')
-        let timeFormat = endRecordingTime - currRecordingTime
-        startButton.setAttribute('value', timeFormat.toString() + 'ms left')
-        recordEntity(el, index);
-        currRecordingTime = Date.now()
+        console.log("Error: not arm or head.")
       }
 
-    } else {
-      recordButton.setAttribute('material', 'color:red')
-      if (savedRecordings.length < numReqReplays) {
-        recordButton.setAttribute('value', 'START RECORDING')
+      if (recording) {
+        if (currRecordingTime == 0) {
+          currRecordingTime = Date.now(); // get current time
+          let seconds = maxRecordingTime * 1000; // convert to milliseconds
+          endRecordingTime = currRecordingTime + seconds; // set time to end recording
+        } else if (currRecordingTime >= endRecordingTime) {
+          if (replayButton.getAttribute('visible') == false) {
+            buttonEvent(replayButton, 'toggle')
+            document.getElementById('replayButton').setAttribute('class', 'links')
+          }
+
+          addReplay(recordedPoses, savedRecordings.length)
+
+          if (savedRecordings.length >= numReqReplays) {
+            startButton.setAttribute('value', 'START!')
+            startButton.setAttribute('geometry', 'primitive:plane; height:0.5')
+            startButton.setAttribute('material', 'color: lightgreen')
+
+            recordButton.setAttribute('visible', false)
+            recordButton.setAttribute('class', '') // Make unclickable
+          } else {
+            startButton.setAttribute('value', 'Record ' + (numReqReplays - savedRecordings.length) + ' more animations to start...')
+          }
+          recording = false;
+        } else {
+          recordButton.setAttribute('material', 'color:lightgreen')
+          recordButton.setAttribute('value', 'RECORDING')
+          let timeFormat = endRecordingTime - currRecordingTime
+          startButton.setAttribute('value', timeFormat.toString() + 'ms left')
+          recordEntity(el, index);
+          currRecordingTime = Date.now()
+        }
+
+      } else {
+        recordButton.setAttribute('material', 'color:red')
+        if (savedRecordings.length < numReqReplays) {
+          recordButton.setAttribute('value', 'START RECORDING')
+        }
       }
-    }
 
-    if (!replaying) {
-      // Need to add a loaded/gameStart function to use this
-      // rotateObject(cube, el, 0, 0, 5)
+      if (!replaying) {
+        // Need to add a loaded/gameStart function to use this
+        // rotateObject(cube, el, 0, 0, 5)
 
-      // mirror current player actions
-      cube.object3D.position.x = el.object3D.position.x * -1
-      cube.object3D.position.y = el.object3D.position.y;
-      cube.object3D.position.z = el.object3D.position.z;
-      cube.object3D.rotation.x = el.object3D.rotation.x;
-      cube.object3D.rotation.y = el.object3D.rotation.y * -1;
-      cube.object3D.rotation.z = el.object3D.rotation.z * -1;
+        // mirror current player actions
+        cube.object3D.position.x = el.object3D.position.x * -1
+        cube.object3D.position.y = el.object3D.position.y;
+        cube.object3D.position.z = el.object3D.position.z;
+        cube.object3D.rotation.x = el.object3D.rotation.x;
+        cube.object3D.rotation.y = el.object3D.rotation.y * -1;
+        cube.object3D.rotation.z = el.object3D.rotation.z * -1;
+      }
     }
   }
 });
@@ -666,6 +671,45 @@ AFRAME.registerComponent('button-intersect', {
   }
 });
 
+// Setup component for fading camera to black
+AFRAME.registerComponent('fade', {
+  schema: {
+    fadeIn: {type: 'boolean', default: true},
+    fadeSeconds: {type: 'number', default: 3}
+  },
+  tick: function() {
+    var fadeIn = this.data.fadeIn;
+    var fadeSeconds = this.data.fadeSeconds;
+    var el = this.el; // The entity
+    var sceneEl = document.querySelector('a-scene');
+    var startingOpacity = 1;
+    if (!fadeIn) {
+      startingOpacity = 0;
+    }
+
+    if (fadeTime == 0) {
+      el.setAttribute('opacity', startingOpacity)
+      fadeTime = Date.now(); // get current time
+      endFadeTime = fadeTime + (fadeSeconds * 1000); // set time to end recording
+    }
+    if (fadeTime < endFadeTime) {
+      var diffTime = endFadeTime - fadeTime
+      if (startingOpacity == 1) {
+        var fadePercentage = (diffTime / (fadeSeconds * 1000))
+      } else {
+        var fadePercentage = 1 - (diffTime / (fadeSeconds * 1000))
+      }
+      el.setAttribute('opacity', fadePercentage)
+      fadeTime = Date.now()
+    } else {
+      fadeTime = 0;
+      el.removeAttribute('fade');
+      document.getElementById('camera').removeChild(el)
+    }
+  }
+});
+
+// Dev tools
 AFRAME.registerComponent('toggle-debug', {
   init: function() {
     if (toggleDebug) {

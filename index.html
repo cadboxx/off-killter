@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Off-Killter</title>
     <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-render-order-component@1.1.0/dist/aframe-render-order-component.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.1.0/dist/aframe-environment-component.min.js"></script>
     <script src="src/index.js"></script>
   </head>
@@ -23,7 +24,9 @@
       <a-text id="startText" class="links" scale="1 1 1" value="Record 3 animations to start!" color="white" position="0 4 -10" rotation="0 0 0" align="center" visible="true" button-intersect></a-text>
 
       <a-entity id="rig">
-        <a-entity id="camera" camera look-controls wasd-controls rotation="0 0 0" mirror-movement replayer></a-entity>
+        <a-entity id="camera" camera look-controls wasd-controls rotation="0 0 0" mirror-movement replayer>
+          <a-plane fade position="0 0 -0.01" width="10" height="10" opacity="1.0" color="black" visible="true"></a-plane>
+        </a-entity>
         <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: lowPoly;" mirror-movement></a-entity>
         <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement triggered></a-entity>
 
