@@ -96,7 +96,7 @@ function gameStart() {
 
   // Move title
   buttonEvent(document.getElementById('titleText'), 'toggle')
-  document.getElementById('titleText').setAttribute('position', '0 7 3')
+  document.getElementById('titleText').setAttribute('position', '0 6 3')
   document.getElementById('titleText').setAttribute('rotation', '30 180 0')
 
   // Make buttons unclickable
@@ -189,12 +189,15 @@ function gameStart() {
 
 function gameEnd() {
   var sceneEl = document.querySelector('a-scene');
+  var replayButton = document.getElementById('replayButton');
+  var mutatedGhost = document.getElementById('replayHead' + randRecord);
+  var mutatedGhostIndicator;
 
   // create restart button
   if (!document.getElementById('restartButton')) {
     var restartButton = document.createElement('a-entity');
     restartButton.setAttribute('id', 'restartButton')
-    restartButton.setAttribute('geometry', 'primitive:plane; height:1; width:2;')
+    restartButton.setAttribute('geometry', 'primitive:plane; height:0.8; width:2;')
     restartButton.setAttribute('material', 'color:lightgreen; transparent:true; opacity:0.5;')
     restartButton.setAttribute('position', '0 4 2')
     restartButton.setAttribute('rotation', '0 180 0')
@@ -207,7 +210,8 @@ function gameEnd() {
 
   // Highlight mutated ghost
   if (!document.getElementById('ghostRing')) {
-    var mutatedGhostIndicator = document.createElement('a-entity');
+    mutatedGhostIndicator = document.createElement('a-entity');
+    sceneEl.appendChild(mutatedGhostIndicator)
   } else {
     mutatedGhostIndicator = document.getElementById('ghostRing')
   }
@@ -216,24 +220,16 @@ function gameEnd() {
   mutatedGhostIndicator.setAttribute('rotation', '0 180 0')
   mutatedGhostIndicator.setAttribute('class', 'replay')
   mutatedGhostIndicator.setAttribute('id', 'ghostRing')
-  sceneEl.appendChild(mutatedGhostIndicator)
-  document.getElementById('ghostRing').object3D.position.x = document.getElementById(('replayHead' + randRecord)).object3D.position.x;
-  document.getElementById('ghostRing').object3D.position.y = document.getElementById(('replayHead' + randRecord)).object3D.position.y;
-  document.getElementById('ghostRing').object3D.position.z = document.getElementById(('replayHead' + randRecord)).object3D.position.z;
+  mutatedGhostIndicator.object3D.position.x = mutatedGhost.object3D.position.x;
+  mutatedGhostIndicator.object3D.position.y = mutatedGhost.object3D.position.y;
+  mutatedGhostIndicator.object3D.position.z = mutatedGhost.object3D.position.z;
 
-  // Color doesn't actually update...unsure why
-  // for (i=0; i < randBodyParts.length; i++) {
-  //   if (randBodyParts[i] == 'head') {
-  //     document.getElementById(('replayHead' + randRecord)).setAttribute('material', 'color: yellow')
-  //     document.getElementById(('replayHead' + randRecord)).material.needsUpdate = true;
-    // } else if (randBodyParts[i] == 'leftHand') {
-    //   document.getElementById(('replayLeftHand' + randRecord)).setAttribute('material', 'color: yellow')
-    //   document.getElementById(('replayLeftHand' + randRecord)).material.needsUpdate = true;
-    // } else if (randBodyParts[i] == 'rightHand') {
-    //   document.getElementById(('replayRightHand' + randRecord)).setAttribute('material', 'color: yellow')
-    //   document.getElementById(('replayRightHand' + randRecord)).material.needsUpdate = true;
-    // }
-  // }
+  // Setup button to compare mutated replay to original
+  replayButton.setAttribute('position', '4.5 2 1')
+  replayButton.setAttribute('rotation', '0 -155 0')
+  replayButton.setAttribute('value', 'REPLAY IMPOSTER')
+  replayButton.setAttribute('class', 'links')
+  replayButton.setAttribute('visible', true)
 }
 
 function restartGame() {
@@ -326,21 +322,44 @@ function addReplay(poses, index) {
   }
 }
 
-// Multiple ghost replayer
-// Handles mutations
-AFRAME.registerComponent('new-replayer', {
+// Ghost replayer
+AFRAME.registerComponent('replayer', {
   tick: function () {
     var scene = document.querySelector('a-scene');
+    var headCube = document.getElementById("headCube");
+    var leftCube = document.getElementById("leftCube");
+    var rightCube = document.getElementById("rightCube");
+    var currReplay = savedRecordings[selectedRecording];
     var replayButton = document.getElementById('replayButton');
 
-    if (gameStarted) {
+    if (!gameStarted) {
+      // Handle replay of single ghost before starting game
+      if (replaying) {
+        if (tick < currReplay[0].length) {
+          replayButton.setAttribute('material', 'color:lightgreen')
+          replayButton.setAttribute('value', 'REPLAYING')
+
+          rotateObject(headCube, currReplay[0][tick])
+          rotateObject(rightCube, currReplay[2][tick])
+          rotateObject(leftCube, currReplay[1][tick])
+
+          tick += 1;
+        } else {
+          replaying = false;
+          replayButton.setAttribute('material', 'color:blue')
+          replayButton.setAttribute('value', 'REPLAY RECORDING')
+          tick = 0;
+        }
+      }
+    } else {
+      // Get start of replay and set mutation times
       if (startTime == 0) {
         startTime = Date.now()
-
         randSecondBottom = startTime + (randSecond * 1000);
         randSecondTop = randSecondBottom + (randSecond * 1000);
       }
 
+      // Loop through all and play all recordings by tick
       savedRecordings.forEach(function(element, index) {
         var headCube = document.getElementById(('replayHead' + index));
         var leftCube = document.getElementById(('replayLeftHand' + index));
@@ -348,22 +367,29 @@ AFRAME.registerComponent('new-replayer', {
         var currReplay = savedRecordings[index];
 
         function move() {
-          rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer)
-          rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer)
-          rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer)
+          if (!gameOver) {
+            rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer)
+            rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer)
+            rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer)
+          } else {
+            rotateObject(headCube, savedRecordings[randRecord][0][tick], index * 2 - spaceBuffer)
+            rotateObject(leftCube, savedRecordings[randRecord][1][tick], index * 2 - spaceBuffer)
+            rotateObject(rightCube, savedRecordings[randRecord][2][tick], index * 2 - spaceBuffer)
+          }
         }
 
-        // rotate the clone body
         if (tick < currReplay[0].length) {
           if (savedRecordings.indexOf(currReplay) == randRecord) {
+            // Mutate randBodyParts if current replay time is within randomized range
             if (Date.now() >= randSecondBottom && Date.now() <= randSecondTop) {
-              // Mutate object if all conditions met
               var randPX = index * 2 - spaceBuffer;
               var randPY = 0;
               var randPZ = 0;
               var randRX = 0;
               var randRY = 0;
               var randRZ = 0;
+
+              // Add movement variation if axes selected for mutation
               for (i = 0; i < randAxes.length; i++) {
                 if (randAxes[i] == 'x') {
                   randPX = index * 2 - spaceBuffer + 0.1;
@@ -377,6 +403,7 @@ AFRAME.registerComponent('new-replayer', {
                 }
               }
 
+              // Mutate recording movement if in randBodyParts array
               for (i = 0; i < randBodyParts.length; i++) {
                 if (randBodyParts[i] == 'head') {
                   rotateObject(headCube, currReplay[0][tick], randPX, randPY, randPZ, randRX, randRY, randRZ)
@@ -387,6 +414,7 @@ AFRAME.registerComponent('new-replayer', {
                 }
               }
 
+              // Move element normally if not in randBodyParts array
               if (!randBodyParts.some((element) => element === 'head')) {
                 rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer)
               }
@@ -397,28 +425,17 @@ AFRAME.registerComponent('new-replayer', {
                 rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer)
               }
             } else {
+              // Move all body parts normally if current timestamp is not within our randomized range
               move();
             }
           } else {
+            // Move !randRecord pieces normally if game isn't over
             move();
           }
         }
       })
-      tick += 1;
-    }
 
-    if (gameOver) {
-      // update replay button for mutation
-      if (replayButton.getAttribute('visible') == false) {
-        replayButton.setAttribute('position', '5 2 1')
-        replayButton.setAttribute('rotation', '0 -155 0')
-        replayButton.setAttribute('value', 'REPLAY IMPOSTER')
-        replayButton.setAttribute('class', 'links')
-        buttonEvent(replayButton, 'toggle')
-      }
-      // plays original recording and mutated recording side by side.
-      // highlights the moving pieces on the mutated model
-      // add button to half speed replay???
+      tick += 1;
     }
   }
 });
@@ -436,8 +453,6 @@ AFRAME.registerComponent('mirror-movement', {
     var replayButton = document.getElementById('replayButton');
     var recordButton = document.getElementById('recordButton');
     var startButton = document.getElementById('startText')
-    var mirrorBody = document.getElementById('mirrorBody');
-    var bodyCube = document.getElementById('bodyCube');
 
     if (el.object3D == camera.object3D) {
       var cube = headCube;
@@ -503,15 +518,6 @@ AFRAME.registerComponent('mirror-movement', {
       cube.object3D.rotation.x = el.object3D.rotation.x;
       cube.object3D.rotation.y = el.object3D.rotation.y * -1;
       cube.object3D.rotation.z = el.object3D.rotation.z * -1;
-      // Move body cube
-      // if (el.object3D == camera.object3D) {
-      //   bodyCube.object3D.position.x = cube.object3D.position.x;
-      //   bodyCube.object3D.position.y = cube.object3D.position.y - 0.5;
-      //   bodyCube.object3D.position.z = cube.object3D.position.z;
-      //   bodyCube.object3D.rotation.x = cube.object3D.rotation.x;
-      //   bodyCube.object3D.rotation.y = cube.object3D.rotation.y;
-      //   bodyCube.object3D.rotation.z = cube.object3D.rotation.z;
-      // }
     }
   }
 });
@@ -529,6 +535,10 @@ AFRAME.registerComponent('triggered', {
 
       if (replayButtonSelected) {
         replaying = true;
+        if (gameOver) {
+          tick = 0;
+          startTime = 0;
+        }
       } else if (recordButtonSelected) {
         if (!replaying) {
           recording = true;
@@ -551,16 +561,16 @@ AFRAME.registerComponent('triggered', {
             startButton.setAttribute('value', 'YOU SHOT THE IMPOSTER!')
             startButton.setAttribute('material', 'color: green')
             startButton.setAttribute('rotation', '-50 180 0')
-            startButton.setAttribute('position', '0 0.5 -2')
-            startButton.setAttribute('geometry', 'primitive:plane; height:1; width:4;')
+            startButton.setAttribute('position', '0 0.3 -2.5')
+            startButton.setAttribute('geometry', 'primitive:plane; height:0.75; width:4;')
             gameOver = true;
             gameEnd();
           } else {
             startButton.setAttribute('value', 'YOU SHOT AN INNOCENT GHOST!')
             startButton.setAttribute('material', 'color: red')
             startButton.setAttribute('rotation', '-50 180 0')
-            startButton.setAttribute('position', '0 0.5 -2')
-            startButton.setAttribute('geometry', 'primitive:plane; height:1; width:4;')
+            startButton.setAttribute('position', '0 0.3 -2.5')
+            startButton.setAttribute('geometry', 'primitive:plane; height:0.75; width:4;')
             gameOver = true;
             gameEnd();
           }
@@ -581,38 +591,6 @@ AFRAME.registerComponent('triggered', {
     el.addEventListener('triggerup', function (evt) {
       triggerDown = false
     });
-  }
-});
-
-// Single playback replayer
-AFRAME.registerComponent('replayer', {
-  tick: function () {
-    var headCube = document.getElementById("headCube");
-    var leftCube = document.getElementById("leftCube");
-    var rightCube = document.getElementById("rightCube");
-    var currReplay = savedRecordings[selectedRecording]
-    var bodyCube = document.getElementById("bodyCube");
-    
-    if (replaying) {
-      if (tick < currReplay[0].length) {
-        document.getElementById('replayButton').setAttribute('material', 'color:lightgreen')
-        document.getElementById('replayButton').setAttribute('value', 'REPLAYING')
-        
-        rotateObject(headCube, currReplay[0][tick])
-        rotateObject(rightCube, currReplay[2][tick])
-        rotateObject(leftCube, currReplay[1][tick])
-        bodyCube.object3D.position.x = headCube.object3D.position.x;
-        bodyCube.object3D.position.y = headCube.object3D.position.y - 0.5;
-        bodyCube.object3D.position.z = headCube.object3D.position.z;
-
-        tick += 1;
-      } else {
-        replaying = false;
-        document.getElementById('replayButton').setAttribute('material', 'color:blue')
-        document.getElementById('replayButton').setAttribute('value', 'REPLAY RECORDING')
-        tick = 0;
-      }
-    }
   }
 });
 
