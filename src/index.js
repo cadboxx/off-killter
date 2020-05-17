@@ -85,12 +85,16 @@ function buttonEvent(button, event) {
 
 // Translate object to anther object's position with optional offsets
 function rotateObject(obj, ref, px = 0, py = 0, pz = 0, rx = 0, ry = 0, rz = 0) {
-  obj.object3D.position.x = ref.position.x + px;
-  obj.object3D.position.y = ref.position.y + py;
-  obj.object3D.position.z = ref.position.z + pz;
-  obj.object3D.rotation.x = THREE.Math.degToRad(ref.rotation.x + rx);
-  obj.object3D.rotation.y = THREE.Math.degToRad(ref.rotation.y + ry);
-  obj.object3D.rotation.z = THREE.Math.degToRad(ref.rotation.z + rz);
+  try {
+    obj.object3D.position.x = ref.position.x + px;
+    obj.object3D.position.y = ref.position.y + py;
+    obj.object3D.position.z = ref.position.z + pz;
+    obj.object3D.rotation.x = THREE.Math.degToRad(ref.rotation.x + rx);
+    obj.object3D.rotation.y = THREE.Math.degToRad(ref.rotation.y + ry);
+    obj.object3D.rotation.z = THREE.Math.degToRad(ref.rotation.z + rz);
+  } catch(error) {
+    console.log('Tried to move object but got error: ' + error)
+  }
 }
 
 function gameStart() {
@@ -120,8 +124,6 @@ function gameStart() {
 
   savedRecordings.forEach(function(element, index) {
     var sceneEl = document.querySelector('a-scene');
-    // New random color -- buggy
-    var randomColor = '#'+Math.floor(Math.random()*16777215).toString(16);
 
     // spawn head model instance
     if (!document.getElementById(('replayHead' + index))) {
@@ -133,10 +135,11 @@ function gameStart() {
     sceneEl.appendChild(newHead);
     var newHeadModel = document.createElement('a-entity')
     newHeadModel.setAttribute('geometry', 'primitive: tetrahedron; radius: 0.15; detail: 2;')
-    newHeadModel.setAttribute('material', 'src: #face-texture; flatShading: true; color: ' + randomColor)
+    newHeadModel.setAttribute('material', 'src: #face-texture; flatShading: true;')
     newHeadModel.setAttribute('rotation', '0 -90 0')
     newHeadModel.setAttribute('button-intersect', 'name: replayHead' + index)
     newHeadModel.setAttribute('class', 'replay links')
+    newHeadModel.setAttribute('random-color', '')
     newHead.appendChild(newHeadModel);
 
     // spawn hand model instances
@@ -186,7 +189,7 @@ function gameStart() {
   }
 
   // Move player in front of ghosteses
-  document.getElementById('rig').setAttribute('position', '1 0 -8')
+  document.getElementById('rig').setAttribute('position', '1 0 -6')
   document.getElementById('rig').setAttribute('rotation', '0 180 0')
 }
 
@@ -246,7 +249,7 @@ function restartGame() {
   buttonEvent(document.getElementById('headCube'), 'toggle')
 
   // reset player positon
-  document.getElementById('rig').setAttribute('position', '0 0 0')
+  document.getElementById('rig').setAttribute('position', '0 0 -4')
   document.getElementById('rig').setAttribute('rotation', '0 0 0')
 
   // delete everything in the 'replay' class
@@ -566,16 +569,16 @@ AFRAME.registerComponent('triggered', {
             startButton.setAttribute('value', 'YOU SHOT THE IMPOSTER!')
             startButton.setAttribute('material', 'color: green')
             startButton.setAttribute('rotation', '-50 180 0')
-            startButton.setAttribute('position', '0 0.3 -2.5')
-            startButton.setAttribute('geometry', 'primitive:plane; height:0.75; width:4;')
+            startButton.setAttribute('position', '0 0.2 -2')
+            startButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
             gameOver = true;
             gameEnd();
           } else {
             startButton.setAttribute('value', 'YOU SHOT AN INNOCENT GHOST!')
             startButton.setAttribute('material', 'color: red')
             startButton.setAttribute('rotation', '-50 180 0')
-            startButton.setAttribute('position', '0 0.3 -2.5')
-            startButton.setAttribute('geometry', 'primitive:plane; height:0.75; width:4;')
+            startButton.setAttribute('position', '0 0.2 -2')
+            startButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
             gameOver = true;
             gameEnd();
           }
@@ -681,13 +684,13 @@ AFRAME.registerComponent('fade', {
     var fadeIn = this.data.fadeIn;
     var fadeSeconds = this.data.fadeSeconds;
     var el = this.el; // The entity
-    var sceneEl = document.querySelector('a-scene');
     var startingOpacity = 1;
     if (!fadeIn) {
       startingOpacity = 0;
     }
 
     if (fadeTime == 0) {
+      el.setAttribute('visible', true)
       el.setAttribute('opacity', startingOpacity)
       fadeTime = Date.now(); // get current time
       endFadeTime = fadeTime + (fadeSeconds * 1000); // set time to end recording
@@ -700,11 +703,34 @@ AFRAME.registerComponent('fade', {
         var fadePercentage = 1 - (diffTime / (fadeSeconds * 1000))
       }
       el.setAttribute('opacity', fadePercentage)
+      // handle child nodes
+      var childNodes = el.childNodes;
+      for (i=0; i < childNodes.length; i++) {
+        if (childNodes[i].attached) {
+          document.getElementById(childNodes[i].id).setAttribute('opacity', fadePercentage)
+        }
+      }
+
       fadeTime = Date.now()
     } else {
       fadeTime = 0;
+      if (fadeIn) {
+        el.setAttribute('visible', false)
+      }
       el.removeAttribute('fade');
-      document.getElementById('camera').removeChild(el)
+    }
+  }
+});
+
+AFRAME.registerComponent('start-game', {
+  init: function() {
+    var scene = this.el; // The entity
+    if (scene.is('vr-mode')) {
+      document.getElementById('fadePlane').setAttribute('fade', '')
+    } else {
+      scene.addEventListener('enter-vr', function () {
+        document.getElementById('fadePlane').setAttribute('fade', '')
+      });
     }
   }
 });
