@@ -19,8 +19,7 @@ let mutatedGhostName = undefined; // Mutated ghost
 let savedRecordings = []; // Recordings saved in memory
 let numReqReplays = 3; // Replays required to start game
 let selectedRecording = 0; // Recording selected for playback
-const recordedPosesArr = [ [], [], [] ];
-let recordedPoses = recordedPosesArr; // Position & rotation
+let recordedPoses = [ [], [], [] ]; // Position & rotation
 let recordedEvents = []; // Button presses
 let tick = 0; // Counter for recording playback
 let currRecordingTime = 0;
@@ -147,7 +146,7 @@ function gameStart() {
     newHeadModel.setAttribute('material', 'src: #face-texture; flatShading: true;')
     newHeadModel.setAttribute('rotation', '0 -90 0')
     newHeadModel.setAttribute('button-intersect', 'name: replayHead' + index)
-    newHeadModel.setAttribute('class', 'replay links')
+    newHeadModel.setAttribute('class', 'replay links replayHeads')
     newHeadModel.setAttribute('random-color', '')
     newHead.appendChild(newHeadModel);
 
@@ -162,7 +161,7 @@ function gameStart() {
     var newLeftHandModel = document.createElement('a-entity')
     newLeftHandModel.setAttribute('gltf-model', '#leftHandModel')
     newLeftHandModel.setAttribute('rotation', '0 0 90')
-    newLeftHandModel.setAttribute('class', 'replay')
+    newLeftHandModel.setAttribute('class', 'replay replayHands')
     newLeftHand.appendChild(newLeftHandModel);
 
     if (!document.getElementById(('replayRightHand' + index))) {
@@ -175,7 +174,7 @@ function gameStart() {
     var newRightHandModel = document.createElement('a-entity')
     newRightHandModel.setAttribute('gltf-model', '#rightHandModel')
     newRightHandModel.setAttribute('rotation', '0 0 -90')
-    newRightHandModel.setAttribute('class', 'replay')
+    newRightHandModel.setAttribute('class', 'replay replayHands')
     newRightHand.appendChild(newRightHandModel);
 
     // Move to starting position
@@ -251,6 +250,12 @@ function gameEnd() {
   replayButton.setAttribute('value', 'REPLAY IMPOSTER')
   replayButton.setAttribute('class', 'links')
   replayButton.setAttribute('visible', true)
+
+  // Make heads unclickable
+  var replayObjects = document.querySelectorAll(".replayHead");
+  for (i = 0; i < replayObjects.length; i++) {
+    replayObjects[i].classList.remove('links');
+  }
 }
 
 function restartGame() {
@@ -289,7 +294,7 @@ function restartGame() {
   startButtonSelected = false;
   restartButtonSelected = false;
   ghostSelected = false;
-  recordedPoses = recordedPosesArr;
+  recordedPoses = [ [], [], [] ];
   selectedRecording = 0;
   savedRecordings = [];
   spaceBuffer = 2;
@@ -603,7 +608,7 @@ AFRAME.registerComponent('triggered', {
           }
         }
       } else {
-        if (cursorOverRecording) {
+        if (cursorOverRecording && !replaying) {
           selectedRecording = parseInt(cursorOverRecording.slice(6), 10);
           document.getElementById('replay' + selectedRecording).setAttribute('text', 'color: yellow');
           for (i = 0; i < savedRecordings.length; i++) {
