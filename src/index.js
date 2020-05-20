@@ -5,6 +5,7 @@ let gameStarted = false;
 let gameOver = false;
 let recording = false;
 let replaying = false;
+let fading = false;
 let leftTriggerDown = false;
 let rightTriggerDown = false;
 let triggerDown = false;
@@ -27,6 +28,10 @@ let endRecordingTime = 0;
 let maxRecordingTime = 3; // recording time in seconds for replays
 let fadeTime = 0;
 let endFadeTime = 0;
+var countdownEndTime = 0;
+var countdownSecond = 0;
+var countdownStartTime = 0;
+var countingDown = false;
 
 let startTime = 0;
 let randRecord; // Ghost that is modified during game
@@ -99,7 +104,7 @@ function rotateObject(obj, ref, px = 0, py = 0, pz = 0, rx = 0, ry = 0, rz = 0) 
 
 function gameStart() {
   console.log("Starting the game...")
-  gameStarted = true;
+  document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 1.5')
 
   // Move title
   buttonEvent(document.getElementById('titleText'), 'toggle')
@@ -121,6 +126,10 @@ function gameStart() {
   buttonEvent(document.getElementById('leftCube'), 'toggle')
   buttonEvent(document.getElementById('rightCube'), 'toggle')
   buttonEvent(document.getElementById('headCube'), 'toggle')
+
+  if (savedRecordings.length > 3) {
+    spaceBuffer += 1;
+  }
 
   savedRecordings.forEach(function(element, index) {
     var sceneEl = document.querySelector('a-scene');
@@ -168,6 +177,11 @@ function gameStart() {
     newRightHandModel.setAttribute('rotation', '0 0 -90')
     newRightHandModel.setAttribute('class', 'replay')
     newRightHand.appendChild(newRightHandModel);
+
+    // Move to starting position
+    rotateObject(newHead, element[0][tick], index * 2 - spaceBuffer)
+    rotateObject(newRightHand, element[1][tick], index * 2 - spaceBuffer)
+    rotateObject(newLeftHand, element[2][tick], index * 2 - spaceBuffer)
   })
   console.log("Finished spawning ghosts")
 
@@ -182,15 +196,16 @@ function gameStart() {
   // Get random float between 0.000 and (maxRecordingTime - 1)
   randSecond = Math.floor(Math.random() * ((maxRecordingTime - 1) * 1000 - 1 * 1000) + 1 * 1000) / (1 * 1000); // 1000 = 3 decimal points
 
-  console.log('Mutated replay: ' + mutatedGhostName + '; randsecond: ' + randSecond + '; randBodyParts:' + randBodyParts)
-
-  if (savedRecordings.length > 3) {
-    spaceBuffer += 1;
-  }
+  console.log('Mutating replay: ' + mutatedGhostName + '; randsecond: ' + randSecond + '; randBodyParts:' + randBodyParts)
 
   // Move player in front of ghosteses
   document.getElementById('rig').setAttribute('position', '1 0 -6')
   document.getElementById('rig').setAttribute('rotation', '0 180 0')
+
+  document.querySelector('a-scene').setAttribute('countdown', '')
+  setTimeout(function() {
+    gameStarted = true
+  }, 3000)
 }
 
 function gameEnd() {
@@ -302,6 +317,7 @@ function restartGame() {
   document.getElementById('startText').removeAttribute('material')
 
   console.log("restarted game")
+  document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 0.5')
 }
 
 // Saves given replay to memory and displays it for playback
@@ -357,7 +373,7 @@ AFRAME.registerComponent('replayer', {
           tick = 0;
         }
       }
-    } else {
+    } else if (!fading && gameStarted) {
       // Get start of replay and set mutation times
       if (startTime == 0) {
         startTime = Date.now()
@@ -440,7 +456,6 @@ AFRAME.registerComponent('replayer', {
           }
         }
       })
-
       tick += 1;
     }
   }
@@ -556,10 +571,14 @@ AFRAME.registerComponent('triggered', {
         }
       } else if (startButtonSelected) {
         if (savedRecordings.length >= numReqReplays) {
-          gameStart();
+          document.getElementById('fadePlane').setAttribute('fade', 'fadeIn: false; fadeSeconds: 1.5')
+          setTimeout(() => {
+            gameStart()
+          }, 1600);
         }
       } else if (restartButtonSelected) {
-        restartGame();
+        document.getElementById('fadePlane').setAttribute('fade', 'fadeIn: false; fadeSeconds: 0.5')
+        setTimeout(function() { restartGame(); }, 600);
       } else if (ghostName) {
         console.log("you shot " + ghostName)
         if (!gameOver) {
@@ -680,6 +699,9 @@ AFRAME.registerComponent('fade', {
     fadeIn: {type: 'boolean', default: true},
     fadeSeconds: {type: 'number', default: 3}
   },
+  init: function() {
+    fading = true;
+  },
   tick: function() {
     var fadeIn = this.data.fadeIn;
     var fadeSeconds = this.data.fadeSeconds;
@@ -719,6 +741,9 @@ AFRAME.registerComponent('fade', {
       }
       el.removeAttribute('fade');
     }
+  },
+  remove: function() {
+    fading = false;
   }
 });
 
@@ -735,6 +760,45 @@ AFRAME.registerComponent('start-game', {
   }
 });
 
+// Adds a numeric countdown to fadePlane
+AFRAME.registerComponent('countdown', {
+  schema: {
+    seconds: {type: 'number', default: 3}
+  },
+  init: function() {
+    // Create number text
+    countdownSecond = this.data.seconds;
+    var countdownText = document.createElement('a-entity');
+    countdownText.setAttribute('id', 'countdownText')
+    countdownText.setAttribute('text', 'value: ' + countdownSecond)
+    countdownText.setAttribute('position', '-10 5 3') // Should make these schema values
+    countdownText.setAttribute('rotation', '30 180 0')
+    countdownText.setAttribute('scale', '20 20 20')
+    document.querySelector('a-scene').appendChild(countdownText)
+    countingDown = true;
+    countdownStartTime = Date.now();
+    countdownEndTime = countdownStartTime + (this.data.seconds * 1000);
+  },
+  tick: function() {
+    var currTime = Date.now()
+
+    if (currTime < countdownEndTime) {
+      var diffTime = countdownEndTime - currTime;
+      if ((countdownSecond * 1000) >= diffTime) {
+        countdownSecond = countdownSecond - 1
+        document.getElementById('countdownText').setAttribute('text', 'value: ' + (countdownSecond + 1))
+      }
+    } else {
+      this.el.removeAttribute('countdown')
+    }
+  },
+  remove: function() {
+    countingDown = false;
+    // Delete the number text
+    document.querySelector('a-scene').removeChild(document.getElementById('countdownText'))
+  }
+});
+
 // Dev tools
 AFRAME.registerComponent('toggle-debug', {
   init: function() {
@@ -742,4 +806,4 @@ AFRAME.registerComponent('toggle-debug', {
       document.querySelector('a-scene').setAttribute('stats', '')
     }
   }
-})
+});
