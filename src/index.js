@@ -31,6 +31,8 @@ var countdownEndTime = 0;
 var countdownSecond = 0;
 var countdownStartTime = 0;
 var countingDown = false;
+var maxReplays = 3;
+var replayCount = 0;
 
 let startTime = 0;
 let randRecord; // Ghost that is modified during game
@@ -300,6 +302,7 @@ function restartGame() {
   spaceBuffer = 2;
   tick = 0;
   randAxes = ['x', 'y', 'z'];
+  replayCount = 0;
 
   // reset buttons
   document.getElementById('restartButton').setAttribute('class', '')
@@ -458,6 +461,14 @@ AFRAME.registerComponent('replayer', {
           } else {
             // Move !randRecord pieces normally if game isn't over
             move();
+          }
+        } else {
+          if (!gameOver && tick > currReplay[0].length) {
+            replayCount += 1;
+            if (replayCount < maxReplays) {
+              tick = 0;
+              startTime = 0;
+            }
           }
         }
       })
