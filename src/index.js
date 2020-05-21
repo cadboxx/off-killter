@@ -13,6 +13,7 @@ let recordButtonSelected = false;
 let replayButtonSelected = false;
 let startButtonSelected = false;
 let restartButtonSelected = false;
+let newRoundButtonSelected = false;
 let ghostSelected = false; // Cursor over spawned ghost
 let ghostName = undefined; // Ghost that was shot
 let mutatedGhostName = undefined; // Mutated ghost
@@ -24,7 +25,7 @@ let recordedEvents = []; // Button presses
 let tick = 0; // Counter for recording playback
 let currRecordingTime = 0;
 let endRecordingTime = 0;
-let maxRecordingTime = 3; // recording time in seconds for replays
+let maxRecordingTime = 4; // recording time in seconds for replays
 let fadeTime = 0;
 let endFadeTime = 0;
 var countdownEndTime = 0;
@@ -36,13 +37,13 @@ var replayCount = 0;
 
 let startTime = 0;
 let randRecord; // Ghost that is modified during game
-let randSecond;
+let randSecond; // Beginning time in replay that mutation occurs
 let randSecondBottom = 0;
 let randSecondTop = 0;
 let randBodyParts; // Body parts chosen to modify during replay
 let spaceBuffer = 2; // This is the temporary space buffer beween pieces
 let defParts = ['head', 'leftHand', 'rightHand'];
-let randAxes = ['x', 'y', 'z'];
+let randAxes = ['x', 'y'];
 let cursorOverRecording;
 
 // https://stackoverflow.com/questions/19269545/how-to-get-n-no-elements-randomly-from-an-array
@@ -87,6 +88,21 @@ function buttonEvent(button, event) {
       }
     }
   }
+}
+
+function randomize() {
+  // Randomize which body parts are mutated
+  randBodyParts = getRandom(defParts, (Math.ceil(Math.random() * defParts.length)))
+  // Randomize which axes are mutated
+  randAxes = getRandom(randAxes, (Math.ceil(Math.random() * randAxes.length)))
+  // Picks random replay to modify
+  randRecord = Math.floor(Math.random() * Math.floor(savedRecordings.length));
+  mutatedGhostName = 'replayHead' + randRecord
+  // Get random float between 0.000 and (maxRecordingTime - 1)
+  randSecond = Math.floor(Math.random() * ((maxRecordingTime - 1) * 1000 - 1 * 1000) + 1 * 1000) / (1 * 1000); // 1000 = 3 decimal points
+
+  // Log the output
+  console.log('Mutating replay: ' + mutatedGhostName + '; randsecond: ' + randSecond + '; randBodyParts: ' + randBodyParts +'; randAxes: ' + randAxes)
 }
 
 // Translate object to anther object's position with optional offsets
@@ -148,7 +164,7 @@ function gameStart() {
     newHeadModel.setAttribute('material', 'src: #face-texture; flatShading: true;')
     newHeadModel.setAttribute('rotation', '0 -90 0')
     newHeadModel.setAttribute('button-intersect', 'name: replayHead' + index)
-    newHeadModel.setAttribute('class', 'replay links replayHeads')
+    newHeadModel.setAttribute('class', 'replay replayHeads')
     newHeadModel.setAttribute('random-color', '')
     newHead.appendChild(newHeadModel);
 
@@ -163,7 +179,7 @@ function gameStart() {
     var newLeftHandModel = document.createElement('a-entity')
     newLeftHandModel.setAttribute('gltf-model', '#leftHandModel')
     newLeftHandModel.setAttribute('rotation', '0 0 90')
-    newLeftHandModel.setAttribute('class', 'replay replayHands')
+    newLeftHandModel.setAttribute('class', 'replay replayHandLeft')
     newLeftHand.appendChild(newLeftHandModel);
 
     if (!document.getElementById(('replayRightHand' + index))) {
@@ -176,7 +192,7 @@ function gameStart() {
     var newRightHandModel = document.createElement('a-entity')
     newRightHandModel.setAttribute('gltf-model', '#rightHandModel')
     newRightHandModel.setAttribute('rotation', '0 0 -90')
-    newRightHandModel.setAttribute('class', 'replay replayHands')
+    newRightHandModel.setAttribute('class', 'replay replayHandRight')
     newRightHand.appendChild(newRightHandModel);
 
     // Move to starting position
@@ -186,18 +202,8 @@ function gameStart() {
   })
   console.log("Finished spawning ghosts")
 
-  // Randomize which body parts are mutated
-  randBodyParts = getRandom(defParts, (Math.ceil(Math.random() * defParts.length)))
-  // Randomize which axes are mutated
-  randAxes = getRandom(randAxes, (Math.ceil(Math.random() * randAxes.length)))
-  console.log(randAxes)
-  // Picks random replay to modify
-  randRecord = Math.floor(Math.random() * Math.floor(savedRecordings.length));
-  mutatedGhostName = 'replayHead' + randRecord
-  // Get random float between 0.000 and (maxRecordingTime - 1)
-  randSecond = Math.floor(Math.random() * ((maxRecordingTime - 1) * 1000 - 1 * 1000) + 1 * 1000) / (1 * 1000); // 1000 = 3 decimal points
-
-  console.log('Mutating replay: ' + mutatedGhostName + '; randsecond: ' + randSecond + '; randBodyParts:' + randBodyParts)
+  // Call our randomizer
+  randomize();
 
   // Move player in front of ghosteses
   document.getElementById('rig').setAttribute('position', '1 0 -6')
@@ -206,6 +212,11 @@ function gameStart() {
   document.querySelector('a-scene').setAttribute('countdown', '')
   setTimeout(function() {
     gameStarted = true
+    // Make heads clickable
+    var replayHeads = document.querySelectorAll(".replayHeads");
+    for (i = 0; i < replayHeads.length; i++) {
+      replayHeads[i].classList.add('links');
+    }
   }, 3000)
 }
 
@@ -221,14 +232,29 @@ function gameEnd() {
     restartButton.setAttribute('id', 'restartButton')
     restartButton.setAttribute('geometry', 'primitive:plane; height:0.8; width:2;')
     restartButton.setAttribute('material', 'color:lightgreen; transparent:true; opacity:0.5;')
-    restartButton.setAttribute('position', '0 4 2')
+    restartButton.setAttribute('position', '2 4 2')
     restartButton.setAttribute('rotation', '0 180 0')
-    restartButton.setAttribute('text', 'color:white; align:center; width: 5; value: RESTART')
+    restartButton.setAttribute('text', 'color:white; align:center; width: 5; value: Restart Game')
     restartButton.setAttribute('button-intersect', 'name:restart')
     sceneEl.appendChild(restartButton);
   }
   document.getElementById('restartButton').setAttribute('class', 'links')
   document.getElementById('restartButton').setAttribute('visible', true)
+
+  // create new round button
+  if (!document.getElementById('newRoundButton')) {
+    var newRoundButton = document.createElement('a-entity');
+    newRoundButton.setAttribute('id', 'newRoundButton')
+    newRoundButton.setAttribute('geometry', 'primitive:plane; height:0.8; width:2;')
+    newRoundButton.setAttribute('material', 'color:blue; transparent:true; opacity:0.5;')
+    newRoundButton.setAttribute('position', '-2 4 2')
+    newRoundButton.setAttribute('rotation', '0 180 0')
+    newRoundButton.setAttribute('text', 'color:white; align:center; width: 5; value: New Round')
+    newRoundButton.setAttribute('button-intersect', 'name: newRoundButton')
+    sceneEl.appendChild(newRoundButton);
+  }
+  document.getElementById('newRoundButton').setAttribute('class', 'links')
+  document.getElementById('newRoundButton').setAttribute('visible', true)
 
   // Highlight mutated ghost
   if (!document.getElementById('ghostRing')) {
@@ -240,6 +266,7 @@ function gameEnd() {
   mutatedGhostIndicator.setAttribute('geometry', 'primitive:ring; radius-inner:0.9; radius-outer:1')
   mutatedGhostIndicator.setAttribute('material', 'color:yellow')
   mutatedGhostIndicator.setAttribute('rotation', '0 180 0')
+  mutatedGhostIndicator.setAttribute('visible', true)
   mutatedGhostIndicator.setAttribute('class', 'replay')
   mutatedGhostIndicator.setAttribute('id', 'ghostRing')
   mutatedGhostIndicator.object3D.position.x = mutatedGhost.object3D.position.x;
@@ -254,12 +281,13 @@ function gameEnd() {
   replayButton.setAttribute('visible', true)
 
   // Make heads unclickable
-  var replayObjects = document.querySelectorAll(".replayHead");
+  var replayObjects = document.querySelectorAll('.replayHeads');
   for (i = 0; i < replayObjects.length; i++) {
     replayObjects[i].classList.remove('links');
   }
 }
 
+// Resets everything
 function restartGame() {
   // Move title
   document.getElementById('titleText').setAttribute('position', '0 5 -9')
@@ -301,12 +329,15 @@ function restartGame() {
   savedRecordings = [];
   spaceBuffer = 2;
   tick = 0;
-  randAxes = ['x', 'y', 'z'];
+  randAxes = ['x', 'y'];
   replayCount = 0;
 
   // reset buttons
   document.getElementById('restartButton').setAttribute('class', '')
   document.getElementById('restartButton').setAttribute('visible', false)
+
+  document.getElementById('newRoundButton').setAttribute('class', '')
+  document.getElementById('newRoundButton').setAttribute('visible', false)
 
   document.getElementById('recordButton').setAttribute('visible', true)
   document.getElementById('recordButton').setAttribute('class', 'links')
@@ -324,8 +355,57 @@ function restartGame() {
   document.getElementById('startText').removeAttribute('geometry')
   document.getElementById('startText').removeAttribute('material')
 
-  console.log("restarted game")
   document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 0.5')
+  console.log("restarted game")
+}
+
+// Restarts game loop using the same replays but a new mutation
+function restartRound() {
+  gameStarted = false;
+  replaying = false;
+  gameOver = false;
+  randAxes = ['x', 'y'];
+  randRecord = undefined;
+  randSecond = undefined;
+  randBodyParts = undefined;
+  tick = 0;
+  replayCount = 0;
+
+  // Reset position of ghosts
+  savedRecordings.forEach(function(element, index) {
+    rotateObject(document.getElementById('replayHead' + index), element[0][tick], index * 2 - spaceBuffer)
+    rotateObject(document.getElementById('replayLeftHand' + index), element[1][tick], index * 2 - spaceBuffer)
+    rotateObject(document.getElementById('replayRightHand' + index), element[2][tick], index * 2 - spaceBuffer)
+  })
+
+  // Randomize everything again
+  randomize();
+
+  // reset buttons
+  document.getElementById('restartButton').classList.remove('links')
+  document.getElementById('restartButton').setAttribute('visible', false)
+  document.getElementById('newRoundButton').classList.remove('links')
+  document.getElementById('newRoundButton').setAttribute('visible', false)
+  document.getElementById('replayButton').setAttribute('visible', false)
+  document.getElementById('startText').setAttribute('visible', false)
+  document.getElementById('titleText').setAttribute('visible', false)
+  document.getElementById('ghostRing').setAttribute('visible', false)
+
+  // Fade back in with countdown
+  document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 0.5');
+  document.querySelector('a-scene').setAttribute('countdown', '');
+
+  // Don't start until after the countdown
+  setTimeout( function() {
+    gameStarted = true
+    // Make heads clickable
+    var replayHeads = document.querySelectorAll(".replayHeads");
+    for (i = 0; i < replayHeads.length; i++) {
+      replayHeads[i].classList.add('links');
+    }
+  }, 3000);
+
+  console.log("restarted round")
 }
 
 // Saves given replay to memory and displays it for playback
@@ -397,7 +477,7 @@ AFRAME.registerComponent('replayer', {
         var currReplay = savedRecordings[index];
 
         function move() {
-          if (!gameOver) {
+          if (!replaying) {
             rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer)
             rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer)
             rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer)
@@ -595,6 +675,9 @@ AFRAME.registerComponent('triggered', {
       } else if (restartButtonSelected) {
         document.getElementById('fadePlane').setAttribute('fade', 'fadeIn: false; fadeSeconds: 0.5')
         setTimeout(function() { restartGame(); }, 600);
+      } else if (newRoundButtonSelected) {
+        document.getElementById('fadePlane').setAttribute('fade', 'fadeIn: false; fadeSeconds: 0.5')
+        setTimeout(function() { restartRound(); }, 600);
       } else if (ghostName) {
         console.log("you shot " + ghostName)
         if (!gameOver) {
@@ -649,6 +732,8 @@ AFRAME.registerComponent('button-intersect', {
     var recordButton = document.getElementById("recordButton");
     var replayButton = document.getElementById("replayButton");
     var startButton = document.getElementById("startText");
+    var startButton = document.getElementById("restartButton");
+    var newRoundButton = document.getElementById("newRoundButton");
 
     this.el.addEventListener('raycaster-intersected', function () {
       // console.log('intersecting button')
@@ -670,6 +755,10 @@ AFRAME.registerComponent('button-intersect', {
       } else {
         if (buttonName == 'restart') {
           restartButtonSelected = true;
+          buttonEvent(restartButton, 'int')
+        } else if (buttonName == 'newRoundButton') {
+          newRoundButtonSelected = true;
+          buttonEvent(newRoundButton, 'int')
         } else if (buttonName.slice(0, 10) == 'replayHead') {
           // console.log('selected head')
           ghostSelected = true;
@@ -700,6 +789,9 @@ AFRAME.registerComponent('button-intersect', {
         } else if (buttonName == 'restart') {
           restartButtonSelected = false;
           buttonEvent(restartButton, 'noInt')
+        } else if (buttonName == 'newRoundButton') {
+          newRoundButtonSelected = false;
+          buttonEvent(newRoundButton, 'noInt')
         } else {
           // console.log('didnt match named button')
           cursorOverRecording = undefined;
