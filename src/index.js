@@ -1,6 +1,22 @@
 // Dev tools
 let toggleDebug = false;
 
+// Gameplay tweak vars
+let numReqReplays = 3; // Replays required to start game
+let maxRecordingTime = 4; // recording time in seconds for replays
+let recordedPoses = [ [], [], [] ]; // Position & rotation
+let recordedEvents = []; // Button presses
+let defParts = ['head', 'leftHand', 'rightHand'];
+let randAxes = ['x', 'y'];
+let defMutRotAmt = 40;
+let defMutPosAmt = 0.2;
+
+let rewindMut = false;
+let mutRotAmt = 0;
+let mutPosAmt = 0;
+let currMutRotAmt = 0;
+let currMutPosAmt = 0;
+let difficulty = 'normal';
 let gameStarted = false;
 let gameOver = false;
 let recording = false;
@@ -18,22 +34,20 @@ let ghostSelected = false; // Cursor over spawned ghost
 let ghostName = undefined; // Ghost that was shot
 let mutatedGhostName = undefined; // Mutated ghost
 let savedRecordings = []; // Recordings saved in memory
-let numReqReplays = 3; // Replays required to start game
 let selectedRecording = 0; // Recording selected for playback
-let recordedPoses = [ [], [], [] ]; // Position & rotation
-let recordedEvents = []; // Button presses
 let tick = 0; // Counter for recording playback
 let currRecordingTime = 0;
 let endRecordingTime = 0;
-let maxRecordingTime = 4; // recording time in seconds for replays
 let fadeTime = 0;
 let endFadeTime = 0;
 var countdownEndTime = 0;
 var countdownSecond = 0;
 var countdownStartTime = 0;
 var countingDown = false;
-var maxReplays = 3;
 var replayCount = 0;
+var startTick = 0;
+var midTick = 0;
+var endTick = 0;
 
 let startTime = 0;
 let randRecord; // Ghost that is modified during game
@@ -41,9 +55,7 @@ let randSecond; // Beginning time in replay that mutation occurs
 let randSecondBottom = 0;
 let randSecondTop = 0;
 let randBodyParts; // Body parts chosen to modify during replay
-let spaceBuffer = 2; // This is the temporary space buffer beween pieces
-let defParts = ['head', 'leftHand', 'rightHand'];
-let randAxes = ['x', 'y'];
+let spaceBuffer = 2; // This is the space buffer between spawned avatars
 let cursorOverRecording;
 
 // https://stackoverflow.com/questions/19269545/how-to-get-n-no-elements-randomly-from-an-array
@@ -99,7 +111,18 @@ function randomize() {
   randRecord = Math.floor(Math.random() * Math.floor(savedRecordings.length));
   mutatedGhostName = 'replayHead' + randRecord
   // Get random float between 0.000 and (maxRecordingTime - 1)
-  randSecond = Math.floor(Math.random() * ((maxRecordingTime - 1) * 1000 - 1 * 1000) + 1 * 1000) / (1 * 1000); // 1000 = 3 decimal points
+  randSecond = Math.floor(Math.random() * ((maxRecordingTime - 1) * 1000 - 1 * 1000) + 1 * 1000) / 1000; // 1000 = 3 decimal points
+
+  if (difficulty == 'easy') {
+    mutRotAmt = defMutRotAmt * 2;
+    mutPosAmt = defMutPosAmt * 2;
+  } else if (difficulty == 'normal') {
+    mutRotAmt = defMutRotAmt;
+    mutPosAmt = defMutPosAmt;
+  } else if (difficulty == 'hard') {
+    mutRotAmt = defMutRotAmt / 2;
+    mutPosAmt = defMutPosAmt / 2;
+  }
 
   // Log the output
   console.log('Mutating replay: ' + mutatedGhostName + '; randsecond: ' + randSecond + '; randBodyParts: ' + randBodyParts +'; randAxes: ' + randAxes)
@@ -115,12 +138,11 @@ function rotateObject(obj, ref, px = 0, py = 0, pz = 0, rx = 0, ry = 0, rz = 0) 
     obj.object3D.rotation.y = THREE.Math.degToRad(ref.rotation.y + ry);
     obj.object3D.rotation.z = THREE.Math.degToRad(ref.rotation.z + rz);
   } catch(error) {
-    console.log('Tried to move object but got error: ' + error)
+    console.log('Tried to move object but got error: ' + error) // This try/catch block shouldn't be required...
   }
 }
 
 function gameStart() {
-  console.log("Starting the game...")
   document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 1.5')
 
   // Move title
@@ -197,10 +219,9 @@ function gameStart() {
 
     // Move to starting position
     rotateObject(newHead, element[0][tick], index * 2 - spaceBuffer)
-    rotateObject(newRightHand, element[1][tick], index * 2 - spaceBuffer)
-    rotateObject(newLeftHand, element[2][tick], index * 2 - spaceBuffer)
+    rotateObject(newLeftHand, element[1][tick], index * 2 - spaceBuffer)
+    rotateObject(newRightHand, element[2][tick], index * 2 - spaceBuffer)
   })
-  console.log("Finished spawning ghosts")
 
   // Call our randomizer
   randomize();
@@ -331,6 +352,8 @@ function restartGame() {
   tick = 0;
   randAxes = ['x', 'y'];
   replayCount = 0;
+  currMutRotAmt = 0;
+  currMutPosAmt = 0;
 
   // reset buttons
   document.getElementById('restartButton').setAttribute('class', '')
@@ -356,7 +379,6 @@ function restartGame() {
   document.getElementById('startText').removeAttribute('material')
 
   document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 0.5')
-  console.log("restarted game")
 }
 
 // Restarts game loop using the same replays but a new mutation
@@ -370,6 +392,11 @@ function restartRound() {
   randBodyParts = undefined;
   tick = 0;
   replayCount = 0;
+  currMutRotAmt = 0;
+  currMutPosAmt = 0;
+  startTime = 0;
+  startTick = 0;
+  rewindMut = false;
 
   // Reset position of ghosts
   savedRecordings.forEach(function(element, index) {
@@ -404,8 +431,6 @@ function restartRound() {
       replayHeads[i].classList.add('links');
     }
   }, 3000);
-
-  console.log("restarted round")
 }
 
 // Saves given replay to memory and displays it for playback
@@ -450,8 +475,8 @@ AFRAME.registerComponent('replayer', {
           replayButton.setAttribute('value', 'REPLAYING')
 
           rotateObject(headCube, currReplay[0][tick])
-          rotateObject(rightCube, currReplay[2][tick])
           rotateObject(leftCube, currReplay[1][tick])
+          rotateObject(rightCube, currReplay[2][tick])
 
           tick += 1;
         } else {
@@ -499,17 +524,46 @@ AFRAME.registerComponent('replayer', {
               var randRY = 0;
               var randRZ = 0;
 
+              var halfCurrFps = (90 / 2); // 90 is targeted FPS but should probably use current scene fps
+
+              if (startTick == 0) {
+                startTick = tick;
+                midTick = startTick + halfCurrFps;
+                endTick = midTick + halfCurrFps;
+              }
+
+              // Update current rotation and position mutation amounts
+              if (!rewindMut && tick > midTick) {
+                rewindMut = true;
+              }
+
+              // need to calc upper and lower bounds of ticks and get middle of that to use as switch
+              // works....wrong end number
+              if (!rewindMut) {
+                currMutRotAmt += (mutRotAmt / halfCurrFps)
+                currMutPosAmt += (mutPosAmt / halfCurrFps)
+              } else if (tick < endTick) {
+                currMutRotAmt -= (mutRotAmt / halfCurrFps)
+                currMutPosAmt -= (mutPosAmt / halfCurrFps)
+                if (currMutRotAmt <= 0) {
+                  currMutRotAmt = 0;
+                }
+                if (currMutPosAmt <= 0) {
+                  currMutPosAmt = 0;
+                }
+              }
+
               // Add movement variation if axes selected for mutation
               for (i = 0; i < randAxes.length; i++) {
                 if (randAxes[i] == 'x') {
-                  randPX = index * 2 - spaceBuffer + 0.1;
-                  randRX = THREE.Math.degToRad(20)
+                  randPX = index * 2 - spaceBuffer + currMutPosAmt; // In addition to mutating we space the replay avatars out along the X axis
+                  randRX = THREE.Math.degToRad(currMutRotAmt)
                 } else if (randAxes[i] == 'y') {
-                  randPY = 0.1;
-                  randRY = THREE.Math.degToRad(20);
+                  randPY = currMutPosAmt;
+                  randRY = THREE.Math.degToRad(currMutRotAmt);
                 } else if (randAxes[i] == 'z') {
-                  randPZ = 0.1;
-                  randRZ = THREE.Math.degToRad(20);
+                  randPZ = currMutPosAmt;
+                  randRZ = THREE.Math.degToRad(currMutRotAmt);
                 }
               }
 
@@ -543,11 +597,17 @@ AFRAME.registerComponent('replayer', {
             move();
           }
         } else {
+          rewindMut = false;
+          startTick = 0;
           if (!gameOver && tick > currReplay[0].length) {
             replayCount += 1;
-            if (replayCount < maxReplays) {
+            if (replayCount < numReqReplays) {
               tick = 0;
               startTime = 0;
+              currMutRotAmt = 0;
+              currMutPosAmt = 0;
+              startTick = 0;
+              rewindMut = false;
             }
           }
         }
@@ -649,7 +709,6 @@ AFRAME.registerComponent('triggered', {
 
     // Ensure support for all controllers
     el.addEventListener('triggerdown', function (evt) {
-      //console.log("Trigger down")
       triggerDown = true
 
       if (replayButtonSelected) {
@@ -657,6 +716,10 @@ AFRAME.registerComponent('triggered', {
         if (gameOver) {
           tick = 0;
           startTime = 0;
+          startTick = 0;
+          currMutRotAmt = 0;
+          currMutPosAmt = 0;
+          rewindMut = false;
         }
       } else if (recordButtonSelected) {
         if (!replaying) {
@@ -679,7 +742,6 @@ AFRAME.registerComponent('triggered', {
         document.getElementById('fadePlane').setAttribute('fade', 'fadeIn: false; fadeSeconds: 0.5')
         setTimeout(function() { restartRound(); }, 600);
       } else if (ghostName) {
-        console.log("you shot " + ghostName)
         if (!gameOver) {
           buttonEvent(document.getElementById('startText'), 'toggle')
           buttonEvent(document.getElementById('titleText'), 'toggle')
@@ -732,11 +794,10 @@ AFRAME.registerComponent('button-intersect', {
     var recordButton = document.getElementById("recordButton");
     var replayButton = document.getElementById("replayButton");
     var startButton = document.getElementById("startText");
-    var startButton = document.getElementById("restartButton");
+    var restartButton = document.getElementById("restartButton");
     var newRoundButton = document.getElementById("newRoundButton");
 
     this.el.addEventListener('raycaster-intersected', function () {
-      // console.log('intersecting button')
       if (el.object3D == recordButton.object3D) {
         if (!recording) {
           buttonEvent(recordButton, 'int')
@@ -760,18 +821,15 @@ AFRAME.registerComponent('button-intersect', {
           newRoundButtonSelected = true;
           buttonEvent(newRoundButton, 'int')
         } else if (buttonName.slice(0, 10) == 'replayHead') {
-          // console.log('selected head')
           ghostSelected = true;
           ghostName = buttonName;
         } else {
-          // console.log('didnt match named button')
           cursorOverRecording = buttonName;
         }
       }
     });
 
     this.el.addEventListener('raycaster-intersected-cleared', function () {
-      // console.log('stopped intersecting button')
       if (el.object3D == recordButton.object3D) {
         buttonEvent(recordButton, 'noInt')
         recordButtonSelected = false;
@@ -783,7 +841,6 @@ AFRAME.registerComponent('button-intersect', {
         startButtonSelected = false;
       } else {
         if (buttonName.slice(0, 10) == 'replayHead') {
-          // console.log('left head')
           ghostSelected = false;
           ghostName = undefined;
         } else if (buttonName == 'restart') {
@@ -793,7 +850,6 @@ AFRAME.registerComponent('button-intersect', {
           newRoundButtonSelected = false;
           buttonEvent(newRoundButton, 'noInt')
         } else {
-          // console.log('didnt match named button')
           cursorOverRecording = undefined;
         }
       }
