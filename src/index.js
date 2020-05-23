@@ -16,7 +16,7 @@ let mutRotAmt = 0;
 let mutPosAmt = 0;
 let currMutRotAmt = 0;
 let currMutPosAmt = 0;
-let difficulty = 'normal';
+let difficulty = 'easy';
 let gameStarted = false;
 let gameOver = false;
 let recording = false;
@@ -30,6 +30,7 @@ let replayButtonSelected = false;
 let startButtonSelected = false;
 let restartButtonSelected = false;
 let newRoundButtonSelected = false;
+let difficultyButtonSelected = false;
 let ghostSelected = false; // Cursor over spawned ghost
 let ghostName = undefined; // Ghost that was shot
 let mutatedGhostName = undefined; // Mutated ghost
@@ -102,6 +103,26 @@ function buttonEvent(button, event) {
   }
 }
 
+function changeDifficulty() {
+  if (difficulty == 'turing') {
+    document.getElementById('diffButton').setAttribute('material', 'color: green')
+    document.getElementById('diffButton').setAttribute('value', 'EASY')
+    difficulty = 'easy'
+  } else if (difficulty == 'easy') {
+    document.getElementById('diffButton').setAttribute('material', 'color: yellow')
+    document.getElementById('diffButton').setAttribute('value', 'NORMAL')
+    difficulty = 'normal'
+  } else if (difficulty == 'normal') {
+    document.getElementById('diffButton').setAttribute('material', 'color: orange')
+    document.getElementById('diffButton').setAttribute('value', 'HARD')
+    difficulty = 'hard'
+  } else if (difficulty == 'hard') {
+    document.getElementById('diffButton').setAttribute('material', 'color: red')
+    document.getElementById('diffButton').setAttribute('value', 'TURING TEST')
+    difficulty = 'turing'
+  }
+}
+
 function randomize() {
   // Randomize which body parts are mutated
   randBodyParts = getRandom(defParts, (Math.ceil(Math.random() * defParts.length)))
@@ -122,9 +143,12 @@ function randomize() {
   } else if (difficulty == 'hard') {
     mutRotAmt = defMutRotAmt / 2;
     mutPosAmt = defMutPosAmt / 2;
+  } else if (difficulty == 'turing') {
+    mutRotAmt = 1;
+    mutPosAmt = 0.01;
   }
 
-  // Log the output
+  // Log the output...should show this endgame in a popup
   console.log('Mutating replay: ' + mutatedGhostName + '; randsecond: ' + randSecond + '; randBodyParts: ' + randBodyParts +'; randAxes: ' + randAxes)
 }
 
@@ -153,8 +177,10 @@ function gameStart() {
   // Make buttons unclickable
   document.getElementById('startText').removeAttribute('class')
   document.getElementById('replayButton').removeAttribute('class')
+  document.getElementById('diffButton').removeAttribute('class')
 
   // Hide buttons
+  buttonEvent(document.getElementById('diffButton'), 'toggle')
   buttonEvent(document.getElementById('startText'), 'toggle')
   buttonEvent(document.getElementById('replayButton'), 'toggle')
   for (i = 0; i < savedRecordings.length; i++) {
@@ -244,6 +270,7 @@ function gameStart() {
 function gameEnd() {
   var sceneEl = document.querySelector('a-scene');
   var replayButton = document.getElementById('replayButton');
+  var difficultyButton = document.getElementById('diffButton');
   var mutatedGhost = document.getElementById('replayHead' + randRecord);
   var mutatedGhostIndicator;
 
@@ -300,6 +327,12 @@ function gameEnd() {
   replayButton.setAttribute('value', 'REPLAY IMPOSTER')
   replayButton.setAttribute('class', 'links')
   replayButton.setAttribute('visible', true)
+
+  // Move difficulty button
+  difficultyButton.setAttribute('position', '-4.5 2 1')
+  difficultyButton.setAttribute('rotation', '0 -215 0')
+  difficultyButton.setAttribute('class', 'links')
+  difficultyButton.setAttribute('visible', true)
 
   // Make heads unclickable
   var replayObjects = document.querySelectorAll('.replayHeads');
@@ -370,6 +403,10 @@ function restartGame() {
   document.getElementById('replayButton').setAttribute('rotation', '0 -25 0')
   document.getElementById('replayButton').setAttribute('value', 'REPLAY RECORDING')
 
+  document.getElementById('diffButton').setAttribute('visible', true)
+  document.getElementById('diffButton').setAttribute('rotation', '0 25 0')
+  document.getElementById('diffButton').setAttribute('position', '-3 4 -10')
+
   document.getElementById('startText').setAttribute('value', 'Record ' + numReqReplays + ' animations to start!')
   document.getElementById('startText').setAttribute('class', 'links')
   document.getElementById('startText').setAttribute('rotation', '0 0 0')
@@ -417,6 +454,8 @@ function restartRound() {
   document.getElementById('startText').setAttribute('visible', false)
   document.getElementById('titleText').setAttribute('visible', false)
   document.getElementById('ghostRing').setAttribute('visible', false)
+  document.getElementById('diffButton').classList.remove('links')
+  document.getElementById('diffButton').setAttribute('visible', false)
 
   // Fade back in with countdown
   document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 0.5');
@@ -721,6 +760,8 @@ AFRAME.registerComponent('triggered', {
           currMutPosAmt = 0;
           rewindMut = false;
         }
+      } else if (difficultyButtonSelected) {
+        changeDifficulty();
       } else if (recordButtonSelected) {
         if (!replaying) {
           recording = true;
@@ -796,6 +837,7 @@ AFRAME.registerComponent('button-intersect', {
     var startButton = document.getElementById("startText");
     var restartButton = document.getElementById("restartButton");
     var newRoundButton = document.getElementById("newRoundButton");
+    var difficultyButton = document.getElementById("diffButton");
 
     this.el.addEventListener('raycaster-intersected', function () {
       if (el.object3D == recordButton.object3D) {
@@ -813,6 +855,9 @@ AFRAME.registerComponent('button-intersect', {
           buttonEvent(startButton, 'int')
           startButtonSelected = true;
         }
+      } else if (el.object3D == difficultyButton.object3D) {
+        buttonEvent(difficultyButton, 'int')
+        difficultyButtonSelected = true;
       } else {
         if (buttonName == 'restart') {
           restartButtonSelected = true;
@@ -839,6 +884,9 @@ AFRAME.registerComponent('button-intersect', {
       } else if (el.object3D == startButton.object3D) {
         buttonEvent(startButton, 'noInt')
         startButtonSelected = false;
+      } else if (el.object3D == difficultyButton.object3D) {
+        buttonEvent(difficultyButton, 'noInt')
+        difficultyButtonSelected = false;
       } else {
         if (buttonName.slice(0, 10) == 'replayHead') {
           ghostSelected = false;
