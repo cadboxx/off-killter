@@ -17,6 +17,7 @@ let mutPosAmt = 0;
 let currMutRotAmt = 0;
 let currMutPosAmt = 0;
 let difficulty = 'easy';
+let diffMet = false;
 let gameStarted = false;
 let gameOver = false;
 let recording = false;
@@ -100,6 +101,15 @@ function recordEntity(el, index) {
 
   // Check oldpoint delta against newpoint
   function calcDiff() {
+    // Apply a percentage of movement to balance body parts
+    if (entId == 'leftHand' || entId == 'rightHand') {
+      var balance = 0.5;
+    } else if (entId == 'camera') {
+      var balance = 0.3;
+    } else {
+      var balance = 0;
+    }
+
     // Positions
     xPosDelta = Math.abs(oldPoint[entId].position.x) - Math.abs(newPoint.position.x);
     yPosDelta = Math.abs(oldPoint[entId].position.y) - Math.abs(newPoint.position.y);
@@ -108,7 +118,7 @@ function recordEntity(el, index) {
     var posDeltas = [xPosDelta,yPosDelta,zPosDelta]
     for (d = 0; d < posDeltas.length; d++) {
       if (Math.abs(posDeltas[d]) > posNoiseThreshold) {
-        pointDiff += Math.abs(posDeltas[d])
+        pointDiff += (Math.abs(posDeltas[d]) * balance)
       }
     }
 
@@ -123,21 +133,29 @@ function recordEntity(el, index) {
     var rotDeltas = [xRotDelta,yRotDelta,zRotDelta]
     for (d = 0; d < rotDeltas.length; d++) {
       if (Math.abs(rotDeltas[d]) > rotNoiseThreshold) {
-        pointDiff += Math.abs(rotDeltas[d])
+        pointDiff += (Math.abs(rotDeltas[d]) * balance)
       }
     }
     diffMeterTotal += (pointDiff / 1000)
     pointDiff = 0;
 
     if (diffMeterTotal < barTotal) {
-      console.log('difftotal: ' + diffMeterTotal)
       document.getElementById('diffMeter').setAttribute('geometry', 'primitive:plane; width: ' + diffMeterTotal + '; height: 0.5')
+      if (diffMeterTotal > (barTotal / 2) ) {
+        document.getElementById('diffMeter').setAttribute('material', 'color: yellow');
+        document.getElementById('diffMeter').setAttribute('value', 'KEEP MOVING');
+      }
+    } else if (!diffMet) {
+      diffMet = true;
+      document.getElementById('diffMeter').setAttribute('material', 'color: lightgreen');
+      document.getElementById('diffMeter').setAttribute('value', 'SAVED!');
     }
   }
 
   if (oldPoint) {
-    if (oldPoint[entId])
+    if (oldPoint[entId]) {
       calcDiff()
+    }
   }
 
   // Save current point for next tick
@@ -244,6 +262,7 @@ function gameStart() {
   document.getElementById('diffButton').removeAttribute('class')
 
   // Hide buttons
+  document.getElementById('diffMeter').setAttribute('visible', false)
   buttonEvent(document.getElementById('diffButton'), 'toggle')
   buttonEvent(document.getElementById('startText'), 'toggle')
   buttonEvent(document.getElementById('replayButton'), 'toggle')
@@ -754,27 +773,37 @@ AFRAME.registerComponent('mirror-movement', {
           let seconds = maxRecordingTime * 1000; // convert to milliseconds
           endRecordingTime = currRecordingTime + seconds; // set time to end recording
         } else if (currRecordingTime >= endRecordingTime) {
-          if (replayButton.getAttribute('visible') == false) {
-            buttonEvent(replayButton, 'toggle')
-            document.getElementById('replayButton').setAttribute('class', 'links')
-          }
+          if (diffMet) {
+            if (replayButton.getAttribute('visible') == false) {
+              buttonEvent(replayButton, 'toggle')
+              document.getElementById('replayButton').setAttribute('class', 'links')
+            }
 
-          addReplay(recordedPoses, savedRecordings.length)
+            addReplay(recordedPoses, savedRecordings.length)
 
-          if (savedRecordings.length >= numReqReplays) {
-            startButton.setAttribute('value', 'START!')
-            startButton.setAttribute('geometry', 'primitive:plane; height:0.5')
-            startButton.setAttribute('material', 'color: lightgreen')
+            if (savedRecordings.length >= numReqReplays) {
+              startButton.setAttribute('value', 'START!')
+              startButton.setAttribute('geometry', 'primitive:plane; height:0.5')
+              startButton.setAttribute('material', 'color: lightgreen')
 
-            recordButton.setAttribute('visible', false)
-            recordButton.setAttribute('class', '') // Make unclickable
+              recordButton.setAttribute('visible', false)
+              recordButton.setAttribute('class', '') // Make unclickable
+              document.getElementById('diffMeter').setAttribute('visible', false)
+            } else {
+              startButton.setAttribute('value', 'Record ' + (numReqReplays - savedRecordings.length) + ' more animations to start...')
+            }
           } else {
-            startButton.setAttribute('value', 'Record ' + (numReqReplays - savedRecordings.length) + ' more animations to start...')
+            startButton.setAttribute('value', 'You need to move enough to fill the bar!')
           }
+
           recording = false;
-          document.getElementById('diffMeter').removeAttribute('geometry');
+          document.getElementById('diffMeter').setAttribute('geometry', 'width: 0; height: 0;')
+          document.getElementById('diffMeter').setAttribute('material', 'color: pink');
+          document.getElementById('diffMeter').setAttribute('value', 'MOVE TO FILL');
+          document.getElementById('diffMeter').setAttribute('visible', false)
           oldPoint = {};
           diffMeterTotal = 0;
+          diffMet = false;
         } else {
           recordButton.setAttribute('material', 'color:lightgreen')
           recordButton.setAttribute('value', 'RECORDING')
@@ -831,6 +860,7 @@ AFRAME.registerComponent('triggered', {
         changeDifficulty();
       } else if (recordButtonSelected) {
         if (!replaying) {
+          document.getElementById('diffMeter').setAttribute('visible', true)
           recording = true;
           recordedPoses = [ [], [], [] ];
           tick = 0;

@@ -55,7 +55,12 @@
 
       <a-text id="recordButton" class="links" value="START RECORDING" geometry="primitive:circle" position="-3 2 -10" rotation="0 25 0" material="color: red" scale="0.7 0.7 0.7" button-intersect></a-text>
 
-      <a-text id="diffMeter" value="MOVE TO FILL" align="center" position="0 3 -10" rotation="0 0 0" material="color: pink" scale="0.7 0.7 0.7" button-intersect></a-text>
+      <a-text id="diffMeter" value="MOVE TO FILL" align="center" position="0 3 -10" rotation="0 0 0" material="color: pink" scale="0.7 0.7 0.7" visible='false'>
+        <a-plane id="topBar" position="0 0.25 0" width="4" height="0.05" color="black"></a-plane>
+        <a-plane id="bottomBar" position="0 -0.25 0" width="4" height="0.05" color="black"></a-plane>
+        <a-plane id="leftBar" position="-2 0 0" width="0.05" height="0.5" color="black"></a-plane>
+        <a-plane id="rightBar" position="2 0 0" width="0.05" height="0.5" color="black"></a-plane>
+      </a-text>
 
       <a-text id="diffButton" class="links" value="EASY" geometry="primitive:plane; width: 2; height: 0.8" align="center" position="-3 4 -10" rotation="0 25 0" material="color: green" scale="0.7 0.7 0.7" button-intersect>
         <a-text id="diffButtonText" value="(Click to change difficulty)" align="center" position="0 -0.2 0" scale="0.5 0.5 0.5" button-intersect></a-text>
