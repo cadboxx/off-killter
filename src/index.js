@@ -2,14 +2,14 @@
 let toggleDebug = false;
 
 // Gameplay tweak vars
-let numReqReplays = 3; // Replays required to start game
-let maxRecordingTime = 4; // recording time in seconds for replays
+const numReqReplays = 3; // Replays required to start game
+const maxRecordingTime = 4; // recording time in seconds for replays
 let recordedPoses = [ [], [], [] ]; // Position & rotation
 let recordedEvents = []; // Button presses
 let defParts = ['head', 'leftHand', 'rightHand'];
 let randAxes = ['x', 'y'];
-let defMutRotAmt = 40;
-let defMutPosAmt = 0.2;
+const defMutRotAmt = 40;
+const defMutPosAmt = 0.2;
 
 let rewindMut = false;
 let mutRotAmt = 0;
@@ -49,6 +49,8 @@ var replayCount = 0;
 var startTick = 0;
 var midTick = 0;
 var endTick = 0;
+var oldPoint = {};
+var diffMeterTotal = 0;
 
 let startTime = 0;
 let randRecord; // Ghost that is modified during game
@@ -76,12 +78,74 @@ function getRandom(arr, n) {
 
 // Records pose of object on tick
 function recordEntity(el, index) {
+  // Record point
   var newPoint = {
     position: AFRAME.utils.clone(el.getAttribute('position')),
     rotation: AFRAME.utils.clone(el.getAttribute('rotation')),
     timestamp: Date.now() // Record timestamp of tick for grouping
   }
   recordedPoses[index].push(newPoint);
+
+  const posNoiseThreshold = 0.001;
+  const rotNoiseThreshold = 0.500;
+  const barTotal = maxRecordingTime;
+  var xPosDelta;
+  var yPosDelta;
+  var zPosDelta;
+  var xRotDelta;
+  var yRotDelta;
+  var zRotDelta;
+  var pointDiff = 0;
+  var entId = el.id;
+
+  // Check oldpoint delta against newpoint
+  function calcDiff() {
+    // Positions
+    xPosDelta = Math.abs(oldPoint[entId].position.x) - Math.abs(newPoint.position.x);
+    yPosDelta = Math.abs(oldPoint[entId].position.y) - Math.abs(newPoint.position.y);
+    zPosDelta = (Math.abs(oldPoint[entId].position.z) - Math.abs(newPoint.position.z)) / 2;
+
+    var posDeltas = [xPosDelta,yPosDelta,zPosDelta]
+    for (d = 0; d < posDeltas.length; d++) {
+      if (Math.abs(posDeltas[d]) > posNoiseThreshold) {
+        pointDiff += Math.abs(posDeltas[d])
+      }
+    }
+
+    diffMeterTotal += pointDiff
+    pointDiff = 0;
+
+    // Rotations
+    xRotDelta = Math.abs(oldPoint[entId].rotation.x) - Math.abs(newPoint.rotation.x);
+    yRotDelta = Math.abs(oldPoint[entId].rotation.y) - Math.abs(newPoint.rotation.y);
+    zRotDelta = (Math.abs(oldPoint[entId].rotation.z) - Math.abs(newPoint.rotation.z)) / 5;
+
+    var rotDeltas = [xRotDelta,yRotDelta,zRotDelta]
+    for (d = 0; d < rotDeltas.length; d++) {
+      if (Math.abs(rotDeltas[d]) > rotNoiseThreshold) {
+        pointDiff += Math.abs(rotDeltas[d])
+      }
+    }
+    diffMeterTotal += (pointDiff / 1000)
+    pointDiff = 0;
+
+    if (diffMeterTotal < barTotal) {
+      console.log('difftotal: ' + diffMeterTotal)
+      document.getElementById('diffMeter').setAttribute('geometry', 'primitive:plane; width: ' + diffMeterTotal + '; height: 0.5')
+    }
+  }
+
+  if (oldPoint) {
+    if (oldPoint[entId])
+      calcDiff()
+  }
+
+  // Save current point for next tick
+  oldPoint[entId] = {
+    position: AFRAME.utils.clone(el.getAttribute('position')),
+    rotation: AFRAME.utils.clone(el.getAttribute('rotation')),
+    timestamp: Date.now() // Record timestamp of tick for grouping
+  }
 }
 
 // Floating button helper
@@ -708,6 +772,9 @@ AFRAME.registerComponent('mirror-movement', {
             startButton.setAttribute('value', 'Record ' + (numReqReplays - savedRecordings.length) + ' more animations to start...')
           }
           recording = false;
+          document.getElementById('diffMeter').removeAttribute('geometry');
+          oldPoint = {};
+          diffMeterTotal = 0;
         } else {
           recordButton.setAttribute('material', 'color:lightgreen')
           recordButton.setAttribute('value', 'RECORDING')
