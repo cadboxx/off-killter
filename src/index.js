@@ -12,6 +12,7 @@ const defMutRotAmt = 40;
 const defMutPosAmt = 0.2;
 
 let rewindMut = false;
+var highlighted = false;
 let mutRotAmt = 0;
 let mutPosAmt = 0;
 let currMutRotAmt = 0;
@@ -61,6 +62,7 @@ let randSecondTop = 0;
 let randBodyParts; // Body parts chosen to modify during replay
 let spaceBuffer = 2; // This is the space buffer between spawned avatars
 let cursorOverRecording;
+let oldColor = "0xFFFFFF";
 
 // https://stackoverflow.com/questions/19269545/how-to-get-n-no-elements-randomly-from-an-array
 function getRandom(arr, n) {
@@ -309,6 +311,7 @@ function gameStart() {
     newLeftHand.setAttribute('id', 'replayLeftHand' + index)
     sceneEl.appendChild(newLeftHand)
     var newLeftHandModel = document.createElement('a-entity')
+    newLeftHandModel.setAttribute('id', 'newLeftHandModel' + index)
     newLeftHandModel.setAttribute('gltf-model', '#leftHandModel')
     newLeftHandModel.setAttribute('rotation', '0 0 90')
     newLeftHandModel.setAttribute('class', 'replay replayHandLeft')
@@ -322,6 +325,7 @@ function gameStart() {
     newRightHand.setAttribute('id', 'replayRightHand' + index)
     sceneEl.appendChild(newRightHand)
     var newRightHandModel = document.createElement('a-entity')
+    newRightHandModel.setAttribute('id', 'newRightHandModel' + index)
     newRightHandModel.setAttribute('gltf-model', '#rightHandModel')
     newRightHandModel.setAttribute('rotation', '0 0 -90')
     newRightHandModel.setAttribute('class', 'replay replayHandRight')
@@ -528,6 +532,10 @@ function restartRound() {
     document.getElementById('newHeadModel' + index).removeAttribute('random-color')
     document.getElementById('newHeadModel' + index).setAttribute('random-color', '')
     document.getElementById('newHeadModel' + index).getObject3D('mesh').geometry.colorsNeedUpdate = true;
+
+    document.getElementById('newRightHandModel' + index).removeAttribute('highlight')
+    document.getElementById('newLeftHandModel' + index).removeAttribute('highlight')
+    document.getElementById('newHeadModel' + index).removeAttribute('highlight')
   })
 
   // Randomize everything again
@@ -664,8 +672,6 @@ AFRAME.registerComponent('replayer', {
                 rewindMut = true;
               }
 
-              // need to calc upper and lower bounds of ticks and get middle of that to use as switch
-              // works....wrong end number
               if (!rewindMut) {
                 currMutRotAmt += (mutRotAmt / halfCurrFps)
                 currMutPosAmt += (mutPosAmt / halfCurrFps)
@@ -698,10 +704,19 @@ AFRAME.registerComponent('replayer', {
               for (i = 0; i < randBodyParts.length; i++) {
                 if (randBodyParts[i] == 'head') {
                   rotateObject(headCube, currReplay[0][tick], randPX, randPY, randPZ, randRX, randRY, randRZ)
+                  if (gameOver && !document.getElementById('newHeadModel' + index).getAttribute('highlight')) {
+                    document.getElementById('newHeadModel' + index).setAttribute('highlight', '')
+                  }
                 } else if (randBodyParts[i] == 'leftHand') {
                   rotateObject(leftCube, currReplay[1][tick], randPX, randPY, randPZ, randRX, randRY, randRZ)
+                  if (gameOver && !document.getElementById('newLeftHandModel' + index).getAttribute('highlight')) {
+                    document.getElementById('newLeftHandModel' + index).setAttribute('highlight', '')
+                  }
                 } else if (randBodyParts[i] == 'rightHand') {
                   rotateObject(rightCube, currReplay[2][tick], randPX, randPY, randPZ, randRX, randRY, randRZ)
+                  if (gameOver && !document.getElementById('newRightHandModel' + index).getAttribute('highlight')) {
+                    document.getElementById('newRightHandModel' + index).setAttribute('highlight', '')
+                  }
                 }
               }
 
@@ -718,10 +733,20 @@ AFRAME.registerComponent('replayer', {
             } else {
               // Move all body parts normally if current timestamp is not within our randomized range
               move();
+              if (gameOver && document.getElementById('newRightHandModel' + index).getAttribute('highlight')) {
+                document.getElementById('newRightHandModel' + index).removeAttribute('highlight')
+                document.getElementById('newLeftHandModel' + index).removeAttribute('highlight')
+                document.getElementById('newHeadModel' + index).removeAttribute('highlight')
+              }
             }
           } else {
             // Move !randRecord pieces normally if game isn't over
             move();
+            if (gameOver && document.getElementById('newRightHandModel' + index).getAttribute('highlight')) {
+              document.getElementById('newRightHandModel' + index).removeAttribute('highlight')
+              document.getElementById('newLeftHandModel' + index).removeAttribute('highlight')
+              document.getElementById('newHeadModel' + index).removeAttribute('highlight')
+            }
           }
         } else {
           rewindMut = false;
@@ -754,7 +779,6 @@ AFRAME.registerComponent('replayer', {
   }
 });
 
-// Mirror user movement while idle
 AFRAME.registerComponent('mirror-movement', {
   tick: function () {
     if (!gameStarted) {
@@ -783,6 +807,12 @@ AFRAME.registerComponent('mirror-movement', {
       }
 
       if (recording) {
+        if (!highlighted) {
+          highlighted = true;
+          document.getElementById('mirrorRightHand').setAttribute('highlight', '')
+          document.getElementById('mirrorLeftHand').setAttribute('highlight', '')
+          document.getElementById('mirrorHead').setAttribute('highlight', '')
+        }
         if (currRecordingTime == 0) {
           currRecordingTime = Date.now(); // get current time
           let seconds = maxRecordingTime * 1000; // convert to milliseconds
@@ -829,6 +859,12 @@ AFRAME.registerComponent('mirror-movement', {
         }
 
       } else {
+        if (highlighted) {
+          document.getElementById('mirrorRightHand').removeAttribute('highlight')
+          document.getElementById('mirrorLeftHand').removeAttribute('highlight')
+          document.getElementById('mirrorHead').removeAttribute('highlight')
+          highlighted = false;
+        }
         recordButton.setAttribute('material', 'color:red')
         if (savedRecordings.length < numReqReplays) {
           recordButton.setAttribute('value', 'START RECORDING')
@@ -1120,6 +1156,37 @@ AFRAME.registerComponent('countdown', {
     countingDown = false;
     // Delete the number text
     document.querySelector('a-scene').removeChild(document.getElementById('countdownText'))
+  }
+});
+
+// Changes color of mesh
+AFRAME.registerComponent('highlight', {
+  init: function() {
+    let el = this.el;
+    let mesh = el.getObject3D('mesh');
+    if (!mesh){return;}
+    mesh.traverse(function(node){
+      if (node.isMesh){
+        if (el.classList.contains('replayHeads')) {
+          oldColor = node.material.color;
+        }
+        node.material.color = new THREE.Color(0xffff00);
+      }
+    });
+  },
+  remove: function() {
+    let el = this.el;
+    let mesh = el.getObject3D('mesh');
+    if (!mesh){return;}
+    mesh.traverse(function(node){
+      if (node.isMesh){
+        if (el.classList.contains('replayHeads')) {
+          node.material.color = oldColor;
+        } else {
+          node.material.color = new THREE.Color(0xFFFFFF);
+        }
+      }
+    });
   }
 });
 
