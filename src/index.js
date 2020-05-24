@@ -733,7 +733,7 @@ AFRAME.registerComponent('replayer', {
             } else {
               // Move all body parts normally if current timestamp is not within our randomized range
               move();
-              if (gameOver && document.getElementById('newRightHandModel' + index).getAttribute('highlight')) {
+              if (gameOver) {
                 document.getElementById('newRightHandModel' + index).removeAttribute('highlight')
                 document.getElementById('newLeftHandModel' + index).removeAttribute('highlight')
                 document.getElementById('newHeadModel' + index).removeAttribute('highlight')
@@ -742,7 +742,7 @@ AFRAME.registerComponent('replayer', {
           } else {
             // Move !randRecord pieces normally if game isn't over
             move();
-            if (gameOver && document.getElementById('newRightHandModel' + index).getAttribute('highlight')) {
+            if (gameOver) {
               document.getElementById('newRightHandModel' + index).removeAttribute('highlight')
               document.getElementById('newLeftHandModel' + index).removeAttribute('highlight')
               document.getElementById('newHeadModel' + index).removeAttribute('highlight')
@@ -751,6 +751,11 @@ AFRAME.registerComponent('replayer', {
         } else {
           rewindMut = false;
           startTick = 0;
+          if (gameOver) {
+            document.getElementById('newRightHandModel' + index).removeAttribute('highlight')
+            document.getElementById('newLeftHandModel' + index).removeAttribute('highlight')
+            document.getElementById('newHeadModel' + index).removeAttribute('highlight')
+          }
           if (!gameOver && tick > currReplay[0].length) {
             replayCount += 1;
             if (replayCount < numReqReplays) {
