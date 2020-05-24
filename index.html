@@ -7,13 +7,11 @@
     <script src="https://unpkg.com/aframe-render-order-component@1.1.0/dist/aframe-render-order-component.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.1.0/dist/aframe-environment-component.min.js"></script>
     <script src="https://unpkg.com/aframe-randomizer-components@3.0.2/dist/aframe-randomizer-components.min.js"></script>
-    <script src="src/index.js"></script>
+    <script src="./src/index.js"></script>
   </head>
   <body>
     <a-scene start-game toggle-debug>
-      <a-assets>
-        <a-asset-item id="head" src="assets/Basehead.obj"></a-asset-item>
-        <a-asset-item id="head-mtl" src="assets/Basehead.mtl"></a-asset-item>
+      <a-assets timeout="10000">
         <a-asset-item id="leftHandModel" src="assets/leftHand.glb"></a-asset-item>
         <a-asset-item id="rightHandModel" src="assets/rightHand.glb"></a-asset-item>
         <img id="face-texture" src="assets/facetext.jpg">
