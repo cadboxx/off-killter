@@ -148,7 +148,7 @@ function recordEntity(el, index) {
     } else if (!diffMet) {
       diffMet = true;
       document.getElementById('diffMeter').setAttribute('material', 'color: lightgreen');
-      document.getElementById('diffMeter').setAttribute('value', 'SAVED!');
+      document.getElementById('diffMeter').setAttribute('value', 'FILLED!');
     }
   }
 
@@ -735,6 +735,16 @@ AFRAME.registerComponent('replayer', {
               currMutPosAmt = 0;
               startTick = 0;
               rewindMut = false;
+            } else {
+              buttonEvent(document.getElementById('startText'), 'toggle')
+              buttonEvent(document.getElementById('titleText'), 'toggle')
+              document.getElementById('startText').setAttribute('value', 'YOU RAN OUT OF TIME, BE FASTER!')
+              document.getElementById('startText').setAttribute('material', 'color: red')
+              document.getElementById('startText').setAttribute('rotation', '-50 180 0')
+              document.getElementById('startText').setAttribute('position', '0 0.2 -2')
+              document.getElementById('startText').setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
+              gameOver = true;
+              gameEnd();
             }
           }
         }
