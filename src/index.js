@@ -28,6 +28,7 @@ let leftTriggerDown = false;
 let rightTriggerDown = false;
 let triggerDown = false;
 let recordButtonSelected = false;
+let helpButtonSelected = false;
 let replayButtonSelected = false;
 let startButtonSelected = false;
 let restartButtonSelected = false;
@@ -249,9 +250,10 @@ function rotateObject(obj, ref, px = 0, py = 0, pz = 0, rx = 0, ry = 0, rz = 0) 
 
 function gameStart() {
   document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 1.5')
+  document.getElementById('helpButton').setAttribute('visible', false)
 
   // Move title
-  buttonEvent(document.getElementById('titleText'), 'toggle')
+  document.getElementById('titleText').setAttribute('visible', false)
   document.getElementById('titleText').setAttribute('position', '0 6 3')
   document.getElementById('titleText').setAttribute('rotation', '30 180 0')
 
@@ -262,17 +264,17 @@ function gameStart() {
 
   // Hide buttons
   document.getElementById('diffMeter').setAttribute('visible', false)
-  buttonEvent(document.getElementById('diffButton'), 'toggle')
-  buttonEvent(document.getElementById('startText'), 'toggle')
-  buttonEvent(document.getElementById('replayButton'), 'toggle')
+  document.getElementById('diffButton').setAttribute('visible', false)
+  document.getElementById('startText').setAttribute('visible', false)
+  document.getElementById('replayButton').setAttribute('visible', false)
   for (i = 0; i < savedRecordings.length; i++) {
-    buttonEvent(document.getElementById('replay' + i), 'toggle')
+    document.getElementById('replay' + i).setAttribute('visible', false)
   }
 
   // hide mirror replay
-  buttonEvent(document.getElementById('leftCube'), 'toggle')
-  buttonEvent(document.getElementById('rightCube'), 'toggle')
-  buttonEvent(document.getElementById('headCube'), 'toggle')
+  document.getElementById('leftCube').setAttribute('visible', false)
+  document.getElementById('rightCube').setAttribute('visible', false)
+  document.getElementById('headCube').setAttribute('visible', false)
 
   if (savedRecordings.length > 3) {
     spaceBuffer += 1;
@@ -474,14 +476,19 @@ function gameEnd() {
 
 // Resets everything
 function restartGame() {
+  document.getElementById('helpButton').setAttribute('visible', true)
+  document.getElementById('mutateStatsAxes').setAttribute('visible', false)
+  document.getElementById('mutateStatsSeconds').setAttribute('visible', false)
+  document.getElementById('mutateStatsParts').setAttribute('visible', false)
+
   // Move title
   document.getElementById('titleText').setAttribute('position', '0 5 -9')
   document.getElementById('titleText').setAttribute('rotation', '30 0 0')
 
   // restore mirror body
-  buttonEvent(document.getElementById('leftCube'), 'toggle')
-  buttonEvent(document.getElementById('rightCube'), 'toggle')
-  buttonEvent(document.getElementById('headCube'), 'toggle')
+  document.getElementById('leftCube').setAttribute('visible', true)
+  document.getElementById('rightCube').setAttribute('visible', true)
+  document.getElementById('headCube').setAttribute('visible', true)
 
   // reset player positon
   document.getElementById('rig').setAttribute('position', '0 0 -4')
@@ -813,8 +820,8 @@ AFRAME.registerComponent('replayer', {
               startTick = 0;
               rewindMut = false;
             } else {
-              buttonEvent(document.getElementById('startText'), 'toggle')
-              buttonEvent(document.getElementById('titleText'), 'toggle')
+              document.getElementById('startText').setAttribute('visible', true)
+              document.getElementById('titleText').setAttribute('visible', true)
               document.getElementById('startText').setAttribute('value', 'YOU RAN OUT OF TIME, BE FASTER!')
               document.getElementById('startText').setAttribute('material', 'color: red')
               document.getElementById('startText').setAttribute('rotation', '-50 180 0')
@@ -872,7 +879,7 @@ AFRAME.registerComponent('mirror-movement', {
         } else if (currRecordingTime >= endRecordingTime) {
           if (diffMet) {
             if (replayButton.getAttribute('visible') == false) {
-              buttonEvent(replayButton, 'toggle')
+              replayButton.setAttribute('visible', true)
               document.getElementById('replayButton').setAttribute('class', 'links')
             }
 
@@ -961,6 +968,8 @@ AFRAME.registerComponent('triggered', {
         }
       } else if (difficultyButtonSelected) {
         changeDifficulty();
+      } else if (helpButtonSelected) {
+        buttonEvent(document.getElementById('helpButtonText'), 'toggle')
       } else if (recordButtonSelected) {
         if (!replaying) {
           document.getElementById('diffMeter').setAttribute('visible', true)
@@ -984,8 +993,8 @@ AFRAME.registerComponent('triggered', {
         setTimeout(function() { restartRound(); }, 600);
       } else if (ghostName) {
         if (!gameOver) {
-          buttonEvent(document.getElementById('startText'), 'toggle')
-          buttonEvent(document.getElementById('titleText'), 'toggle')
+          document.getElementById('startText').setAttribute('visible', true)
+          document.getElementById('titleText').setAttribute('visible', true)
           if (ghostName == mutatedGhostName) {
             startButton.setAttribute('value', 'YOU SHOT THE IMPOSTER!')
             startButton.setAttribute('material', 'color: green')
@@ -1038,9 +1047,13 @@ AFRAME.registerComponent('button-intersect', {
     var restartButton = document.getElementById("restartButton");
     var newRoundButton = document.getElementById("newRoundButton");
     var difficultyButton = document.getElementById("diffButton");
+    var helpButton = document.getElementById('helpButton');
 
     this.el.addEventListener('raycaster-intersected', function () {
-      if (el.object3D == recordButton.object3D) {
+      if (el.object3D == helpButton.object3D) {
+        buttonEvent(helpButton, 'int')
+        helpButtonSelected = true;
+      } else if (el.object3D == recordButton.object3D) {
         if (!recording) {
           buttonEvent(recordButton, 'int')
           recordButtonSelected = true;
@@ -1075,7 +1088,10 @@ AFRAME.registerComponent('button-intersect', {
     });
 
     this.el.addEventListener('raycaster-intersected-cleared', function () {
-      if (el.object3D == recordButton.object3D) {
+      if (el.object3D == helpButton.object3D) {
+        buttonEvent(helpButton, 'noInt')
+        helpButtonSelected = false;
+      } else if (el.object3D == recordButton.object3D) {
         buttonEvent(recordButton, 'noInt')
         recordButtonSelected = false;
       } else if (el.object3D == replayButton.object3D) {
