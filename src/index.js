@@ -231,9 +231,6 @@ function randomize() {
     mutRotAmt = 1;
     mutPosAmt = 0.01;
   }
-
-  // Log the output...should show this endgame in a popup
-  console.log('Mutating replay: ' + mutatedGhostName + '; randsecond: ' + randSecond + '; randBodyParts: ' + randBodyParts +'; randAxes: ' + randAxes)
 }
 
 // Translate object to anther object's position with optional offsets
@@ -427,6 +424,52 @@ function gameEnd() {
   for (i = 0; i < replayObjects.length; i++) {
     replayObjects[i].classList.remove('links');
   }
+
+  // Add text
+  //console.log('Mutating replay: ' + mutatedGhostName + '; randsecond: ' + randSecond + '; randBodyParts: ' + randBodyParts +'; randAxes: ' + randAxes)
+  if (!document.getElementById('mutateStatsParts')) {
+    var sceneEl = document.querySelector('a-scene');
+    var entityEl = document.createElement('a-text');
+    entityEl.setAttribute('id', 'mutateStatsParts')
+    entityEl.setAttribute('value', 'Mutated parts: ' + randBodyParts)
+    entityEl.setAttribute('rotation', '-60 180 0')
+    entityEl.setAttribute('position', '2 0.4 1.0')
+    entityEl.setAttribute('wrapCount', '100')
+    entityEl.setAttribute('scale', '1 1 1')
+    entityEl.setAttribute('color', 'black')
+    sceneEl.appendChild(entityEl);
+
+    var sceneEl = document.querySelector('a-scene');
+    var entityEl = document.createElement('a-text');
+    entityEl.setAttribute('id', 'mutateStatsSeconds')
+    entityEl.setAttribute('value', 'Mutation started at: ' + randSecond + 's')
+    entityEl.setAttribute('rotation', '-60 180 0')
+    entityEl.setAttribute('position', '2 0.3 0.5')
+    entityEl.setAttribute('wrapCount', '100')
+    entityEl.setAttribute('scale', '1 1 1')
+    entityEl.setAttribute('color', 'black')
+    sceneEl.appendChild(entityEl);
+
+    var sceneEl = document.querySelector('a-scene');
+    var entityEl = document.createElement('a-text');
+    entityEl.setAttribute('id', 'mutateStatsAxes')
+    entityEl.setAttribute('value', 'Mutated along these axes: ' + randAxes)
+    entityEl.setAttribute('rotation', '-60 180 0')
+    entityEl.setAttribute('position', '2 0.2 0')
+    entityEl.setAttribute('wrapCount', '100')
+    entityEl.setAttribute('scale', '1 1 1')
+    entityEl.setAttribute('color', 'black')
+    sceneEl.appendChild(entityEl);
+  } else {
+    document.getElementById('mutateStatsAxes').setAttribute('visible', true)
+    document.getElementById('mutateStatsAxes').setAttribute('value', 'Mutated along these axes: ' + randAxes)
+
+    document.getElementById('mutateStatsSeconds').setAttribute('value', 'Mutation started at ' + randSecond + 's')
+    document.getElementById('mutateStatsSeconds').setAttribute('visible', true)
+
+    document.getElementById('mutateStatsParts').setAttribute('value', 'Mutated parts: ' + randBodyParts)
+    document.getElementById('mutateStatsParts').setAttribute('visible', true)
+  }
 }
 
 // Resets everything
@@ -540,6 +583,10 @@ function restartRound() {
 
   // Randomize everything again
   randomize();
+
+  document.getElementById('mutateStatsAxes').setAttribute('visible', false)
+  document.getElementById('mutateStatsSeconds').setAttribute('visible', false)
+  document.getElementById('mutateStatsParts').setAttribute('visible', false)
 
   // reset buttons
   document.getElementById('restartButton').classList.remove('links')
@@ -771,7 +818,7 @@ AFRAME.registerComponent('replayer', {
               document.getElementById('startText').setAttribute('value', 'YOU RAN OUT OF TIME, BE FASTER!')
               document.getElementById('startText').setAttribute('material', 'color: red')
               document.getElementById('startText').setAttribute('rotation', '-50 180 0')
-              document.getElementById('startText').setAttribute('position', '0 0.2 -2')
+              document.getElementById('startText').setAttribute('position', '0 0.2 -1.5')
               document.getElementById('startText').setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
               gameOver = true;
               gameEnd();
@@ -943,7 +990,7 @@ AFRAME.registerComponent('triggered', {
             startButton.setAttribute('value', 'YOU SHOT THE IMPOSTER!')
             startButton.setAttribute('material', 'color: green')
             startButton.setAttribute('rotation', '-50 180 0')
-            startButton.setAttribute('position', '0 0.2 -2')
+            startButton.setAttribute('position', '0 0.2 -1.5')
             startButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
             gameOver = true;
             gameEnd();
@@ -951,7 +998,7 @@ AFRAME.registerComponent('triggered', {
             startButton.setAttribute('value', 'YOU SHOT AN INNOCENT GHOST!')
             startButton.setAttribute('material', 'color: red')
             startButton.setAttribute('rotation', '-50 180 0')
-            startButton.setAttribute('position', '0 0.2 -2')
+            startButton.setAttribute('position', '0 0.2 -1.5')
             startButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
             gameOver = true;
             gameEnd();
