@@ -291,6 +291,7 @@ function gameStart() {
     newHead.setAttribute('id', 'replayHead' + index)
     sceneEl.appendChild(newHead);
     var newHeadModel = document.createElement('a-entity')
+    newHeadModel.setAttribute('id', 'newHeadModel' + index)
     newHeadModel.setAttribute('geometry', 'primitive: tetrahedron; radius: 0.15; detail: 2;')
     newHeadModel.setAttribute('material', 'src: #face-texture; flatShading: true;')
     newHeadModel.setAttribute('rotation', '0 -90 0')
@@ -523,6 +524,10 @@ function restartRound() {
     rotateObject(document.getElementById('replayHead' + index), element[0][tick], index * 2 - spaceBuffer)
     rotateObject(document.getElementById('replayLeftHand' + index), element[1][tick], index * 2 - spaceBuffer)
     rotateObject(document.getElementById('replayRightHand' + index), element[2][tick], index * 2 - spaceBuffer)
+
+    document.getElementById('newHeadModel' + index).removeAttribute('random-color')
+    document.getElementById('newHeadModel' + index).setAttribute('random-color', '')
+    document.getElementById('newHeadModel' + index).getObject3D('mesh').geometry.colorsNeedUpdate = true;
   })
 
   // Randomize everything again
