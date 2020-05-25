@@ -1,4 +1,3 @@
-<br/>
 <a href="https://elocnat.itch.io/off-killter"><img src="https://i.imgur.com/OD9Lp52.jpg" title="Play Off-Killter now at elocnat.itch.io!" alt="elocnat logo" width="256">
 
 # Off-Killter
@@ -11,7 +10,7 @@ As soon as you enter VR your movement input will be mirrored back to you in real
 
 You can watch these recordings back as many times as you want to memorize them. Be aware that while the onscreen avatar is mirrored back to you in real time, your recordings are not.
 
-When you're ready to start, the game will spawn avatars to play all the recordings three times each; but one of the replays has been mutated. Spot the mutated recording before playback finishes to win!
+When you're ready to start, the game will spawn avatars to play all the recordings three times each; but one of the replays has been mutated. Spot the mutated recording before playback finishes to win! The harder the difficulty the harder it is to spot the mutation.
 
 When the game is over you can see what body parts were mutated, at what point the mutation started, and along what axes the mutations were applied. Start a new round to replay the same recordings with a new mutation or restart the game to record new ones!
 
@@ -20,14 +19,14 @@ When the game is over you can see what body parts were mutated, at what point th
 ### Connect
 ---
 
-<a href="https://elocnat.itch.io"><img src="https://i.imgur.com/s5iagnG.png" title="Play my games on https://elocnat.itch.io" alt="elocnat logo" width="48" height="48"></a> Connect with me to keep up with my current projects. Help me out by following me and starring/sharing my work! <a href="https://twitter.com/elocnat"><img src="https://i.imgur.com/s5iagnG.png" title="Follow me on Twitter at @elocnat!" alt="elocnat logo" width="48" height="48">
+<a href="https://elocnat.itch.io"><img src="https://i.imgur.com/s5iagnG.png" title="Play my games on https://elocnat.itch.io" alt="elocnat logo" width="48" height="48"></a> **Connect with me** to keep up with my current projects. **Help me out by following me and starring/sharing my work!**
 
-- Follow me and play my games at <a href="https://elocnat.itch.io" target="_blank">`elocnat.itch.io`</a>
-  - Play `Off-Killter` live at <a href="https://elocnat.itch.io/off-killter" target="_blank">`elocnat.itch.io/off-killter`</a>!
-- Follow me on Twitter at <a href="https://twitter.com/elocnat" target="_blank">`@elocnat`</a>
-  - Tweet <a href="https://twitter.com/elocnat" target="_blank">`@elocnat`</a> with the hashtag <a href="https://twitter.com/hashtag/OffKillter?f=live" target="_blank">#OffKillter</a> if you have feedback on the project!
-- Follow me on GitHub at <a href="https://github.com/elocnatsirt" target="_blank">`@elocnatsirt`</a>
-  - Star <a href="https://github.com/elocnatsirt/off-killter" target="_blank">this project</a>!
+- **Follow me** and **play my games** at <a href="https://elocnat.itch.io" target="_blank">`elocnat.itch.io`</a>
+  - **Play** `Off-Killter` live at <a href="https://elocnat.itch.io/off-killter" target="_blank">`elocnat.itch.io/off-killter`</a>!
+- **Follow me** on Twitter at <a href="https://twitter.com/elocnat" target="_blank">`@elocnat`</a>
+  - **Tweet** <a href="https://twitter.com/elocnat" target="_blank">`@elocnat`</a> with the hashtag <a href="https://twitter.com/hashtag/OffKillter?f=live" target="_blank">#OffKillter</a> if you have feedback on the project!
+- **Follow me** on GitHub at <a href="https://github.com/elocnatsirt" target="_blank">`@elocnatsirt`</a>
+  - **Star** <a href="https://github.com/elocnatsirt/off-killter" target="_blank">this project</a>!
 
 ### Libraries
 ---

@@ -1178,11 +1178,24 @@ AFRAME.registerComponent('fade', {
 AFRAME.registerComponent('start-game', {
   init: function() {
     var scene = this.el; // The entity
+
+    function hideTheChildren() {
+      // hide initial text
+      var childNodes = document.getElementById('fadePlane').childNodes;
+      for (i=0; i < childNodes.length; i++) {
+        if (childNodes[i].attached) {
+          document.getElementById(childNodes[i].id).setAttribute('visible', false)
+        }
+      }
+    }
+
     if (scene.is('vr-mode')) {
       document.getElementById('fadePlane').setAttribute('fade', '')
+      hideTheChildren()
     } else {
       scene.addEventListener('enter-vr', function () {
         document.getElementById('fadePlane').setAttribute('fade', '')
+        hideTheChildren()
       });
     }
   }
