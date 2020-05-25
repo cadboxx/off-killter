@@ -15,7 +15,7 @@
       <a-assets timeout="10000">
         <a-asset-item id="leftHandModel" src="assets/leftHand.glb"></a-asset-item>
         <a-asset-item id="rightHandModel" src="assets/rightHand.glb"></a-asset-item>
-        <img id="face-texture" src="assets/facetext.jpg">
+        <img offset="{x: 50, y: 0}" id="face-texture" src="assets/facetext.jpg">
       </a-assets>
 
       <a-entity environment="preset: egypt;"></a-entity>
@@ -30,8 +30,8 @@
             <a-text id="startSocialTextAction" value="Follow me on Twitter for updates on #OffKillter" color="grey" scale="0.003 0.003 0.003" position="-0.007 -0.006 0"></a-text>
           </a-plane>
         </a-entity>
-        <a-entity haptics id="leftHand" hand-controls="hand: left; handModelStyle: lowPoly;" mirror-movement triggered></a-entity>
-        <a-entity haptics id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement triggered></a-entity>
+        <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: lowPoly;" mirror-movement haptics></a-entity>
+        <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement haptics triggered></a-entity>
 
         <!-- NOTE: For something to be intersected, needs to have class="links"! -->
         <a-entity laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 20" line="color: blue; opacity: 0.25"></a-entity>
@@ -45,7 +45,7 @@
           <a-entity id="mirrorRightHand" rotation="0 0 -90" gltf-model="#rightHandModel"></a-entity>
         </a-entity>
         <a-entity id="headCube">
-          <a-tetrahedron id="mirrorHead" rotation="0 -90 0" material="src: #face-texture; flatShading: true;" radius="0.15" detail="2"></a-tetrahedron>
+          <a-sphere id="mirrorHead" rotation="0 90 0" material="src: #face-texture; flatShading: true; width: 0.5;" radius="0.15"></a-sphere>
         </a-entity>
       </a-entity>
 

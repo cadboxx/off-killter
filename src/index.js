@@ -303,9 +303,9 @@ function gameStart() {
     sceneEl.appendChild(newHead);
     var newHeadModel = document.createElement('a-entity')
     newHeadModel.setAttribute('id', 'newHeadModel' + index)
-    newHeadModel.setAttribute('geometry', 'primitive: tetrahedron; radius: 0.15; detail: 2;')
+    newHeadModel.setAttribute('geometry', 'primitive: sphere; radius: 0.15;')
     newHeadModel.setAttribute('material', 'src: #face-texture; flatShading: true;')
-    newHeadModel.setAttribute('rotation', '0 -90 0')
+    newHeadModel.setAttribute('rotation', '0 90 0')
     newHeadModel.setAttribute('button-intersect', 'name: replayHead' + index)
     newHeadModel.setAttribute('class', 'replay replayHeads')
     newHeadModel.setAttribute('random-color', '')
