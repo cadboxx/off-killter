@@ -8,8 +8,8 @@ let recordedPoses = [ [], [], [] ]; // Position & rotation
 let recordedEvents = []; // Button presses
 let defParts = ['head', 'leftHand', 'rightHand'];
 let randAxes = ['x', 'y'];
-const defMutRotAmt = 40;
-const defMutPosAmt = 0.2;
+const defMutRotAmt = 40; // "normal" difficulty
+const defMutPosAmt = 0.2; // "normal" difficulty
 
 let rewindMut = false;
 var highlighted = false;
@@ -184,6 +184,16 @@ function buttonEvent(button, event) {
       } else {
         button.setAttribute('visible', true)
       }
+    }
+  }
+}
+
+function hideTheChildren(node) {
+  // hide initial text
+  var childNodes = node.childNodes;
+  for (i=0; i < childNodes.length; i++) {
+    if (childNodes[i].attached) {
+      buttonEvent(document.getElementById(childNodes[i].id), 'toggle')
     }
   }
 }
@@ -827,6 +837,8 @@ AFRAME.registerComponent('replayer', {
               document.getElementById('startText').setAttribute('rotation', '-50 180 0')
               document.getElementById('startText').setAttribute('position', '0 0.2 -1.5')
               document.getElementById('startText').setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
+              document.getElementById('leftHand').components.haptics.pulse(0.5, 1000);
+              document.getElementById('rightHand').components.haptics.pulse(0.5, 1000);
               gameOver = true;
               gameEnd();
             }
@@ -955,6 +967,7 @@ AFRAME.registerComponent('triggered', {
     // Ensure support for all controllers
     el.addEventListener('triggerdown', function (evt) {
       triggerDown = true
+      var vibrate = true;
 
       if (replayButtonSelected) {
         replaying = true;
@@ -969,7 +982,7 @@ AFRAME.registerComponent('triggered', {
       } else if (difficultyButtonSelected) {
         changeDifficulty();
       } else if (helpButtonSelected) {
-        buttonEvent(document.getElementById('helpButtonText'), 'toggle')
+        hideTheChildren(document.getElementById('helpButton'));
       } else if (recordButtonSelected) {
         if (!replaying) {
           document.getElementById('diffMeter').setAttribute('visible', true)
@@ -992,6 +1005,7 @@ AFRAME.registerComponent('triggered', {
         document.getElementById('fadePlane').setAttribute('fade', 'fadeIn: false; fadeSeconds: 0.5')
         setTimeout(function() { restartRound(); }, 600);
       } else if (ghostName) {
+        vibrate = false;
         if (!gameOver) {
           document.getElementById('startText').setAttribute('visible', true)
           document.getElementById('titleText').setAttribute('visible', true)
@@ -1004,7 +1018,9 @@ AFRAME.registerComponent('triggered', {
             gameOver = true;
             gameEnd();
           } else {
-            startButton.setAttribute('value', 'YOU SHOT AN INNOCENT GHOST!')
+            document.getElementById('leftHand').components.haptics.pulse(0.5, 500);
+            document.getElementById('rightHand').components.haptics.pulse(0.5, 500);
+            startButton.setAttribute('value', 'YOU SHOT AN INNOCENT AVATAR!')
             startButton.setAttribute('material', 'color: red')
             startButton.setAttribute('rotation', '-50 180 0')
             startButton.setAttribute('position', '0 0.2 -1.5')
@@ -1022,7 +1038,12 @@ AFRAME.registerComponent('triggered', {
               document.getElementById('replay' + i).setAttribute('text', 'color: white')
             }
           }
+        } else {
+          vibrate = false;
         }
+      }
+      if (vibrate) {
+        el.components.haptics.pulse(0.5, 100);
       }
     });
 
@@ -1179,23 +1200,13 @@ AFRAME.registerComponent('start-game', {
   init: function() {
     var scene = this.el; // The entity
 
-    function hideTheChildren() {
-      // hide initial text
-      var childNodes = document.getElementById('fadePlane').childNodes;
-      for (i=0; i < childNodes.length; i++) {
-        if (childNodes[i].attached) {
-          document.getElementById(childNodes[i].id).setAttribute('visible', false)
-        }
-      }
-    }
-
     if (scene.is('vr-mode')) {
       document.getElementById('fadePlane').setAttribute('fade', '')
-      hideTheChildren()
+      hideTheChildren(document.getElementById('fadePlane'));
     } else {
       scene.addEventListener('enter-vr', function () {
         document.getElementById('fadePlane').setAttribute('fade', '')
-        hideTheChildren()
+        hideTheChildren(document.getElementById('fadePlane'));
       });
     }
   }
@@ -1228,6 +1239,8 @@ AFRAME.registerComponent('countdown', {
       if ((countdownSecond * 1000) >= diffTime) {
         countdownSecond = countdownSecond - 1
         document.getElementById('countdownText').setAttribute('text', 'value: ' + (countdownSecond + 1))
+        document.getElementById('leftHand').components.haptics.pulse(0.5, 100);
+        document.getElementById('rightHand').components.haptics.pulse(0.5, 100);
       }
     } else {
       this.el.removeAttribute('countdown')

@@ -7,6 +7,7 @@
     <script src="https://unpkg.com/aframe-render-order-component@1.1.0/dist/aframe-render-order-component.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.1.0/dist/aframe-environment-component.min.js"></script>
     <script src="https://unpkg.com/aframe-randomizer-components@3.0.2/dist/aframe-randomizer-components.min.js"></script>
+    <script src="https://unpkg.com/aframe-haptics-component/dist/aframe-haptics-component.min.js"></script>
     <script src="./src/index.js"></script>
   </head>
   <body>
@@ -18,21 +19,19 @@
       </a-assets>
 
       <a-entity environment="preset: egypt;"></a-entity>
-      <a-text id="titleText" scale="5 5 5" value="Off-Killter" color="black" position="0 5 -9" rotation="30 0 0" align="center" visible="true"></a-text>
-
-      <a-text id="startText" class="links" scale="1 1 1" value="Record 3 animations to start!" color="white" position="0 4 -10" rotation="0 0 0" align="center" visible="true" button-intersect></a-text>
 
       <a-entity id="rig" position="0 0 -4">
         <a-entity id="camera" camera look-controls wasd-controls rotation="0 0 0" mirror-movement replayer>
           <a-plane id="fadePlane" position="0 0 -0.01" width="10" height="10" opacity="1.0" color="black" visible="true">
             <a-text id="startTitleText" value="Off-Killter" scale="0.01 0.01 0.01" position="-0.005 0.004 0"></a-text>
             <a-text id="startGameText" value="Enter VR to begin" color="grey" scale="0.0025 0.0025 0.0025" position="-0.00035 0.0028 0"></a-text>
+            <a-text id="startSocialTextPre" value="Created by" color="grey" scale="0.002 0.002 0.002" position="-0.0015 -0.0043 0"></a-text>
             <a-text id="startSocialText" value="@elocnat" scale="0.004 0.004 0.004" position="-0.0025 -0.005 0"></a-text>
             <a-text id="startSocialTextAction" value="Follow me on Twitter for updates on #OffKillter" color="grey" scale="0.003 0.003 0.003" position="-0.007 -0.006 0"></a-text>
           </a-plane>
         </a-entity>
-        <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: lowPoly;" mirror-movement></a-entity>
-        <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement triggered></a-entity>
+        <a-entity haptics id="leftHand" hand-controls="hand: left; handModelStyle: lowPoly;" mirror-movement triggered></a-entity>
+        <a-entity haptics id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement triggered></a-entity>
 
         <!-- NOTE: For something to be intersected, needs to have class="links"! -->
         <a-entity laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 20" line="color: blue; opacity: 0.25"></a-entity>
@@ -42,17 +41,13 @@
         <a-entity id="leftCube">
           <a-entity id="mirrorLeftHand" rotation="0 0 90" gltf-model="#leftHandModel"></a-entity>
         </a-entity>
-
         <a-entity id="rightCube">
           <a-entity id="mirrorRightHand" rotation="0 0 -90" gltf-model="#rightHandModel"></a-entity>
         </a-entity>
-
         <a-entity id="headCube">
           <a-tetrahedron id="mirrorHead" rotation="0 -90 0" material="src: #face-texture; flatShading: true;" radius="0.15" detail="2"></a-tetrahedron>
         </a-entity>
       </a-entity>
-
-      <a-text id="recordButton" class="links" value="START RECORDING" geometry="primitive:circle" position="-3 2 -10" rotation="0 25 0" material="color: red" scale="0.7 0.7 0.7" button-intersect></a-text>
 
       <a-text id="diffMeter" value="MOVE TO FILL" align="center" position="0 3 -10" rotation="0 0 0" material="color: pink" scale="0.7 0.7 0.7" visible='false'>
         <a-plane id="topBar" position="0 0.25 0" width="4" height="0.05" color="black"></a-plane>
@@ -66,10 +61,28 @@
       </a-text>
 
       <a-text id="helpButton" class="links" value="HOW TO PLAY" geometry="primitive:plane; width: 2; height: 0.8" align="center" position="3 4 -10" rotation="0 -25 0" material="color: yellow" scale="0.7 0.7 0.7" button-intersect>
-        <a-text id="helpButtonText" value="Press the record button to begin. Move around as the time counts down; you must move around enough to fill the bar displayed on screen. After your replays are saved you can watch them back. When you have memorized the replays, you can start the game. As the replays play you'll notice one is slightly off. The harder the difficulty the harder it is to spot. Shoot the imposter before the animations play 3 times to win!" align="center" position="0 -1.2 0" scale="0.65 0.65 0.65" visible='false'></a-text>
+        <a-text id="helpButtonText" value="* Press the record button to begin." align="center" position="0 -0.5 0" scale="0.65 0.65 0.65" visible='false'></a-text>
+
+        <a-text id="helpButtonText1" value="* Move around as the time counts down." align="center" position="0 -0.65 0" scale="0.65 0.65 0.65" visible='false'></a-text>
+
+        <a-text id="helpButtonText2" color="black" value="** You must move around enough to fill the bar displayed on screen!" align="center" position="0 -0.85 0" scale="0.6 0.6 0.6" visible='false'></a-text>
+
+        <a-text id="helpButtonText3" value="* After replays are saved you can replay each of them separately. When you have recorded and memorized the replays, click the start button." align="center" position="0 -1.2 0" scale="0.65 0.65 0.65" visible='false'></a-text>
+
+        <a-text id="helpButtonText4" value="* Your replays are played back to you but one of them has changed." align="center" position="0 -1.6 0" scale="0.65 0.65 0.65" visible='false'></a-text>
+
+        <a-text id="helpButtonText5" color="black" value="** The harder the difficulty the harder it is to spot the mutated replay." align="center" position="0 -1.9 0" scale="0.6 0.6 0.6" visible='false'></a-text>
+
+        <a-text id="helpButtonText6" value="* Shoot the imposter replay before the recordings play 3 times to win!" align="center" position="0 -2.2 0" scale="0.65 0.65 0.65" visible='false'></a-text>
       </a-text>
 
+      <a-text id="titleText" scale="5 5 5" value="Off-Killter" color="black" position="0 5 -9" rotation="30 0 0" align="center" visible="true"></a-text>
+
+      <a-text id="startText" class="links" scale="1 1 1" value="Record 3 animations to start!" color="white" position="0 4 -10" rotation="0 0 0" align="center" visible="true" button-intersect></a-text>
+
       <a-text id="replayButton" class="links" value="REPLAY RECORDING" geometry="primitive:plane" position="3 2 -10" rotation="0 -25 0" material="color: grey" scale="0.7 0.7 0.7" align="right" visible="false" button-intersect></a-text>
+
+      <a-text id="recordButton" class="links" value="START RECORDING" geometry="primitive:circle" position="-3 2 -10" rotation="0 25 0" material="color: red" scale="0.7 0.7 0.7" button-intersect></a-text>
     </a-scene>
   </body>
 </html>
