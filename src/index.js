@@ -259,12 +259,16 @@ function rotateObject(obj, ref, px = 0, py = 0, pz = 0, rx = 0, ry = 0, rz = 0) 
 }
 
 function gameStart() {
+  // Move player in front of ghosteses
+  document.getElementById('rig').setAttribute('position', '0 0 8')
+  document.getElementById('rig').setAttribute('rotation', '0 180 0')
+
   document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 1.5')
   document.getElementById('helpButton').setAttribute('visible', false)
 
   // Move title
   document.getElementById('titleText').setAttribute('visible', false)
-  document.getElementById('titleText').setAttribute('position', '0 3.5 3')
+  document.getElementById('titleText').setAttribute('position', '0 3.5 ' + (document.getElementById('rig').getAttribute('position').z + 6))
   document.getElementById('titleText').setAttribute('rotation', '30 180 0')
 
   // Make buttons unclickable
@@ -341,17 +345,13 @@ function gameStart() {
     newRightHand.appendChild(newRightHandModel);
 
     // Move to starting position
-    rotateObject(newHead, element[0][tick], index * 2 - spaceBuffer)
-    rotateObject(newLeftHand, element[1][tick], index * 2 - spaceBuffer)
-    rotateObject(newRightHand, element[2][tick], index * 2 - spaceBuffer)
+    rotateObject(newHead, element[0][tick], index * 2 - spaceBuffer, 0, (document.getElementById('rig').getAttribute('position').z + 6))
+    rotateObject(newLeftHand, element[1][tick], index * 2 - spaceBuffer, 0, (document.getElementById('rig').getAttribute('position').z + 6))
+    rotateObject(newRightHand, element[2][tick], index * 2 - spaceBuffer, 0, (document.getElementById('rig').getAttribute('position').z + 6))
   })
 
   // Call our randomizer
   randomize();
-
-  // Move player in front of ghosteses
-  document.getElementById('rig').setAttribute('position', '0 0 -5')
-  document.getElementById('rig').setAttribute('rotation', '0 180 0')
 
   document.querySelector('a-scene').setAttribute('countdown', '')
   setTimeout(function() {
@@ -375,9 +375,9 @@ function gameEnd() {
   if (!document.getElementById('restartButton')) {
     var restartButton = document.createElement('a-entity');
     restartButton.setAttribute('id', 'restartButton')
-    restartButton.setAttribute('geometry', 'primitive:plane; height:0.8; width:2;')
+    restartButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:2;')
     restartButton.setAttribute('material', 'color:lightgreen; transparent:true; opacity:0.5;')
-    restartButton.setAttribute('position', '2 2.25 2')
+    restartButton.setAttribute('position', '2 2.5 ' + (document.getElementById('rig').getAttribute('position').z + 6))
     restartButton.setAttribute('rotation', '0 180 0')
     restartButton.setAttribute('text', 'color:white; align:center; width: 5; value: Restart Game')
     restartButton.setAttribute('button-intersect', 'name:restart')
@@ -390,9 +390,9 @@ function gameEnd() {
   if (!document.getElementById('newRoundButton')) {
     var newRoundButton = document.createElement('a-entity');
     newRoundButton.setAttribute('id', 'newRoundButton')
-    newRoundButton.setAttribute('geometry', 'primitive:plane; height:0.8; width:2;')
+    newRoundButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:2;')
     newRoundButton.setAttribute('material', 'color:blue; transparent:true; opacity:0.5;')
-    newRoundButton.setAttribute('position', '-2 2.25 2')
+    newRoundButton.setAttribute('position', '-2 2.5 ' + (document.getElementById('rig').getAttribute('position').z + 6))
     newRoundButton.setAttribute('rotation', '0 180 0')
     newRoundButton.setAttribute('text', 'color:white; align:center; width: 5; value: New Round')
     newRoundButton.setAttribute('button-intersect', 'name: newRoundButton')
@@ -419,14 +419,14 @@ function gameEnd() {
   mutatedGhostIndicator.object3D.position.z = mutatedGhost.object3D.position.z;
 
   // Setup button to compare mutated replay to original
-  replayButton.setAttribute('position', '4.5 1 1')
+  replayButton.setAttribute('position', '4.5 1 ' + (document.getElementById('rig').getAttribute('position').z + 6))
   replayButton.setAttribute('rotation', '0 -155 0')
   replayButton.setAttribute('value', 'REPLAY IMPOSTER')
   replayButton.setAttribute('class', 'links')
   replayButton.setAttribute('visible', true)
 
   // Move difficulty button
-  difficultyButton.setAttribute('position', '-4.5 2 1')
+  difficultyButton.setAttribute('position', '-4.5 2 ' + (document.getElementById('rig').getAttribute('position').z + 6))
   difficultyButton.setAttribute('rotation', '0 -215 0')
   difficultyButton.setAttribute('class', 'links')
   difficultyButton.setAttribute('visible', true)
@@ -445,7 +445,7 @@ function gameEnd() {
     entityEl.setAttribute('id', 'mutateStatsParts')
     entityEl.setAttribute('value', 'Mutated parts: ' + randBodyParts)
     entityEl.setAttribute('rotation', '-60 180 0')
-    entityEl.setAttribute('position', '2 0.4 1.0')
+    entityEl.setAttribute('position', '2 0.4 ' + (document.getElementById('rig').getAttribute('position').z + 6))
     entityEl.setAttribute('wrapCount', '100')
     entityEl.setAttribute('scale', '1 1 1')
     entityEl.setAttribute('color', 'black')
@@ -456,7 +456,7 @@ function gameEnd() {
     entityEl.setAttribute('id', 'mutateStatsSeconds')
     entityEl.setAttribute('value', 'Mutation started at: ' + randSecond + 's')
     entityEl.setAttribute('rotation', '-60 180 0')
-    entityEl.setAttribute('position', '2 0.3 0.5')
+    entityEl.setAttribute('position', '2 0.3 ' + (document.getElementById('rig').getAttribute('position').z + 5.5))
     entityEl.setAttribute('wrapCount', '100')
     entityEl.setAttribute('scale', '1 1 1')
     entityEl.setAttribute('color', 'black')
@@ -467,7 +467,7 @@ function gameEnd() {
     entityEl.setAttribute('id', 'mutateStatsAxes')
     entityEl.setAttribute('value', 'Mutated along these axes: ' + randAxes)
     entityEl.setAttribute('rotation', '-60 180 0')
-    entityEl.setAttribute('position', '2 0.2 0')
+    entityEl.setAttribute('position', '2 0.2 ' + (document.getElementById('rig').getAttribute('position').z + 5))
     entityEl.setAttribute('wrapCount', '100')
     entityEl.setAttribute('scale', '1 1 1')
     entityEl.setAttribute('color', 'black')
@@ -585,9 +585,9 @@ function restartRound() {
 
   // Reset position of ghosts
   savedRecordings.forEach(function(element, index) {
-    rotateObject(document.getElementById('replayHead' + index), element[0][tick], index * 2 - spaceBuffer)
-    rotateObject(document.getElementById('replayLeftHand' + index), element[1][tick], index * 2 - spaceBuffer)
-    rotateObject(document.getElementById('replayRightHand' + index), element[2][tick], index * 2 - spaceBuffer)
+    rotateObject(document.getElementById('replayHead' + index), element[0][tick], index * 2 - spaceBuffer, 0, (document.getElementById('rig').getAttribute('position').z + 6))
+    rotateObject(document.getElementById('replayLeftHand' + index), element[1][tick], index * 2 - spaceBuffer, 0, (document.getElementById('rig').getAttribute('position').z + 6))
+    rotateObject(document.getElementById('replayRightHand' + index), element[2][tick], index * 2 - spaceBuffer, 0, (document.getElementById('rig').getAttribute('position').z + 6))
 
     document.getElementById('newHeadModel' + index).removeAttribute('random-color')
     document.getElementById('newHeadModel' + index).setAttribute('random-color', '')
@@ -702,13 +702,13 @@ AFRAME.registerComponent('replayer', {
 
         function move() {
           if (!replaying) {
-            rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer)
-            rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer)
-            rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer)
+            rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer, 0, (document.getElementById('rig').getAttribute('position').z + 6))
+            rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer, 0, (document.getElementById('rig').getAttribute('position').z + 6))
+            rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer, 0, (document.getElementById('rig').getAttribute('position').z + 6))
           } else {
-            rotateObject(headCube, savedRecordings[randRecord][0][tick], index * 2 - spaceBuffer)
-            rotateObject(leftCube, savedRecordings[randRecord][1][tick], index * 2 - spaceBuffer)
-            rotateObject(rightCube, savedRecordings[randRecord][2][tick], index * 2 - spaceBuffer)
+            rotateObject(headCube, savedRecordings[randRecord][0][tick], index * 2 - spaceBuffer, 0, (document.getElementById('rig').getAttribute('position').z + 6))
+            rotateObject(leftCube, savedRecordings[randRecord][1][tick], index * 2 - spaceBuffer, 0, (document.getElementById('rig').getAttribute('position').z + 6))
+            rotateObject(rightCube, savedRecordings[randRecord][2][tick], index * 2 - spaceBuffer, 0, (document.getElementById('rig').getAttribute('position').z + 6))
           }
         }
 
@@ -767,17 +767,17 @@ AFRAME.registerComponent('replayer', {
               // Mutate recording movement if in randBodyParts array
               for (i = 0; i < randBodyParts.length; i++) {
                 if (randBodyParts[i] == 'head') {
-                  rotateObject(headCube, currReplay[0][tick], randPX, randPY, randPZ, randRX, randRY, randRZ)
+                  rotateObject(headCube, currReplay[0][tick], randPX, randPY, (randPZ + (document.getElementById('rig').getAttribute('position').z + 6)), randRX, randRY, randRZ)
                   if (gameOver && !document.getElementById('newHeadModel' + index).getAttribute('highlight')) {
                     document.getElementById('newHeadModel' + index).setAttribute('highlight', '')
                   }
                 } else if (randBodyParts[i] == 'leftHand') {
-                  rotateObject(leftCube, currReplay[1][tick], randPX, randPY, randPZ, randRX, randRY, randRZ)
+                  rotateObject(leftCube, currReplay[1][tick], randPX, randPY, (randPZ + (document.getElementById('rig').getAttribute('position').z + 6)), randRX, randRY, randRZ)
                   if (gameOver && !document.getElementById('newLeftHandModel' + index).getAttribute('highlight')) {
                     document.getElementById('newLeftHandModel' + index).setAttribute('highlight', '')
                   }
                 } else if (randBodyParts[i] == 'rightHand') {
-                  rotateObject(rightCube, currReplay[2][tick], randPX, randPY, randPZ, randRX, randRY, randRZ)
+                  rotateObject(rightCube, currReplay[2][tick], randPX, randPY, (randPZ + (document.getElementById('rig').getAttribute('position').z + 6)), randRX, randRY, randRZ)
                   if (gameOver && !document.getElementById('newRightHandModel' + index).getAttribute('highlight')) {
                     document.getElementById('newRightHandModel' + index).setAttribute('highlight', '')
                   }
@@ -786,13 +786,13 @@ AFRAME.registerComponent('replayer', {
 
               // Move element normally if not in randBodyParts array
               if (!randBodyParts.some((element) => element === 'head')) {
-                rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer)
+                rotateObject(headCube, currReplay[0][tick], index * 2 - spaceBuffer, 0, (document.getElementById('rig').getAttribute('position').z + 6))
               }
               if (!randBodyParts.some((element) => element === 'leftHand')) {
-                rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer)
+                rotateObject(leftCube, currReplay[1][tick], index * 2 - spaceBuffer, 0, (document.getElementById('rig').getAttribute('position').z + 6))
               }
               if (!randBodyParts.some((element) => element === 'rightHand')) {
-                rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer)
+                rotateObject(rightCube, currReplay[2][tick], index * 2 - spaceBuffer, 0, (document.getElementById('rig').getAttribute('position').z + 6))
               }
             } else {
               // Move all body parts normally if current timestamp is not within our randomized range
