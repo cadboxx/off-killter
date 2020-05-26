@@ -7,29 +7,31 @@
     <script src="https://unpkg.com/aframe-render-order-component@1.1.0/dist/aframe-render-order-component.min.js"></script>
     <script src="https://unpkg.com/aframe-randomizer-components@3.0.2/dist/aframe-randomizer-components.min.js"></script>
     <script src="https://unpkg.com/aframe-haptics-component/dist/aframe-haptics-component.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.0/dist/aframe-extras.min.js"></script>
+    <script src="https://rawgit.com/fernandojsg/aframe-teleport-controls/master/dist/aframe-teleport-controls.min.js"></script>
+    <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v4.0.1/dist/aframe-physics-system.min.js"></script>
     <script src="./src/index.js"></script>
   </head>
   <body>
-    <a-scene start-game toggle-debug>
+    <a-scene start-game toggle-debug renderer="antialias: true; highRefreshrate: true;" physics="gravity: -1.6">
       <a-assets timeout="10000">
         <a-asset-item id="leftHandModel" src="assets/leftHand.glb"></a-asset-item>
         <a-asset-item id="rightHandModel" src="assets/rightHand.glb"></a-asset-item>
         <img offset="{x: 50, y: 0}" id="face-texture" src="assets/facetext.jpg">
       </a-assets>
 
-      <!-- Here's a modern table, because why not! -->
       <a-entity id="table" position="-1 0 -3" rotation="0 90 0">
-        <a-box position="-1 0.5 -3" height="0.05" width="4" depth="2.5" rotation="0 0 0" color="#a8ccd7" opacity="0.25"></a-box>
-        <a-cylinder position="0.5 0.25 -4" radius="0.05" height="0.5" color="#000000"></a-cylinder>
-        <a-cylinder position="0.5 0.25 -2" radius="0.05" height="0.5" color="#000000"></a-cylinder>
-        <a-cylinder position="-2.5 0.25 -4" radius="0.05" height="0.5" color="#000000"></a-cylinder>
-        <a-cylinder position="-2.5 0.25 -2" radius="0.05" height="0.5" color="#000000"></a-cylinder>
+        <a-box static-body position="-1 1 -3" height="0.05" width="4" depth="2.5" rotation="0 0 0" color="#a8ccd7" opacity="0.25"></a-box>
+        <a-cylinder static-body position="0.5 0.5 -4" radius="0.05" height="1" color="#000000"></a-cylinder>
+        <a-cylinder static-body position="0.5 0.5 -2" radius="0.05" height="1" color="#000000"></a-cylinder>
+        <a-cylinder static-body position="-2.5 0.5 -4" radius="0.05" height="1" color="#000000"></a-cylinder>
+        <a-cylinder static-body position="-2.5 0.5 -2" radius="0.05" height="1" color="#000000"></a-cylinder>
       </a-entity>
       
       <!-- Define Scene Room -->
       <a-entity id="intRoom">
         <!-- floor -->
-        <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#474747"></a-plane>
+        <a-plane static-body position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#474747"></a-plane>
         <!-- ceiling -->
         <a-plane position="0 4 0" rotation="90 0 0" width="20" height="20" color="#FFFFFF"></a-plane>
         <!-- lower walls -->
@@ -51,7 +53,7 @@
         <a-box position="0 2 10" rotation="-180 0 0" depth="0.05" width="8" height="2.5" color="#a8ccd7" opacity="0.25"></a-box>
       </a-entity>
 
-      <!-- Define room behind glass -->
+      <!-- Define Replay Room -->
       <a-entity id="replayRoom">
         <!-- floor -->
         <a-plane position="0 0 12.5" rotation="-90 0 0" width="20" height="5" color="#474747"></a-plane>
@@ -70,7 +72,7 @@
       </a-entity>
 
       <a-entity id="rig" position="0 0 -2">
-        <a-entity id="camera" camera look-controls wasd-controls rotation="0 0 0" mirror-movement replayer>
+        <a-entity static-body="shape: sphere; sphereRadius: 0.2;" id="camera" camera look-controls wasd-controls rotation="0 0 0" mirror-movement replayer>
           <a-plane id="fadePlane" position="0 0 -0.01" width="10" height="10" opacity="1.0" color="black" visible="true">
             <a-text id="startTitleText" value="Off-Killter" scale="0.01 0.01 0.01" position="-0.005 0.004 0"></a-text>
             <a-text id="startGameText" value="Enter VR to begin" color="grey" scale="0.0025 0.0025 0.0025" position="-0.00035 0.0028 0"></a-text>
@@ -79,12 +81,18 @@
             <a-text id="startSocialTextAction" value="Follow me on Twitter for updates on #OffKillter" color="grey" scale="0.003 0.003 0.003" position="-0.007 -0.006 0"></a-text>
           </a-plane>
         </a-entity>
-        <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: lowPoly;" mirror-movement haptics></a-entity>
-        <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement haptics triggered></a-entity>
+        <a-entity id="leftHand" teleport-controls="cameraRig: #rig; teleportOrigin: #camera;" hand-controls="hand: left; handModelStyle: lowPoly;" mirror-movement haptics static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .grabbable" grab></a-entity>
+        <a-entity id="rightHand" teleport-controls="cameraRig: #rig; teleportOrigin: #camera;" hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement haptics triggered static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .grabbable" grab></a-entity>
 
         <!-- NOTE: For something to be intersected, needs to have class="links"! -->
         <a-entity laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 20" line="color: blue; opacity: 0.25"></a-entity>
       </a-entity>
+
+      <a-box id="paper" material='color: black' class="grabbable" rotation='90 90 0' width='0.2159' height='0.2794' depth='0.005' position='-3 1.1 -2.125' dynamic-body position="0 2 0">
+        <!-- <a-text id="paperText" position='-0.109 -0.125 -0.001' rotation='180 0 0' scale='0.08, 0.08, 0.08' value='ROBOT FACTORY MANUAL'></a-text> -->
+      </a-box>
+      <a-box id="folder" material='color: #fff1d6' class="grabbable" rotation='90 90 0' width='0.4826' height='0.295275' depth='0.006' position='-3 1.05 -2' dynamic-body position="0 2 0"></a-box>
+
 
       <a-entity id="mirrorBody" position="0 0 -6" rotation="0 180 0">
         <a-entity id="leftCube">
@@ -104,7 +112,7 @@
         <a-plane id="leftBar" position="-2 0 0" width="0.05" height="0.5" color="black"></a-plane>
         <a-plane id="rightBar" position="2 0 0" width="0.05" height="0.5" color="black"></a-plane>
       </a-text>
-      <!-- TODO: MAKE UI CLASS CONTAINING ALL BUTTONS/ETC. -->
+
       <a-text id="diffButton" class="links" value="EASY" geometry="primitive:plane; width: 2; height: 0.8" align="center" position="-3 3 -8" rotation="0 25 0" material="color: green" scale="0.7 0.7 0.7" button-intersect>
         <a-text id="diffButtonText" value="(Click to change difficulty)" align="center" position="0 -0.2 0" scale="0.5 0.5 0.5" button-intersect></a-text>
       </a-text>
@@ -114,13 +122,13 @@
 
         <a-text id="helpButtonText1" value="* Move around as the time counts down." align="center" position="0 -0.65 0" scale="0.65 0.65 0.65" visible='false'></a-text>
 
-        <a-text id="helpButtonText2" color="black" value="** You must move around enough to fill the bar displayed on screen!" align="center" position="0 -0.85 0" scale="0.6 0.6 0.6" visible='false'></a-text>
+        <a-text id="helpButtonText2" value="** You must move around enough to fill the bar displayed on screen!" align="center" position="0 -0.85 0" scale="0.6 0.6 0.6" visible='false'></a-text>
 
         <a-text id="helpButtonText3" value="* After replays are saved you can replay each of them separately. When you have recorded and memorized the replays, click the start button." align="center" position="0 -1.2 0" scale="0.65 0.65 0.65" visible='false'></a-text>
 
         <a-text id="helpButtonText4" value="* Your replays are played back to you but one of them has changed." align="center" position="0 -1.6 0" scale="0.65 0.65 0.65" visible='false'></a-text>
 
-        <a-text id="helpButtonText5" color="black" value="** The harder the difficulty the harder it is to spot the mutated replay." align="center" position="0 -1.9 0" scale="0.6 0.6 0.6" visible='false'></a-text>
+        <a-text id="helpButtonText5" value="** The harder the difficulty the harder it is to spot the mutated replay." align="center" position="0 -1.9 0" scale="0.6 0.6 0.6" visible='false'></a-text>
 
         <a-text id="helpButtonText6" value="* Shoot the imposter replay before the recordings play 3 times to win!" align="center" position="0 -2.2 0" scale="0.65 0.65 0.65" visible='false'></a-text>
       </a-text>
