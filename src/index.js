@@ -28,7 +28,6 @@ let leftTriggerDown = false;
 let rightTriggerDown = false;
 let triggerDown = false;
 let recordButtonSelected = false;
-let helpButtonSelected = false;
 let replayButtonSelected = false;
 let startButtonSelected = false;
 let restartButtonSelected = false;
@@ -108,7 +107,7 @@ function recordEntity(el, index) {
     if (entId == 'leftHand' || entId == 'rightHand') {
       var balance = 0.5;
     } else if (entId == 'camera') {
-      var balance = 0.3;
+      var balance = 0.4;
     } else {
       var balance = 0;
     }
@@ -264,7 +263,6 @@ function gameStart() {
   document.getElementById('rig').setAttribute('rotation', '0 180 0')
 
   document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 1.5')
-  document.getElementById('helpButton').setAttribute('visible', false)
 
   // Move title
   document.getElementById('titleText').setAttribute('visible', false)
@@ -408,7 +406,7 @@ function gameEnd() {
   } else {
     mutatedGhostIndicator = document.getElementById('ghostRing')
   }
-  mutatedGhostIndicator.setAttribute('geometry', 'primitive:ring; radius-inner:0.9; radius-outer:1')
+  mutatedGhostIndicator.setAttribute('geometry', 'primitive:ring; radius-inner:0.7; radius-outer:0.8')
   mutatedGhostIndicator.setAttribute('material', 'color:gold')
   mutatedGhostIndicator.setAttribute('rotation', '0 180 0')
   mutatedGhostIndicator.setAttribute('visible', true)
@@ -445,7 +443,7 @@ function gameEnd() {
     entityEl.setAttribute('id', 'mutateStatsParts')
     entityEl.setAttribute('value', 'Mutated parts: ' + randBodyParts)
     entityEl.setAttribute('rotation', '-60 180 0')
-    entityEl.setAttribute('position', '2 0.4 ' + (document.getElementById('rig').getAttribute('position').z + 6))
+    entityEl.setAttribute('position', '2 0.4 ' + (document.getElementById('rig').getAttribute('position').z + 5))
     entityEl.setAttribute('wrapCount', '100')
     entityEl.setAttribute('scale', '1 1 1')
     entityEl.setAttribute('color', 'black')
@@ -456,7 +454,7 @@ function gameEnd() {
     entityEl.setAttribute('id', 'mutateStatsSeconds')
     entityEl.setAttribute('value', 'Mutation started at: ' + randSecond + 's')
     entityEl.setAttribute('rotation', '-60 180 0')
-    entityEl.setAttribute('position', '2 0.3 ' + (document.getElementById('rig').getAttribute('position').z + 5.5))
+    entityEl.setAttribute('position', '2 0.3 ' + (document.getElementById('rig').getAttribute('position').z + 4.5))
     entityEl.setAttribute('wrapCount', '100')
     entityEl.setAttribute('scale', '1 1 1')
     entityEl.setAttribute('color', 'black')
@@ -467,7 +465,7 @@ function gameEnd() {
     entityEl.setAttribute('id', 'mutateStatsAxes')
     entityEl.setAttribute('value', 'Mutated along these axes: ' + randAxes)
     entityEl.setAttribute('rotation', '-60 180 0')
-    entityEl.setAttribute('position', '2 0.2 ' + (document.getElementById('rig').getAttribute('position').z + 5))
+    entityEl.setAttribute('position', '2 0.2 ' + (document.getElementById('rig').getAttribute('position').z + 4))
     entityEl.setAttribute('wrapCount', '100')
     entityEl.setAttribute('scale', '1 1 1')
     entityEl.setAttribute('color', 'black')
@@ -486,7 +484,6 @@ function gameEnd() {
 
 // Resets everything
 function restartGame() {
-  document.getElementById('helpButton').setAttribute('visible', true)
   document.getElementById('mutateStatsAxes').setAttribute('visible', false)
   document.getElementById('mutateStatsSeconds').setAttribute('visible', false)
   document.getElementById('mutateStatsParts').setAttribute('visible', false)
@@ -834,8 +831,8 @@ AFRAME.registerComponent('replayer', {
               document.getElementById('titleText').setAttribute('visible', true)
               document.getElementById('startText').setAttribute('value', 'YOU RAN OUT OF TIME, BE FASTER!')
               document.getElementById('startText').setAttribute('material', 'color: red')
-              document.getElementById('startText').setAttribute('rotation', '-50 180 0')
-              document.getElementById('startText').setAttribute('position', '0 0.2 -1.5')
+              document.getElementById('startText').setAttribute('rotation', '-20 180 0')
+              document.getElementById('startText').setAttribute('position', '0 0.5 ' + (document.getElementById('rig').getAttribute('position').z + 6))
               document.getElementById('startText').setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
               document.getElementById('leftHand').components.haptics.pulse(0.5, 1000);
               document.getElementById('rightHand').components.haptics.pulse(0.5, 1000);
@@ -981,8 +978,6 @@ AFRAME.registerComponent('triggered', {
         }
       } else if (difficultyButtonSelected) {
         changeDifficulty();
-      } else if (helpButtonSelected) {
-        hideTheChildren(document.getElementById('helpButton'));
       } else if (recordButtonSelected) {
         if (!replaying) {
           document.getElementById('diffMeter').setAttribute('visible', true)
@@ -1012,8 +1007,8 @@ AFRAME.registerComponent('triggered', {
           if (ghostName == mutatedGhostName) {
             startButton.setAttribute('value', 'YOU SHOT THE IMPOSTER!')
             startButton.setAttribute('material', 'color: green')
-            startButton.setAttribute('rotation', '-50 180 0')
-            startButton.setAttribute('position', '0 0.2 -1.5')
+            startButton.setAttribute('rotation', '-20 180 0')
+            startButton.setAttribute('position', '0 0.5 ' + (document.getElementById('rig').getAttribute('position').z + 6))
             startButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
             gameOver = true;
             gameEnd();
@@ -1022,8 +1017,8 @@ AFRAME.registerComponent('triggered', {
             document.getElementById('rightHand').components.haptics.pulse(0.5, 500);
             startButton.setAttribute('value', 'YOU SHOT AN INNOCENT AVATAR!')
             startButton.setAttribute('material', 'color: red')
-            startButton.setAttribute('rotation', '-50 180 0')
-            startButton.setAttribute('position', '0 0.2 -1.5')
+            startButton.setAttribute('rotation', '-20 180 0')
+            startButton.setAttribute('position', '0 0.5 ' + (document.getElementById('rig').getAttribute('position').z + 6))
             startButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
             gameOver = true;
             gameEnd();
@@ -1068,13 +1063,9 @@ AFRAME.registerComponent('button-intersect', {
     var restartButton = document.getElementById("restartButton");
     var newRoundButton = document.getElementById("newRoundButton");
     var difficultyButton = document.getElementById("diffButton");
-    var helpButton = document.getElementById('helpButton');
 
     this.el.addEventListener('raycaster-intersected', function () {
-      if (el.object3D == helpButton.object3D) {
-        buttonEvent(helpButton, 'int')
-        helpButtonSelected = true;
-      } else if (el.object3D == recordButton.object3D) {
+      if (el.object3D == recordButton.object3D) {
         if (!recording) {
           buttonEvent(recordButton, 'int')
           recordButtonSelected = true;
@@ -1109,10 +1100,7 @@ AFRAME.registerComponent('button-intersect', {
     });
 
     this.el.addEventListener('raycaster-intersected-cleared', function () {
-      if (el.object3D == helpButton.object3D) {
-        buttonEvent(helpButton, 'noInt')
-        helpButtonSelected = false;
-      } else if (el.object3D == recordButton.object3D) {
+      if (el.object3D == recordButton.object3D) {
         buttonEvent(recordButton, 'noInt')
         recordButtonSelected = false;
       } else if (el.object3D == replayButton.object3D) {
@@ -1223,7 +1211,8 @@ AFRAME.registerComponent('countdown', {
     var countdownText = document.createElement('a-entity');
     countdownText.setAttribute('id', 'countdownText')
     countdownText.setAttribute('text', 'value: ' + countdownSecond)
-    countdownText.setAttribute('position', '-10 3.5 3') // Should make these schema values
+    countdownText.setAttribute('color', 'black')
+    countdownText.setAttribute('position', '-10 3.5 ' + (document.getElementById('rig').getAttribute('position').z + 6)) // Should make these schema values
     countdownText.setAttribute('rotation', '30 180 0')
     countdownText.setAttribute('scale', '20 20 20')
     document.querySelector('a-scene').appendChild(countdownText)
