@@ -145,7 +145,7 @@ function recordEntity(el, index) {
     if (diffMeterTotal < barTotal) {
       document.getElementById('diffMeter').setAttribute('geometry', 'primitive:plane; width: ' + diffMeterTotal + '; height: 0.5')
       if (diffMeterTotal > (barTotal / 2) ) {
-        document.getElementById('diffMeter').setAttribute('material', 'color: yellow');
+        document.getElementById('diffMeter').setAttribute('material', 'color: gold');
         document.getElementById('diffMeter').setAttribute('value', 'KEEP MOVING');
       }
     } else if (!diffMet) {
@@ -173,7 +173,7 @@ function recordEntity(el, index) {
 function buttonEvent(button, event) {
   if (button) {
     if (event == 'int') {
-      button.setAttribute('color', 'yellow') // text color
+      button.setAttribute('color', 'gold') // text color
     }
     if (event == 'noInt') {
       button.setAttribute('color', 'white') // text color
@@ -204,7 +204,7 @@ function changeDifficulty() {
     document.getElementById('diffButton').setAttribute('value', 'EASY')
     difficulty = 'easy'
   } else if (difficulty == 'easy') {
-    document.getElementById('diffButton').setAttribute('material', 'color: yellow')
+    document.getElementById('diffButton').setAttribute('material', 'color: gold')
     document.getElementById('diffButton').setAttribute('value', 'NORMAL')
     difficulty = 'normal'
   } else if (difficulty == 'normal') {
@@ -264,7 +264,7 @@ function gameStart() {
 
   // Move title
   document.getElementById('titleText').setAttribute('visible', false)
-  document.getElementById('titleText').setAttribute('position', '0 6 3')
+  document.getElementById('titleText').setAttribute('position', '0 3.5 3')
   document.getElementById('titleText').setAttribute('rotation', '30 180 0')
 
   // Make buttons unclickable
@@ -350,7 +350,7 @@ function gameStart() {
   randomize();
 
   // Move player in front of ghosteses
-  document.getElementById('rig').setAttribute('position', '1 0 -6')
+  document.getElementById('rig').setAttribute('position', '0 0 -5')
   document.getElementById('rig').setAttribute('rotation', '0 180 0')
 
   document.querySelector('a-scene').setAttribute('countdown', '')
@@ -377,7 +377,7 @@ function gameEnd() {
     restartButton.setAttribute('id', 'restartButton')
     restartButton.setAttribute('geometry', 'primitive:plane; height:0.8; width:2;')
     restartButton.setAttribute('material', 'color:lightgreen; transparent:true; opacity:0.5;')
-    restartButton.setAttribute('position', '2 4 2')
+    restartButton.setAttribute('position', '2 2.25 2')
     restartButton.setAttribute('rotation', '0 180 0')
     restartButton.setAttribute('text', 'color:white; align:center; width: 5; value: Restart Game')
     restartButton.setAttribute('button-intersect', 'name:restart')
@@ -392,7 +392,7 @@ function gameEnd() {
     newRoundButton.setAttribute('id', 'newRoundButton')
     newRoundButton.setAttribute('geometry', 'primitive:plane; height:0.8; width:2;')
     newRoundButton.setAttribute('material', 'color:blue; transparent:true; opacity:0.5;')
-    newRoundButton.setAttribute('position', '-2 4 2')
+    newRoundButton.setAttribute('position', '-2 2.25 2')
     newRoundButton.setAttribute('rotation', '0 180 0')
     newRoundButton.setAttribute('text', 'color:white; align:center; width: 5; value: New Round')
     newRoundButton.setAttribute('button-intersect', 'name: newRoundButton')
@@ -409,7 +409,7 @@ function gameEnd() {
     mutatedGhostIndicator = document.getElementById('ghostRing')
   }
   mutatedGhostIndicator.setAttribute('geometry', 'primitive:ring; radius-inner:0.9; radius-outer:1')
-  mutatedGhostIndicator.setAttribute('material', 'color:yellow')
+  mutatedGhostIndicator.setAttribute('material', 'color:gold')
   mutatedGhostIndicator.setAttribute('rotation', '0 180 0')
   mutatedGhostIndicator.setAttribute('visible', true)
   mutatedGhostIndicator.setAttribute('class', 'replay')
@@ -419,7 +419,7 @@ function gameEnd() {
   mutatedGhostIndicator.object3D.position.z = mutatedGhost.object3D.position.z;
 
   // Setup button to compare mutated replay to original
-  replayButton.setAttribute('position', '4.5 2 1')
+  replayButton.setAttribute('position', '4.5 1 1')
   replayButton.setAttribute('rotation', '0 -155 0')
   replayButton.setAttribute('value', 'REPLAY IMPOSTER')
   replayButton.setAttribute('class', 'links')
@@ -492,7 +492,7 @@ function restartGame() {
   document.getElementById('mutateStatsParts').setAttribute('visible', false)
 
   // Move title
-  document.getElementById('titleText').setAttribute('position', '0 5 -9')
+  document.getElementById('titleText').setAttribute('position', '0 3.5 -8')
   document.getElementById('titleText').setAttribute('rotation', '30 0 0')
 
   // restore mirror body
@@ -501,7 +501,7 @@ function restartGame() {
   document.getElementById('headCube').setAttribute('visible', true)
 
   // reset player positon
-  document.getElementById('rig').setAttribute('position', '0 0 -4')
+  document.getElementById('rig').setAttribute('position', '0 0 -2')
   document.getElementById('rig').setAttribute('rotation', '0 0 0')
 
   // delete everything in the 'replay' class
@@ -547,18 +547,18 @@ function restartGame() {
   document.getElementById('recordButton').setAttribute('class', 'links')
 
   document.getElementById('replayButton').setAttribute('visible', false)
-  document.getElementById('replayButton').setAttribute('position', '3 2 -10')
+  document.getElementById('replayButton').setAttribute('position', '3 1 -8')
   document.getElementById('replayButton').setAttribute('rotation', '0 -25 0')
   document.getElementById('replayButton').setAttribute('value', 'REPLAY RECORDING')
 
   document.getElementById('diffButton').setAttribute('visible', true)
   document.getElementById('diffButton').setAttribute('rotation', '0 25 0')
-  document.getElementById('diffButton').setAttribute('position', '-3 4 -10')
+  document.getElementById('diffButton').setAttribute('position', '-3 3 -8')
 
   document.getElementById('startText').setAttribute('value', 'Record ' + numReqReplays + ' animations to start!')
   document.getElementById('startText').setAttribute('class', 'links')
   document.getElementById('startText').setAttribute('rotation', '0 0 0')
-  document.getElementById('startText').setAttribute('position', '0 4 -10')
+  document.getElementById('startText').setAttribute('position', '0 2 -8')
   document.getElementById('startText').setAttribute('color', 'white')
   document.getElementById('startText').removeAttribute('geometry')
   document.getElementById('startText').removeAttribute('material')
@@ -642,9 +642,9 @@ function addReplay(poses, index) {
   entityEl.setAttribute('id', 'replay' + index)
   entityEl.setAttribute('geometry', 'primitive:plane; height:0.25; width:0.25;')
   entityEl.setAttribute('material', 'color:grey; transparent:true; opacity:0.5;')
-  entityEl.setAttribute('position', pos + ' 1 -10')
+  entityEl.setAttribute('position', pos + ' 0.5 -8')
   entityEl.setAttribute('rotation', '0 -25 0')
-  entityEl.setAttribute('text', 'color:yellow; align:center; width: 5; value:' + (index + 1))
+  entityEl.setAttribute('text', 'color:gold; align:center; width: 5; value:' + (index + 1))
   entityEl.setAttribute('class', 'replay links')
   entityEl.setAttribute('button-intersect', 'name:replay' + index)
   sceneEl.appendChild(entityEl);
@@ -1032,7 +1032,7 @@ AFRAME.registerComponent('triggered', {
       } else {
         if (cursorOverRecording && !replaying) {
           selectedRecording = parseInt(cursorOverRecording.slice(6), 10);
-          document.getElementById('replay' + selectedRecording).setAttribute('text', 'color: yellow');
+          document.getElementById('replay' + selectedRecording).setAttribute('text', 'color: gold');
           for (i = 0; i < savedRecordings.length; i++) {
             if (i != selectedRecording) {
               document.getElementById('replay' + i).setAttribute('text', 'color: white')
@@ -1223,7 +1223,7 @@ AFRAME.registerComponent('countdown', {
     var countdownText = document.createElement('a-entity');
     countdownText.setAttribute('id', 'countdownText')
     countdownText.setAttribute('text', 'value: ' + countdownSecond)
-    countdownText.setAttribute('position', '-10 5 3') // Should make these schema values
+    countdownText.setAttribute('position', '-10 3.5 3') // Should make these schema values
     countdownText.setAttribute('rotation', '30 180 0')
     countdownText.setAttribute('scale', '20 20 20')
     document.querySelector('a-scene').appendChild(countdownText)

@@ -5,7 +5,6 @@
     <title>Off-Killter</title>
     <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-render-order-component@1.1.0/dist/aframe-render-order-component.min.js"></script>
-    <script src="https://unpkg.com/aframe-environment-component@1.1.0/dist/aframe-environment-component.min.js"></script>
     <script src="https://unpkg.com/aframe-randomizer-components@3.0.2/dist/aframe-randomizer-components.min.js"></script>
     <script src="https://unpkg.com/aframe-haptics-component/dist/aframe-haptics-component.min.js"></script>
     <script src="./src/index.js"></script>
@@ -18,9 +17,59 @@
         <img offset="{x: 50, y: 0}" id="face-texture" src="assets/facetext.jpg">
       </a-assets>
 
-      <a-entity environment="preset: egypt;"></a-entity>
+      <!-- Here's a modern table, because why not! -->
+      <a-entity id="table" position="-1 0 -3" rotation="0 90 0">
+        <a-box position="-1 0.8 -3" height="0.05" width="4" depth="2.5" rotation="0 0 0" color="#a8ccd7" opacity="0.25"></a-box>
+        <a-cylinder position="0.5 0.15 -4" radius="0.05" height="1.3" color="#000000"></a-cylinder>
+        <a-cylinder position="0.5 0.15 -2" radius="0.05" height="1.3" color="#000000"></a-cylinder>
+        <a-cylinder position="-2.5 0.15 -4" radius="0.05" height="1.3" color="#000000"></a-cylinder>
+        <a-cylinder position="-2.5 0.15 -2" radius="0.05" height="1.3" color="#000000"></a-cylinder>
+      </a-entity>
+      
+      <!-- Define Scene Room -->
+      <a-entity id="intRoom">
+        <!-- floor -->
+        <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#474747"></a-plane>
+        <!-- ceiling -->
+        <a-plane position="0 4 0" rotation="90 0 0" width="20" height="20" color="#FFFFFF"></a-plane>
+        <!-- lower walls -->
+        <a-plane position="0 1 -10" rotation="0 0 0" width="20" height="2" color="#001d29"></a-plane>
+        <a-plane position="10 1 0" rotation="0 -90 0" width="20" height="2" color="#001d29"></a-plane>
+        <a-plane position="-10 1 0" rotation="0 90 0" width="20" height="2" color="#001d29"></a-plane>
+        <!-- upper walls -->
+        <a-plane position="0 3 -10" rotation="0 0 0" width="20" height="2" color="#007eb0"></a-plane>
+        <a-plane position="10 3 0" rotation="0 -90 0" width="20" height="2" color="#007eb0"></a-plane>
+        <a-plane position="-10 3 0" rotation="0 90 0" width="20" height="2" color="#007eb0"></a-plane>
+        <!-- glass wall -->
+        <a-box position="-7 1 10" rotation="-180 0 0" depth="0.2" width="6" height="2" color="#001d29"></a-box>
+        <a-box position="7 3 10" rotation="-180 0 0" depth="0.2" width="6" height="2" color="#007eb0"></a-box>
+        <a-box position="7 1 10" rotation="-180 0 0" depth="0.2" width="6" height="2" color="#001d29"></a-box>
+        <a-box position="-7 3 10" rotation="-180 0 0" depth="0.2" width="6" height="2" color="#007eb0"></a-box>
+        <a-box position="0 0.25 10" rotation="-180 0 0" depth="0.2" width="8" height="1" color="#001d29"></a-box>
+        <a-box position="0 3.75 10" rotation="-180 0 0" depth="0.2"width="8" height="1" color="#007eb0"></a-box>
+        <!-- glass -->
+        <a-box position="0 2 10" rotation="-180 0 0" depth="0.05" width="8" height="2.5" color="#a8ccd7" opacity="0.25"></a-box>
+      </a-entity>
 
-      <a-entity id="rig" position="0 0 -4">
+      <!-- Define room behind glass -->
+      <a-entity id="replayRoom">
+        <!-- floor -->
+        <a-plane position="0 0 12.5" rotation="-90 0 0" width="20" height="5" color="#474747"></a-plane>
+        <!-- ceiling -->
+        <a-plane position="0 4 12.5" rotation="90 0 0" width="20" height="5" color="#FFFFFF"></a-plane>
+        <!-- lower walls -->
+        <a-plane position="0 1 15" rotation="0 180 0" width="20" height="2" color="#001d29"></a-plane>
+        <a-plane position="10 1 12.5" rotation="0 -90 0" width="5" height="2" color="#001d29"></a-plane>
+        <a-plane position="-10 1 12.5" rotation="0 90 0" width="5" height="2" color="#001d29"></a-plane>
+        <!-- upper walls -->
+        <a-plane position="0 3 15" rotation="0 180 0" width="20" height="2" color="#007eb0"></a-plane>
+        <a-plane position="10 3 12.5" rotation="0 -90 0" width="5" height="2" color="#007eb0"></a-plane>
+        <a-plane position="-10 3 12.5" rotation="0 90 0" width="5" height="2" color="#007eb0"></a-plane>
+        <!-- height board -->
+        <a-plane position="0 2 14.99" rotation="-180 0 0" width="8" height="2.5" color="#FFFFFF"></a-box>
+      </a-entity>
+
+      <a-entity id="rig" position="0 0 -2">
         <a-entity id="camera" camera look-controls wasd-controls rotation="0 0 0" mirror-movement replayer>
           <a-plane id="fadePlane" position="0 0 -0.01" width="10" height="10" opacity="1.0" color="black" visible="true">
             <a-text id="startTitleText" value="Off-Killter" scale="0.01 0.01 0.01" position="-0.005 0.004 0"></a-text>
@@ -37,7 +86,7 @@
         <a-entity laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 20" line="color: blue; opacity: 0.25"></a-entity>
       </a-entity>
 
-      <a-entity id="mirrorBody" position="0 0 -8" rotation="0 180 0">
+      <a-entity id="mirrorBody" position="0 0 -6" rotation="0 180 0">
         <a-entity id="leftCube">
           <a-entity id="mirrorLeftHand" rotation="0 0 90" gltf-model="#leftHandModel"></a-entity>
         </a-entity>
@@ -49,18 +98,18 @@
         </a-entity>
       </a-entity>
 
-      <a-text id="diffMeter" value="MOVE TO FILL" align="center" position="0 3 -10" rotation="0 0 0" material="color: pink" scale="0.7 0.7 0.7" visible='false'>
+      <a-text id="diffMeter" value="MOVE TO FILL" align="center" position="0 2.5 -8" rotation="0 0 0" material="color: pink" scale="0.7 0.7 0.7" visible='false'>
         <a-plane id="topBar" position="0 0.25 0" width="4" height="0.05" color="black"></a-plane>
         <a-plane id="bottomBar" position="0 -0.25 0" width="4" height="0.05" color="black"></a-plane>
         <a-plane id="leftBar" position="-2 0 0" width="0.05" height="0.5" color="black"></a-plane>
         <a-plane id="rightBar" position="2 0 0" width="0.05" height="0.5" color="black"></a-plane>
       </a-text>
-
-      <a-text id="diffButton" class="links" value="EASY" geometry="primitive:plane; width: 2; height: 0.8" align="center" position="-3 4 -10" rotation="0 25 0" material="color: green" scale="0.7 0.7 0.7" button-intersect>
+      <!-- TODO: MAKE UI CLASS CONTAINING ALL BUTTONS/ETC. -->
+      <a-text id="diffButton" class="links" value="EASY" geometry="primitive:plane; width: 2; height: 0.8" align="center" position="-3 3 -8" rotation="0 25 0" material="color: green" scale="0.7 0.7 0.7" button-intersect>
         <a-text id="diffButtonText" value="(Click to change difficulty)" align="center" position="0 -0.2 0" scale="0.5 0.5 0.5" button-intersect></a-text>
       </a-text>
 
-      <a-text id="helpButton" class="links" value="HOW TO PLAY" geometry="primitive:plane; width: 2; height: 0.8" align="center" position="3 4 -10" rotation="0 -25 0" material="color: yellow" scale="0.7 0.7 0.7" button-intersect>
+      <a-text id="helpButton" class="links" value="HOW TO PLAY" geometry="primitive:plane; width: 2; height: 0.8" align="center" position="3 3 -8" rotation="0 -25 0" material="color: gold" scale="0.7 0.7 0.7" button-intersect>
         <a-text id="helpButtonText" value="* Press the record button to begin." align="center" position="0 -0.5 0" scale="0.65 0.65 0.65" visible='false'></a-text>
 
         <a-text id="helpButtonText1" value="* Move around as the time counts down." align="center" position="0 -0.65 0" scale="0.65 0.65 0.65" visible='false'></a-text>
@@ -76,13 +125,13 @@
         <a-text id="helpButtonText6" value="* Shoot the imposter replay before the recordings play 3 times to win!" align="center" position="0 -2.2 0" scale="0.65 0.65 0.65" visible='false'></a-text>
       </a-text>
 
-      <a-text id="titleText" scale="5 5 5" value="Off-Killter" color="black" position="0 5 -9" rotation="30 0 0" align="center" visible="true"></a-text>
+      <a-text id="titleText" scale="5 5 5" value="Off-Killter" color="black" position="0 3.5 -8" rotation="30 0 0" align="center" visible="true"></a-text>
 
-      <a-text id="startText" class="links" scale="1 1 1" value="Record 3 animations to start!" color="white" position="0 4 -10" rotation="0 0 0" align="center" visible="true" button-intersect></a-text>
+      <a-text id="startText" class="links" scale="1 1 1" value="Record 3 animations to start!" color="white" position="0 2 -8" rotation="0 0 0" align="center" visible="true" button-intersect></a-text>
 
-      <a-text id="replayButton" class="links" value="REPLAY RECORDING" geometry="primitive:plane" position="3 2 -10" rotation="0 -25 0" material="color: grey" scale="0.7 0.7 0.7" align="right" visible="false" button-intersect></a-text>
+      <a-text id="replayButton" class="links" value="REPLAY RECORDING" geometry="primitive:plane" position="3 1 -8" rotation="0 -25 0" material="color: grey" scale="0.7 0.7 0.7" align="right" visible="false" button-intersect></a-text>
 
-      <a-text id="recordButton" class="links" value="START RECORDING" geometry="primitive:circle" position="-3 2 -10" rotation="0 25 0" material="color: red" scale="0.7 0.7 0.7" button-intersect></a-text>
+      <a-text id="recordButton" class="links" value="START RECORDING" geometry="primitive:circle" position="-3 1 -8" rotation="0 25 0" material="color: red" scale="0.7 0.7 0.7" button-intersect></a-text>
     </a-scene>
   </body>
 </html>
