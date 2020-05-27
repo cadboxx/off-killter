@@ -92,7 +92,7 @@
           </a-plane>
         </a-entity>
         <a-entity id="leftHand" teleport-controls="cameraRig: #rig; teleportOrigin: #camera;" hand-controls="hand: left; handModelStyle: lowPoly;" mirror-movement haptics static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .grabbable" grab></a-entity>
-        <a-entity id="rightHand" teleport-controls="cameraRig: #rig; teleportOrigin: #camera;" hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement haptics triggered static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .grabbable" grab></a-entity>
+        <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement haptics triggered static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .grabbable" grab camera-rotation></a-entity>
 
         <!-- NOTE: For something to be intersected, needs to have class="links"! -->
         <a-entity laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 20" line="color: blue; opacity: 0.25"></a-entity>

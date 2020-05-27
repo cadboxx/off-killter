@@ -53,6 +53,7 @@ var midTick = 0;
 var endTick = 0;
 var oldPoint = {};
 var diffMeterTotal = 0;
+var trackpadAxis;
 
 let startTime = 0;
 let randRecord; // Ghost that is modified during game
@@ -1048,6 +1049,30 @@ AFRAME.registerComponent('triggered', {
   }
 });
 
+AFRAME.registerComponent('camera-rotation', {
+  init: function() {
+    this.el.addEventListener('trackpaddown', function() {
+      if (Math.abs(trackpadAxis[0]) > 0.5 || Math.abs(trackpadAxis[0]) < -0.5) {
+        var mult = -1;
+        if (Math.sign(trackpadAxis[0]) == -1 ) {
+          mult = 1;
+        }
+        var currRigRot = document.getElementById('rig').getAttribute('rotation')
+        var newRotX = currRigRot.x;
+        var newRotY = currRigRot.y + (30 * mult);
+        var newRotZ = currRigRot.z;
+        var newRot = newRotX + ' ' + newRotY + ' ' + newRotZ
+        document.getElementById('rig').setAttribute('rotation', newRot)
+      }
+    });
+    this.el.addEventListener('axismove', function(axis) {
+      if (axis.detail.changed[0]) {
+        trackpadAxis = axis.detail.axis;
+      }
+    });
+  }
+});
+
 // Floating button interaction
 AFRAME.registerComponent('button-intersect', {
   schema: {
@@ -1064,7 +1089,7 @@ AFRAME.registerComponent('button-intersect', {
     var newRoundButton = document.getElementById("newRoundButton");
     var difficultyButton = document.getElementById("diffButton");
 
-    this.el.addEventListener('raycaster-intersected', function () {
+    this.el.addEventListener('raycaster-intersected', function() {
       if (el.object3D == recordButton.object3D) {
         if (!recording) {
           buttonEvent(recordButton, 'int')
