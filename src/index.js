@@ -490,7 +490,7 @@ function restartGame() {
   document.getElementById('mutateStatsParts').setAttribute('visible', false)
 
   // Move title
-  document.getElementById('titleText').setAttribute('position', '0 3.5 -8')
+  document.getElementById('titleText').setAttribute('position', '0 3.5 -9')
   document.getElementById('titleText').setAttribute('rotation', '30 0 0')
 
   // restore mirror body
@@ -545,18 +545,18 @@ function restartGame() {
   document.getElementById('recordButton').setAttribute('class', 'links')
 
   document.getElementById('replayButton').setAttribute('visible', false)
-  document.getElementById('replayButton').setAttribute('position', '3 1 -8')
+  document.getElementById('replayButton').setAttribute('position', '3 1.25 -9')
   document.getElementById('replayButton').setAttribute('rotation', '0 -25 0')
   document.getElementById('replayButton').setAttribute('value', 'REPLAY RECORDING')
 
   document.getElementById('diffButton').setAttribute('visible', true)
   document.getElementById('diffButton').setAttribute('rotation', '0 25 0')
-  document.getElementById('diffButton').setAttribute('position', '-3 3 -8')
+  document.getElementById('diffButton').setAttribute('position', '-3 2.5 -9')
 
   document.getElementById('startText').setAttribute('value', 'Record ' + numReqReplays + ' animations to start!')
   document.getElementById('startText').setAttribute('class', 'links')
   document.getElementById('startText').setAttribute('rotation', '0 0 0')
-  document.getElementById('startText').setAttribute('position', '0 2 -8')
+  document.getElementById('startText').setAttribute('position', '0 2.5 -9')
   document.getElementById('startText').setAttribute('color', 'white')
   document.getElementById('startText').removeAttribute('geometry')
   document.getElementById('startText').removeAttribute('material')
@@ -640,7 +640,7 @@ function addReplay(poses, index) {
   entityEl.setAttribute('id', 'replay' + index)
   entityEl.setAttribute('geometry', 'primitive:plane; height:0.25; width:0.25;')
   entityEl.setAttribute('material', 'color:grey; transparent:true; opacity:0.5;')
-  entityEl.setAttribute('position', pos + ' 0.5 -8')
+  entityEl.setAttribute('position', pos + ' 0.5 -9.5')
   entityEl.setAttribute('rotation', '0 -25 0')
   entityEl.setAttribute('text', 'color:gold; align:center; width: 5; value:' + (index + 1))
   entityEl.setAttribute('class', 'replay links')
@@ -898,7 +898,7 @@ AFRAME.registerComponent('mirror-movement', {
             if (savedRecordings.length >= numReqReplays) {
               startButton.setAttribute('value', 'START!')
               startButton.setAttribute('geometry', 'primitive:plane; height:0.5')
-              startButton.setAttribute('material', 'color: lightgreen')
+              startButton.setAttribute('material', 'color: blue')
 
               recordButton.setAttribute('visible', false)
               recordButton.setAttribute('class', '') // Make unclickable
