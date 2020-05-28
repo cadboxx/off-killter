@@ -306,9 +306,6 @@ function gameStart() {
     document.getElementById('replay' + i).setAttribute('visible', false)
   }
 
-  // hide mirror replay
-  document.getElementById('mirrorBody').setAttribute('visible', true)
-
   if (savedRecordings.length > 3) {
     spaceBuffer += 1;
   }
@@ -556,6 +553,7 @@ function restartGame() {
   document.getElementById('recordButton').setAttribute('class', 'links')
   document.getElementById('recordButton').setAttribute('rotation', '0 115 0')
   document.getElementById('recordButton').setAttribute('position', '-9 1.25 3')
+  document.getElementById('recordButton').setAttribute('geometry', 'primitive:circle')
 
   document.getElementById('replayButton').setAttribute('visible', false)
   document.getElementById('replayButton').setAttribute('position', '9 1.25 3')
@@ -690,7 +688,6 @@ AFRAME.registerComponent('replayer', {
         } else {
           replaying = false;
           lockRig(null, false);
-          document.getElementById('mirrorBody').setAttribute('visible', false)
           replayButton.setAttribute('material', 'color:blue')
           replayButton.setAttribute('value', 'REPLAY RECORDING')
           tick = 0;
@@ -877,12 +874,18 @@ AFRAME.registerComponent('mirror-movement', {
       if (el.object3D == camera.object3D) {
         var cube = headCube;
         var index = 0;
+        var staticpos = [0, 1.65, -0.230]
+        var staticrot = [0, 0, 0]
       } else if (el.object3D == leftHand.object3D) {
         var cube = rightCube;
         var index = 1;
+        var staticpos = [0.327, 1.25, -0.575]
+        var staticrot = [0, 0, 0]
       } else if (el.object3D == rightHand.object3D) {
         var cube = leftCube;
         var index = 2;
+        var staticpos = [-0.327, 1.25, -0.575]
+        var staticrot = [0, 0, 0]
       } else {
         console.log("Error: not arm or head.")
       }
@@ -915,8 +918,10 @@ AFRAME.registerComponent('mirror-movement', {
               startButton.setAttribute('rotation', '0 0 0')
               document.getElementById('diffButton').setAttribute('visible', true)
 
-              recordButton.setAttribute('visible', false)
-              recordButton.setAttribute('class', '') // Make unclickable
+              recordButton.setAttribute('visible', true)
+              recordButton.setAttribute('value', 'GO TO REPLAY AREA')
+              recordButton.setAttribute('geometry', 'primitive:plane;')
+              recordButton.setAttribute('material', 'color: orange')
               document.getElementById('diffMeter').setAttribute('visible', false)
             } else {
               startButton.setAttribute('value', 'Record ' + (numReqReplays - savedRecordings.length) + ' more animations to start...')
@@ -956,17 +961,14 @@ AFRAME.registerComponent('mirror-movement', {
         }
       }
 
-      if (!replaying) {
-        // Need to add a loaded/gameStart function to use this
-        // rotateObject(cube, el, 0, 0, 5)
-
+      if (!replaying && savedRecordings.length == 0) {
         // mirror current player actions
-        cube.object3D.position.x = el.object3D.position.x * -1
-        cube.object3D.position.y = el.object3D.position.y;
-        cube.object3D.position.z = el.object3D.position.z;
-        cube.object3D.rotation.x = el.object3D.rotation.x;
-        cube.object3D.rotation.y = el.object3D.rotation.y * -1;
-        cube.object3D.rotation.z = el.object3D.rotation.z * -1;
+        cube.object3D.position.x = staticpos[0];
+        cube.object3D.position.y = staticpos[1];
+        cube.object3D.position.z = staticpos[2];
+        cube.object3D.rotation.x = staticrot[0];
+        cube.object3D.rotation.y = staticrot[1];
+        cube.object3D.rotation.z = staticrot[2];
       }
     }
   }
@@ -995,14 +997,12 @@ AFRAME.registerComponent('triggered', {
         } else {
           // lock rig at replay position
           lockRig('replay');
-          document.getElementById('mirrorBody').setAttribute('visible', true)
         }
       } else if (difficultyButtonSelected) {
         changeDifficulty();
       } else if (recordButtonSelected) {
-        if (!replaying) {
+        if (!replaying && savedRecordings.length < numReqReplays ) {
           document.getElementById('diffMeter').setAttribute('visible', true)
-          document.getElementById('mirrorBody').setAttribute('visible', false)
           document.getElementById('startText').setAttribute('position', '-5 2.5 0')
           document.getElementById('startText').setAttribute('rotation', '0 -90 0')
           document.getElementById('recordButton').setAttribute('position', '-5 1.25 1')
@@ -1012,6 +1012,9 @@ AFRAME.registerComponent('triggered', {
           recordedPoses = [ [], [], [] ];
           tick = 0;
           currRecordingTime = 0;
+        } else {
+          document.getElementById('rig').setAttribute('position', '5 0 0')
+          document.getElementById('rig').setAttribute('rotation', '0 -90 0')
         }
       } else if (startButtonSelected) {
         if (savedRecordings.length >= numReqReplays) {
