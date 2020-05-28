@@ -198,10 +198,10 @@ function lockRig(position=null, lock=true) {
 
     // need to get original rotation and set based on that
     if (position == 'replay') {
-      rig.setAttribute('position', '5 0 0')
+      rig.setAttribute('position', '4.5 0 0')
       rig.setAttribute('rotation', '0 -90 0')
     } else if (position == 'record') {
-      rig.setAttribute('position', '-8.5 0 0')
+      rig.setAttribute('position', '-9 0 0')
       rig.setAttribute('rotation', '0 -90 0')
     } else if (position == 'startgame') {
       rig.setAttribute('position', '0 0 8')
@@ -873,16 +873,19 @@ AFRAME.registerComponent('mirror-movement', {
 
       if (el.object3D == camera.object3D) {
         var cube = headCube;
+        var tvcube = tvheadCube;
         var index = 0;
         var staticpos = [0, 1.65, -0.230]
         var staticrot = [0, 0, 0]
       } else if (el.object3D == leftHand.object3D) {
         var cube = rightCube;
+        var tvcube = tvrightCube;
         var index = 1;
         var staticpos = [0.327, 1.25, -0.575]
         var staticrot = [0, 0, 0]
       } else if (el.object3D == rightHand.object3D) {
         var cube = leftCube;
+        var tvcube = tvleftCube;
         var index = 2;
         var staticpos = [-0.327, 1.25, -0.575]
         var staticrot = [0, 0, 0]
@@ -961,14 +964,23 @@ AFRAME.registerComponent('mirror-movement', {
         }
       }
 
-      if (!replaying && savedRecordings.length == 0) {
-        // mirror current player actions
-        cube.object3D.position.x = staticpos[0];
-        cube.object3D.position.y = staticpos[1];
-        cube.object3D.position.z = staticpos[2];
-        cube.object3D.rotation.x = staticrot[0];
-        cube.object3D.rotation.y = staticrot[1];
-        cube.object3D.rotation.z = staticrot[2];
+      if (!replaying) {
+        if (savedRecordings.length == 0) {
+          cube.object3D.position.x = staticpos[0];
+          cube.object3D.position.y = staticpos[1];
+          cube.object3D.position.z = staticpos[2];
+          cube.object3D.rotation.x = staticrot[0];
+          cube.object3D.rotation.y = staticrot[1];
+          cube.object3D.rotation.z = staticrot[2];
+        }
+
+        // mirror current player actions to recording area "monitor"
+        tvcube.object3D.position.x = el.object3D.position.x * -1;
+        tvcube.object3D.position.y = el.object3D.position.y;
+        tvcube.object3D.position.z = el.object3D.position.z;
+        tvcube.object3D.rotation.x = el.object3D.rotation.x;
+        tvcube.object3D.rotation.y = el.object3D.rotation.y * -1;
+        tvcube.object3D.rotation.z = el.object3D.rotation.z * -1;
       }
     }
   }
