@@ -562,9 +562,9 @@ function restartGame() {
   document.getElementById('replayButton').setAttribute('rotation', '0 -100 0')
   document.getElementById('replayButton').setAttribute('value', 'REPLAY RECORDING')
 
-  document.getElementById('diffButton').setAttribute('visible', true)
-  document.getElementById('diffButton').setAttribute('rotation', '-5 0 0')
-  document.getElementById('diffButton').setAttribute('position', '0 1.55 -9.95')
+  document.getElementById('diffButton').setAttribute('visible', false)
+  document.getElementById('diffButton').setAttribute('rotation', '0 0 0')
+  document.getElementById('diffButton').setAttribute('position', '1 1.55 -9.95')
 
   document.getElementById('startText').setAttribute('value', 'Record ' + numReqReplays + ' animations to start!')
   document.getElementById('startText').setAttribute('class', 'links')
@@ -909,10 +909,11 @@ AFRAME.registerComponent('mirror-movement', {
 
             if (savedRecordings.length >= numReqReplays) {
               startButton.setAttribute('value', 'START!')
-              startButton.setAttribute('geometry', 'primitive:plane; height:0.5')
+              startButton.setAttribute('geometry', 'primitive:plane; width: 1.4; height:0.7')
               startButton.setAttribute('material', 'color: green')
-              startButton.setAttribute('position', '-5 2.5 0')
-              startButton.setAttribute('rotation', '0 -90 0')
+              startButton.setAttribute('position', '-1 1.55 -9.95')
+              startButton.setAttribute('rotation', '0 0 0')
+              document.getElementById('diffButton').setAttribute('visible', true)
 
               recordButton.setAttribute('visible', false)
               recordButton.setAttribute('class', '') // Make unclickable
@@ -1073,6 +1074,7 @@ AFRAME.registerComponent('triggered', {
   }
 });
 
+// Handle camera rotation locomotion when rig isn't locked
 AFRAME.registerComponent('camera-rotation', {
   init: function() {
     this.el.addEventListener('trackpaddown', function() {
@@ -1248,6 +1250,19 @@ AFRAME.registerComponent('start-game', {
         hideTheChildren(document.getElementById('fadePlane'));
       });
     }
+  }
+});
+
+// animates elevator doors
+AFRAME.registerComponent('elevator-door', {
+  schema: {
+    open: {type: 'bool', defaut: true}
+  },
+  tick: function() {
+
+  },
+  remove: function() {
+
   }
 });
 
