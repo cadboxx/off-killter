@@ -188,6 +188,37 @@ function buttonEvent(button, event) {
   }
 }
 
+function lockRig(position=null, lock=true) {
+  var rig = document.getElementById('rig');
+  var camera = document.getElementById('camera');
+  if (lock) {
+    // disable teleport
+    // disable camera rotate
+    document.getElementById('leftHand').removeAttribute('teleport-controls');
+    document.getElementById('rightHand').removeAttribute('camera-rotation');
+
+    // need to get original rotation and set based on that
+    if (position == 'replay') {
+      rig.setAttribute('position', '5 0 0')
+      rig.setAttribute('rotation', '0 -90 0')
+    } else if (position == 'record') {
+      rig.setAttribute('position', '-8.5 0 0')
+      rig.setAttribute('rotation', '0 -90 0')
+    } else if (position == 'startgame') {
+      rig.setAttribute('position', '0 0 8')
+      rig.setAttribute('rotation', '0 180 0')
+    } else if (position == 'start') {
+      rig.setAttribute('position', '0 0 -2')
+      rig.setAttribute('rotation', '0 0 0')
+    }
+  } else {
+    // enable teleport
+    // enable camera rotate
+    document.getElementById('leftHand').setAttribute('teleport-controls', 'cameraRig: #rig; teleportOrigin: #camera;')
+    document.getElementById('rightHand').setAttribute('camera-rotation', '');
+  }
+}
+
 function hideTheChildren(node) {
   // hide initial text
   var childNodes = node.childNodes;
@@ -260,15 +291,9 @@ function rotateObject(obj, ref, px = 0, py = 0, pz = 0, rx = 0, ry = 0, rz = 0) 
 
 function gameStart() {
   // Move player in front of ghosteses
-  document.getElementById('rig').setAttribute('position', '0 0 8')
-  document.getElementById('rig').setAttribute('rotation', '0 180 0')
+  lockRig('startgame');
 
   document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 1.5')
-
-  // Move title
-  document.getElementById('titleText').setAttribute('visible', false)
-  document.getElementById('titleText').setAttribute('position', '0 3.5 ' + (document.getElementById('rig').getAttribute('position').z + 6))
-  document.getElementById('titleText').setAttribute('rotation', '30 180 0')
 
   // Make buttons unclickable
   document.getElementById('startText').removeAttribute('class')
@@ -285,9 +310,7 @@ function gameStart() {
   }
 
   // hide mirror replay
-  document.getElementById('leftCube').setAttribute('visible', false)
-  document.getElementById('rightCube').setAttribute('visible', false)
-  document.getElementById('headCube').setAttribute('visible', false)
+  document.getElementById('mirrorBody').setAttribute('visible', true)
 
   if (savedRecordings.length > 3) {
     spaceBuffer += 1;
@@ -489,18 +512,9 @@ function restartGame() {
   document.getElementById('mutateStatsSeconds').setAttribute('visible', false)
   document.getElementById('mutateStatsParts').setAttribute('visible', false)
 
-  // Move title
-  document.getElementById('titleText').setAttribute('position', '0 3.5 -9')
-  document.getElementById('titleText').setAttribute('rotation', '30 0 0')
-
-  // restore mirror body
-  document.getElementById('leftCube').setAttribute('visible', true)
-  document.getElementById('rightCube').setAttribute('visible', true)
-  document.getElementById('headCube').setAttribute('visible', true)
-
   // reset player positon
-  document.getElementById('rig').setAttribute('position', '0 0 -2')
-  document.getElementById('rig').setAttribute('rotation', '0 0 0')
+  lockRig('start');
+  lockRig(null, false);
 
   // delete everything in the 'replay' class
   var replayObjects = document.querySelectorAll(".replay");
@@ -545,18 +559,18 @@ function restartGame() {
   document.getElementById('recordButton').setAttribute('class', 'links')
 
   document.getElementById('replayButton').setAttribute('visible', false)
-  document.getElementById('replayButton').setAttribute('position', '3 1.25 -9')
-  document.getElementById('replayButton').setAttribute('rotation', '0 -25 0')
+  document.getElementById('replayButton').setAttribute('position', '9 1.25 3')
+  document.getElementById('replayButton').setAttribute('rotation', '0 -100 0')
   document.getElementById('replayButton').setAttribute('value', 'REPLAY RECORDING')
 
   document.getElementById('diffButton').setAttribute('visible', true)
-  document.getElementById('diffButton').setAttribute('rotation', '0 25 0')
-  document.getElementById('diffButton').setAttribute('position', '-3 2.5 -9')
+  document.getElementById('diffButton').setAttribute('rotation', '-5 0 0')
+  document.getElementById('diffButton').setAttribute('position', '0 1.55 -9.95')
 
   document.getElementById('startText').setAttribute('value', 'Record ' + numReqReplays + ' animations to start!')
   document.getElementById('startText').setAttribute('class', 'links')
-  document.getElementById('startText').setAttribute('rotation', '0 0 0')
-  document.getElementById('startText').setAttribute('position', '0 2.5 -9')
+  document.getElementById('startText').setAttribute('rotation', '0 90 0')
+  document.getElementById('startText').setAttribute('position', '-9.9 2.5 0')
   document.getElementById('startText').setAttribute('color', 'white')
   document.getElementById('startText').removeAttribute('geometry')
   document.getElementById('startText').removeAttribute('material')
@@ -610,7 +624,6 @@ function restartRound() {
   document.getElementById('newRoundButton').setAttribute('visible', false)
   document.getElementById('replayButton').setAttribute('visible', false)
   document.getElementById('startText').setAttribute('visible', false)
-  document.getElementById('titleText').setAttribute('visible', false)
   document.getElementById('ghostRing').setAttribute('visible', false)
   document.getElementById('diffButton').classList.remove('links')
   document.getElementById('diffButton').setAttribute('visible', false)
@@ -639,9 +652,9 @@ function addReplay(poses, index) {
   var pos = (2 + (index / 2))
   entityEl.setAttribute('id', 'replay' + index)
   entityEl.setAttribute('geometry', 'primitive:plane; height:0.25; width:0.25;')
-  entityEl.setAttribute('material', 'color:grey; transparent:true; opacity:0.5;')
-  entityEl.setAttribute('position', pos + ' 0.5 -9.5')
-  entityEl.setAttribute('rotation', '0 -25 0')
+  entityEl.setAttribute('material', 'color:grey; transparent:true; opacity:0.75;')
+  entityEl.setAttribute('position', '9 0.5 ' + pos)
+  entityEl.setAttribute('rotation', '0 -100 0')
   entityEl.setAttribute('text', 'color:gold; align:center; width: 5; value:' + (index + 1))
   entityEl.setAttribute('class', 'replay links')
   entityEl.setAttribute('button-intersect', 'name:replay' + index)
@@ -657,7 +670,6 @@ function addReplay(poses, index) {
 // Ghost replayer
 AFRAME.registerComponent('replayer', {
   tick: function () {
-    var scene = document.querySelector('a-scene');
     var headCube = document.getElementById("headCube");
     var leftCube = document.getElementById("leftCube");
     var rightCube = document.getElementById("rightCube");
@@ -678,6 +690,8 @@ AFRAME.registerComponent('replayer', {
           tick += 1;
         } else {
           replaying = false;
+          lockRig(null, false);
+          document.getElementById('mirrorBody').setAttribute('visible', false)
           replayButton.setAttribute('material', 'color:blue')
           replayButton.setAttribute('value', 'REPLAY RECORDING')
           tick = 0;
@@ -829,11 +843,10 @@ AFRAME.registerComponent('replayer', {
               rewindMut = false;
             } else {
               document.getElementById('startText').setAttribute('visible', true)
-              document.getElementById('titleText').setAttribute('visible', true)
               document.getElementById('startText').setAttribute('value', 'YOU RAN OUT OF TIME, BE FASTER!')
               document.getElementById('startText').setAttribute('material', 'color: red')
               document.getElementById('startText').setAttribute('rotation', '-20 180 0')
-              document.getElementById('startText').setAttribute('position', '0 0.5 ' + (document.getElementById('rig').getAttribute('position').z + 6))
+              document.getElementById('startText').setAttribute('position', '0 3.5 ' + (document.getElementById('rig').getAttribute('position').z + 6))
               document.getElementById('startText').setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
               document.getElementById('leftHand').components.haptics.pulse(0.5, 1000);
               document.getElementById('rightHand').components.haptics.pulse(0.5, 1000);
@@ -898,7 +911,9 @@ AFRAME.registerComponent('mirror-movement', {
             if (savedRecordings.length >= numReqReplays) {
               startButton.setAttribute('value', 'START!')
               startButton.setAttribute('geometry', 'primitive:plane; height:0.5')
-              startButton.setAttribute('material', 'color: blue')
+              startButton.setAttribute('material', 'color: green')
+              startButton.setAttribute('position', '-5 2.5 0')
+              startButton.setAttribute('rotation', '0 -90 0')
 
               recordButton.setAttribute('visible', false)
               recordButton.setAttribute('class', '') // Make unclickable
@@ -911,6 +926,7 @@ AFRAME.registerComponent('mirror-movement', {
           }
 
           recording = false;
+          lockRig(null, false);
           document.getElementById('diffMeter').setAttribute('geometry', 'width: 0; height: 0;')
           document.getElementById('diffMeter').setAttribute('material', 'color: pink');
           document.getElementById('diffMeter').setAttribute('value', 'MOVE TO FILL');
@@ -976,13 +992,21 @@ AFRAME.registerComponent('triggered', {
           currMutRotAmt = 0;
           currMutPosAmt = 0;
           rewindMut = false;
+        } else {
+          // lock rig at replay position
+          lockRig('replay');
+          document.getElementById('mirrorBody').setAttribute('visible', true)
         }
       } else if (difficultyButtonSelected) {
         changeDifficulty();
       } else if (recordButtonSelected) {
         if (!replaying) {
           document.getElementById('diffMeter').setAttribute('visible', true)
+          document.getElementById('mirrorBody').setAttribute('visible', false)
+          document.getElementById('startText').setAttribute('position', '-5 2.5 0')
+          document.getElementById('startText').setAttribute('rotation', '0 -90 0')
           recording = true;
+          lockRig('record')
           recordedPoses = [ [], [], [] ];
           tick = 0;
           currRecordingTime = 0;
@@ -1004,12 +1028,11 @@ AFRAME.registerComponent('triggered', {
         vibrate = false;
         if (!gameOver) {
           document.getElementById('startText').setAttribute('visible', true)
-          document.getElementById('titleText').setAttribute('visible', true)
           if (ghostName == mutatedGhostName) {
             startButton.setAttribute('value', 'YOU SHOT THE IMPOSTER!')
             startButton.setAttribute('material', 'color: green')
             startButton.setAttribute('rotation', '-20 180 0')
-            startButton.setAttribute('position', '0 0.5 ' + (document.getElementById('rig').getAttribute('position').z + 6))
+            startButton.setAttribute('position', '0 3.5 ' + (document.getElementById('rig').getAttribute('position').z + 6))
             startButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
             gameOver = true;
             gameEnd();
@@ -1019,7 +1042,7 @@ AFRAME.registerComponent('triggered', {
             startButton.setAttribute('value', 'YOU SHOT AN INNOCENT AVATAR!')
             startButton.setAttribute('material', 'color: red')
             startButton.setAttribute('rotation', '-20 180 0')
-            startButton.setAttribute('position', '0 0.5 ' + (document.getElementById('rig').getAttribute('position').z + 6))
+            startButton.setAttribute('position', '0 3.5 ' + (document.getElementById('rig').getAttribute('position').z + 6))
             startButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
             gameOver = true;
             gameEnd();
