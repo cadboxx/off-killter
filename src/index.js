@@ -54,6 +54,7 @@ var endTick = 0;
 var oldPoint = {};
 var diffMeterTotal = 0;
 var trackpadAxis;
+var rigLocked = false;
 
 let startTime = 0;
 let randRecord; // Ghost that is modified during game
@@ -192,10 +193,8 @@ function lockRig(position=null, lock=true) {
   var rig = document.getElementById('rig');
   var camera = document.getElementById('camera');
   if (lock) {
-    // disable teleport
-    // disable camera rotate
-    document.getElementById('leftHand').removeAttribute('teleport-controls');
-    document.getElementById('rightHand').removeAttribute('camera-rotation');
+    rigLocked = true;
+    document.getElementById('leftHand').setAttribute('teleport-controls', 'cameraRig: null; teleportOrigin: null;');
 
     // need to get original rotation and set based on that
     if (position == 'replay') {
@@ -212,10 +211,8 @@ function lockRig(position=null, lock=true) {
       rig.setAttribute('rotation', '0 0 0')
     }
   } else {
-    // enable teleport
-    // enable camera rotate
+    rigLocked = false;
     document.getElementById('leftHand').setAttribute('teleport-controls', 'cameraRig: #rig; teleportOrigin: #camera;')
-    document.getElementById('rightHand').setAttribute('camera-rotation', '');
   }
 }
 
@@ -1075,17 +1072,19 @@ AFRAME.registerComponent('triggered', {
 AFRAME.registerComponent('camera-rotation', {
   init: function() {
     this.el.addEventListener('trackpaddown', function() {
-      if (Math.abs(trackpadAxis[0]) > 0.5 || Math.abs(trackpadAxis[0]) < -0.5) {
-        var mult = -1;
-        if (Math.sign(trackpadAxis[0]) == -1 ) {
-          mult = 1;
+      if (!rigLocked) {
+        if (Math.abs(trackpadAxis[0]) > 0.5 || Math.abs(trackpadAxis[0]) < -0.5) {
+          var mult = -1;
+          if (Math.sign(trackpadAxis[0]) == -1 ) {
+            mult = 1;
+          }
+          var currRigRot = document.getElementById('rig').getAttribute('rotation')
+          var newRotX = currRigRot.x;
+          var newRotY = currRigRot.y + (30 * mult);
+          var newRotZ = currRigRot.z;
+          var newRot = newRotX + ' ' + newRotY + ' ' + newRotZ
+          document.getElementById('rig').setAttribute('rotation', newRot)
         }
-        var currRigRot = document.getElementById('rig').getAttribute('rotation')
-        var newRotX = currRigRot.x;
-        var newRotY = currRigRot.y + (30 * mult);
-        var newRotZ = currRigRot.z;
-        var newRot = newRotX + ' ' + newRotY + ' ' + newRotZ
-        document.getElementById('rig').setAttribute('rotation', newRot)
       }
     });
     this.el.addEventListener('axismove', function(axis) {
