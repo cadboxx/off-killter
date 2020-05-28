@@ -1333,38 +1333,3 @@ AFRAME.registerComponent('toggle-debug', {
     }
   }
 });
-
-// Somehow this doesn't work?? It doesn't register as grabbable.
-// AFRAME.registerComponent('help', {
-//   init: function() {
-//     // Create a page like document that has how to play
-//     var sceneEl = document.querySelector('a-scene');
-//     var helpFolder = document.createElement('a-box');
-//     helpFolder.setAttribute('id', 'helpFolder')
-//     helpFolder.setAttribute('geometry', 'width: 0.4826; height: 0.295275; depth: 0.006;')
-//     helpFolder.setAttribute('material', 'color: #fff1d6')
-//     helpFolder.setAttribute('position', '-3 1.05 -2')
-//     helpFolder.setAttribute('rotation', '90 90 0')
-//     helpFolder.setAttribute('dynamic-body', '')
-//     helpFolder.classList.add('grabbable')
-//     sceneEl.appendChild(helpFolder);
-
-//     var helpPaper = document.createElement('a-entity');
-//     helpPaper.setAttribute('id', 'helpPaper')
-//     helpPaper.setAttribute('geometry', 'primitive: box; width: 0.2159; height: 0.2794; depth: 0.005;')
-//     helpPaper.setAttribute('material', 'color: black')
-//     helpPaper.setAttribute('position', '-3 1.1 -2.125')
-//     helpPaper.setAttribute('rotation', '90 90 0')
-//     helpPaper.setAttribute('dynamic-body', 'shape: box')
-//     helpPaper.classList.add('grabbable');
-//     sceneEl.appendChild(helpPaper);
-
-//     var helpText0 = document.createElement('a-text');
-//     helpText0.setAttribute('id', 'helpText0')
-//     helpText0.setAttribute('value', 'ROBOT FACTORY MANUAL')
-//     helpText0.setAttribute('position', '-0.109 -0.125 -0.001')
-//     helpText0.setAttribute('rotation', '180 0 0')
-//     helpText0.setAttribute('scale', '0.08, 0.08, 0.08')
-//     helpPaper.appendChild(helpText0);
-//   }
-// });

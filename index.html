@@ -55,11 +55,12 @@
         <a-box depth="0.05" width="0.05" height="1" position="-0.2 0.5 -0.2" rotation="12.5 0 -12.5" material="color: black;"></a-box>
       </a-entity>
 
-      <!-- Help Manual -->
-      <a-box constraint="target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.12 0 0; targetPivot: 0.12 0 0; axis: 0 1 0; targetAxis: 0 1 0;" id="page1" material='color: #f5f5f5; src: #help-manual-page1; flatShading: true;' class="grabbable" rotation='90 90 180' width='0.2159' height='0.2794' depth='0.005' dynamic-body="mass: 1" position='0.25 1.205 -8.55'></a-box>
-      <a-box constraint="target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.12 0 0; targetPivot: 0.12 0 0; axis: 0 1 0; targetAxis: 0 1 0;" id="page2" material='color: #f5f5f5; src: #help-manual-page2; flatShading: true;' class="grabbable" rotation='90 90 180' width='0.2159' height='0.2794' depth='0.005' dynamic-body="mass: 1" position='0.25 1.210 -1.3'></a-box>
-      <a-box constraint="target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.12 0 0; targetPivot: 0.12 0 0; axis: 0 1 0; targetAxis: 0 1 0;" id="folder" material='color: #fffbb5' class="grabbable" rotation='90 90 0' width='0.2413' height='0.295275' depth='0.006' position='0.25 1.206 -8.55' dynamic-body></a-box>
-      <a-box id="folder2" material='color: #fffbb5' class="grabbable" rotation='90 90 0' width='0.2413' height='0.295275' depth='0.006' position='0.25 1.2 -8.3' dynamic-body></a-box>
+      <a-entity id='help-manual'>
+        <a-box constraint="target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.12 0 0; targetPivot: 0.12 0 0; axis: 0 1 0; targetAxis: 0 1 0;" id="page1" material='color: #f5f5f5; src: #help-manual-page1; flatShading: true;' class="grabbable" rotation='90 90 180' width='0.2159' height='0.2794' depth='0.005' dynamic-body="mass: 1" position='0.25 1.205 -8.55'></a-box>
+        <a-box constraint="target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.12 0 0; targetPivot: 0.12 0 0; axis: 0 1 0; targetAxis: 0 1 0;" id="page2" material='color: #f5f5f5; src: #help-manual-page2; flatShading: true;' class="grabbable" rotation='90 90 180' width='0.2159' height='0.2794' depth='0.005' dynamic-body="mass: 1" position='0.25 1.210 -1.3'></a-box>
+        <a-box constraint="target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.12 0 0; targetPivot: 0.12 0 0; axis: 0 1 0; targetAxis: 0 1 0;" id="folder" material='color: #fffbb5' class="grabbable" rotation='90 90 0' width='0.2413' height='0.295275' depth='0.006' position='0.25 1.206 -8.55' dynamic-body></a-box>
+        <a-box id="folder2" material='color: #fffbb5' class="grabbable" rotation='90 90 0' width='0.2413' height='0.295275' depth='0.006' position='0.25 1.2 -8.3' dynamic-body></a-box>
+      </a-entity>
       
       <!-- Define Scene Room -->
       <a-entity id="intRoom">
@@ -158,26 +159,28 @@
       </a-entity>
 
       <!-- UI -->
-      <a-text id="diffMeter" color="black" value="MOVE TO FILL" align="center" position="-5.5 0.25 0" rotation="-25 270 0" material="color: pink" scale="0.7 0.7 0.7" visible='false'>
-        <a-plane id="topBar" position="0 0.25 0" width="4" height="0.05" color="black"></a-plane>
-        <a-plane id="bottomBar" position="0 -0.25 0" width="4" height="0.05" color="black"></a-plane>
-        <a-plane id="leftBar" position="-2 0 0" width="0.05" height="0.5" color="black"></a-plane>
-        <a-plane id="rightBar" position="2 0 0" width="0.05" height="0.5" color="black"></a-plane>
-      </a-text>
+      <a-entity id="ui">
+        <a-text id="diffMeter" color="black" value="MOVE TO FILL" align="center" position="-5.5 0.25 0" rotation="-25 270 0" material="color: pink" scale="0.7 0.7 0.7" visible='false'>
+          <a-plane id="topBar" position="0 0.25 0" width="4" height="0.05" color="black"></a-plane>
+          <a-plane id="bottomBar" position="0 -0.25 0" width="4" height="0.05" color="black"></a-plane>
+          <a-plane id="leftBar" position="-2 0 0" width="0.05" height="0.5" color="black"></a-plane>
+          <a-plane id="rightBar" position="2 0 0" width="0.05" height="0.5" color="black"></a-plane>
+        </a-text>
 
-      <a-text id="diffButton" class="links" value="EASY" geometry="primitive:plane; width: 2; height: 0.8" align="center" position="0 1.55 -9.95" rotation="-5 0 0" material="color: green" scale="0.7 0.7 0.7" button-intersect>
-        <a-text id="diffButtonText" value="(Click to change difficulty)" align="center" position="0 -0.2 0" scale="0.5 0.5 0.5" button-intersect></a-text>
-      </a-text>
+        <a-text id="diffButton" class="links" value="EASY" geometry="primitive:plane; width: 2; height: 0.8" align="center" position="0 1.55 -9.95" rotation="-5 0 0" material="color: green" scale="0.7 0.7 0.7" button-intersect>
+          <a-text id="diffButtonText" value="(Click to change difficulty)" align="center" position="0 -0.2 0" scale="0.5 0.5 0.5" button-intersect></a-text>
+        </a-text>
 
-      <a-text id="titleText" scale="5 5 5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: white" value="Killter Innovations" color="black" position="0 3 -9.8" rotation="0 0 0" align="center" visible="true"></a-text>
+        <a-text id="titleText" scale="5 5 5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: white" value="Killter Innovations" color="black" position="0 3 -9.8" rotation="0 0 0" align="center" visible="true"></a-text>
 
-      <a-text id="startText" class="links" scale="1 1 1" value="Record 3 animations to start!" color="white" position="-9.9 2.5 0" rotation="0 90 0" align="center" visible="true" button-intersect></a-text>
+        <a-text id="startText" class="links" scale="1 1 1" value="Record 3 animations to start!" color="white" position="-9.9 2.5 0" rotation="0 90 0" align="center" visible="true" button-intersect></a-text>
 
-      <a-text id="recordText" scale="1.5 1.5 1.5" value="Robot Replay Preview Station" color="black" position="9.9 3 0" rotation="0 -90 0" align="center" visible="true"></a-text>
+        <a-text id="recordText" scale="1.5 1.5 1.5" value="Robot Replay Preview Station" color="black" position="9.9 3 0" rotation="0 -90 0" align="center" visible="true"></a-text>
 
-      <a-text id="replayButton" class="links" value="REPLAY RECORDING" geometry="primitive:plane" position="9 1.25 3" rotation="0 -100 0" material="color: grey" scale="0.7 0.7 0.7" align="right" visible="false" button-intersect></a-text>
+        <a-text id="replayButton" class="links" value="REPLAY RECORDING" geometry="primitive:plane" position="9 1.25 3" rotation="0 -100 0" material="color: grey" scale="0.7 0.7 0.7" align="right" visible="false" button-intersect></a-text>
 
-      <a-text id="recordButton" class="links" value="START RECORDING" geometry="primitive:circle" position="-9 1.25 3" rotation="0 115 0" material="color: red" scale="0.7 0.7 0.7" button-intersect></a-text>
+        <a-text id="recordButton" class="links" value="START RECORDING" geometry="primitive:circle" position="-9 1.25 3" rotation="0 115 0" material="color: red" scale="0.7 0.7 0.7" button-intersect></a-text>
+      </a-entity>
     </a-scene>
   </body>
 </html>
