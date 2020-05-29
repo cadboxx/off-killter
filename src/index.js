@@ -107,9 +107,9 @@ function recordEntity(el, index) {
   function calcDiff() {
     // Apply a percentage of movement to balance body parts
     if (entId == 'leftHand' || entId == 'rightHand') {
-      var balance = 0.5;
+      var balance = 0.25;
     } else if (entId == 'camera') {
-      var balance = 0.4;
+      var balance = 0.95;
     } else {
       var balance = 0;
     }
