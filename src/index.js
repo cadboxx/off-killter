@@ -315,11 +315,16 @@ function gameStart() {
     // spawn head model instance
     if (!document.getElementById(('replayHead' + index))) {
       var newHead = document.createElement('a-entity')
+      var replayRig = document.createElement('a-entity')
     } else {
       var newHead = document.getElementById(('replayHead' + index))
+      var replayRig = document.getElementById(('replayRig' + index))
     }
+    replayRig.setAttribute('id', 'replayRig' + index)
+    replayRig.setAttribute('class', 'replay')
+    sceneEl.appendChild(replayRig)
     newHead.setAttribute('id', 'replayHead' + index)
-    sceneEl.appendChild(newHead);
+    replayRig.appendChild(newHead);
     var newHeadModel = document.createElement('a-entity')
     newHeadModel.setAttribute('id', 'newHeadModel' + index)
     newHeadModel.setAttribute('geometry', 'primitive: sphere; radius: 0.15;')
@@ -337,7 +342,7 @@ function gameStart() {
       var newLeftHand = document.getElementById(('replayLeftHand' + index))
     }
     newLeftHand.setAttribute('id', 'replayLeftHand' + index)
-    sceneEl.appendChild(newLeftHand)
+    replayRig.appendChild(newLeftHand)
     var newLeftHandModel = document.createElement('a-entity')
     newLeftHandModel.setAttribute('id', 'newLeftHandModel' + index)
     newLeftHandModel.setAttribute('gltf-model', '#leftHandModel')
@@ -351,7 +356,7 @@ function gameStart() {
       var newRightHand = document.getElementById(('replayRightHand' + index))
     }
     newRightHand.setAttribute('id', 'replayRightHand' + index)
-    sceneEl.appendChild(newRightHand)
+    replayRig.appendChild(newRightHand)
     var newRightHandModel = document.createElement('a-entity')
     newRightHandModel.setAttribute('id', 'newRightHandModel' + index)
     newRightHandModel.setAttribute('gltf-model', '#rightHandModel')
@@ -363,6 +368,9 @@ function gameStart() {
     rotateObject(newHead, element[0][tick], index * 2 - spaceBuffer, 0, 15)
     rotateObject(newLeftHand, element[1][tick], index * 2 - spaceBuffer, 0, 15)
     rotateObject(newRightHand, element[2][tick], index * 2 - spaceBuffer, 0, 15)
+    replayRig.setAttribute('position', '-8 0 0')
+
+    replayRig.setAttribute('animation', 'to: 0 0 0; dur: 2500; easing: linear; loop: false; property: position;');
   })
 
   // Call our randomizer
