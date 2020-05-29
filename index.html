@@ -83,6 +83,14 @@
 
       <!-- Define Scene Room -->
       <a-entity id="intRoom">
+        <!-- signs -->
+        <a-text id="replaySign" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="Replay Station ->" color="white" position="7.5 2 -9.9" rotation="0 0 0" align="center" visible="true"></a-text>
+
+        <a-text id="recordSign" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="<- Record Station" color="white" position="-7.5 2 -9.9" rotation="0 0 0" align="center" visible="true"></a-text>
+
+        <a-text id="replaySign2" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="Replay Station ->" color="white" position="9.9 2 -7.5" rotation="0 -90 0" align="center" visible="true"></a-text>
+
+        <a-text id="recordSign2" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="<- Record Station" color="white" position="-9.9 2 -7.5" rotation="0 90 0" align="center" visible="true"></a-text>
         <!-- floor -->
         <a-plane static-body position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#474747"></a-plane>
         <!-- ceiling -->
@@ -104,6 +112,19 @@
         <a-box static-body position="0 3.75 10" rotation="-180 0 0" depth="0.2"width="8" height="1" color="#007eb0"></a-box>
         <!-- glass -->
         <!-- <a-box static-body position="0 2 10" rotation="-180 0 0" depth="0.05" width="8" height="2.5" color="#a8ccd7" opacity="0.25"></a-box> -->
+        <!-- control panel -->
+        <a-box static-body position="0 0.5 9.75" depth="0.3" width="0.5" height="1" color="#595959"></a-box>
+        <a-box static-body position="0 1 9.6" rotation="-45 0 0" depth="0.4" width="0.75" height="0.01" color="#818282"></a-box>
+        <!-- joystick -->
+        <a-box id="joystickpanel" static-body position="0 1 9.59" rotation="-45 0 0" depth="0.25" width="0.5" height="0.001" color="#595959"></a-box>
+
+        <a-cylinder id="joystickleft" constraint="target: #joystickpanel; type: hinge; axis: 0 1 0; targetAxis: 0 1 0; targetPivot: 0.125 0 0;" dynamic-body="shape: cylinder;" class="grabbable" position="0 1.01 9.59" radius="0.01" rotation="-45 0 0" height="0.25" color="#FFFFFF">
+          <a-sphere static-body position="0 0.15 0" radius="0.03" color="red"></a-sphere>
+        </a-cylinder>
+
+        <a-cylinder id="joystickright" constraint="target: #joystickpanel; type: hinge; axis: 0 1 0; targetAxis: 0 1 0; targetPivot: -0.125 0 0;" dynamic-body="shape: cylinder;" class="grabbable" position="0 1.01 9.59" radius="0.01" rotation="-45 0 0" height="0.25" color="#FFFFFF">
+          <a-sphere static-body position="0 0.15 0" radius="0.03" color="red"></a-sphere>
+        </a-cylinder>
         <!-- blocking walls -->
         <a-box static-body position="0 1 6" rotation="0 0 0" width="20" height="2" depth="0.2" color="#001d29"></a-box>
         <a-box static-body position="0 3 6" rotation="0 0 0" width="20" height="2" depth="0.2" color="#007eb0"></a-box>
@@ -137,24 +158,24 @@
       <!-- Define Replay Room -->
       <a-entity id="replayRoom">
         <!-- floor -->
-        <a-plane static-body position="0 0 12.5" rotation="-90 0 0" width="20" height="5" color="#474747"></a-plane>
+        <a-plane static-body position="0 0 15" rotation="-90 0 0" width="30" height="10" color="#474747"></a-plane>
         <!-- ceiling -->
-        <a-plane static-body position="0 4 12.5" rotation="90 0 0" width="20" height="5" color="#FFFFFF"></a-plane>
+        <a-plane static-body position="0 4 15" rotation="90 0 0" width="24" height="10" color="#FFFFFF"></a-plane>
         <!-- lower walls -->
-        <a-plane static-body position="0 1 15" rotation="0 180 0" width="20" height="2" color="#001d29"></a-plane>
-        <a-plane static-body position="10 1 12.5" rotation="0 -90 0" width="5" height="2" color="#001d29"></a-plane>
-        <a-plane static-body position="-10 1 12.5" rotation="0 90 0" width="5" height="2" color="#001d29"></a-plane>
+        <a-plane static-body position="0 1 20" rotation="0 180 0" width="20" height="2" color="#001d29"></a-plane>
+        <a-plane static-body position="10 1 15" rotation="0 -90 0" width="10" height="2" color="#001d29"></a-plane>
+        <a-plane static-body position="-10 1 15" rotation="0 90 0" width="10" height="2" color="#001d29"></a-plane>
         <!-- upper walls -->
-        <a-plane static-body position="0 3 15" rotation="0 180 0" width="20" height="2" color="#007eb0"></a-plane>
-        <a-plane static-body position="10 3 12.5" rotation="0 -90 0" width="5" height="2" color="#007eb0"></a-plane>
-        <a-plane static-body position="-10 3 12.5" rotation="0 90 0" width="5" height="2" color="#007eb0"></a-plane>
+        <a-plane static-body position="0 3 20" rotation="0 180 0" width="20" height="2" color="#007eb0"></a-plane>
+        <a-plane static-body position="10 3 15" rotation="0 -90 0" width="10" height="2" color="#007eb0"></a-plane>
+        <a-plane static-body position="-10 3 15" rotation="0 90 0" width="10" height="2" color="#007eb0"></a-plane>
         <!-- height board -->
-        <a-plane static-body position="0 1.75 14.95" rotation="-180 0 0" width="8" height="3" color="#FFFFFF"></a-box>
+        <a-plane static-body position="0 1.75 18" rotation="-180 0 0" width="8" height="3" color="#FFFFFF"></a-box>
       </a-entity>
 
       <!-- Player -->
       <a-entity id="rig" position="-1.75 0 -2">
-        <a-entity static-body="shape: sphere; sphereRadius: 0.2;" id="camera" camera look-controls wasd-controls rotation="0 0 0" mirror-movement replayer>
+        <a-entity static-body="shape: sphere; sphereRadius: 0.19;" id="camera" camera look-controls wasd-controls rotation="0 0 0" mirror-movement replayer>
           <a-plane id="fadePlane" position="0 0 -0.01" width="10" height="10" opacity="1.0" color="black" visible="true">
             <a-text id="startTitleText" value="Off-Killter" scale="0.01 0.01 0.01" position="-0.005 0.004 0"></a-text>
             <a-text id="startGameText" value="Enter VR to begin" color="grey" scale="0.0025 0.0025 0.0025" position="-0.00035 0.0028 0"></a-text>
@@ -163,14 +184,14 @@
             <a-text id="startSocialTextAction" value="Follow me on Twitter for updates on #OffKillter" color="grey" scale="0.003 0.003 0.003" position="-0.007 -0.006 0"></a-text>
           </a-plane>
         </a-entity>
-        <a-entity id="leftHand" teleport-controls="cameraRig: #rig; teleportOrigin: #camera;" hand-controls="hand: left; handModelStyle: lowPoly;" mirror-movement haptics static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .grabbable" grab></a-entity>
-        <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement haptics triggered static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .grabbable" grab camera-rotation></a-entity>
+        <a-entity id="leftHand" teleport-controls="cameraRig: #rig; teleportOrigin: #camera;" hand-controls="hand: left; handModelStyle: lowPoly;" mirror-movement haptics static-body="shape: sphere; sphereRadius: 0.01; mass: 10;" sphere-collider="objects: .grabbable" grab></a-entity>
+        <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement haptics triggered static-body="shape: sphere; sphereRadius: 0.01; mass: 10;" sphere-collider="objects: .grabbable" grab camera-rotation></a-entity>
 
         <!-- NOTE: For something to be intersected, needs to have class="links"! -->
         <a-entity laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 20" line="color: blue; opacity: 0.25"></a-entity>
       </a-entity>
 
-      <!-- Mirrored recording body -->
+      <!-- Replay body -->
       <a-entity id="mirrorBody" position="9 0 0" rotation="0 90 0" visible="true">
         <a-entity id="leftCube">
           <a-entity id="mirrorLeftHand" rotation="0 0 90" gltf-model="#leftHandModel"></a-entity>
@@ -183,6 +204,7 @@
         </a-entity>
       </a-entity>
 
+      <!-- TV screen recording mirror body -->
       <a-entity id="tvBody" position="-5.2 0.75 -1.5" scale="0.5 0.5 0.5" rotation="0 115 0" visible="true">
         <a-entity id="tvleftCube">
           <a-entity id="mirrorLeftHand" rotation="0 0 90" gltf-model="#leftHandModel"></a-entity>
@@ -209,14 +231,6 @@
         </a-text>
 
         <a-text id="titleText" scale="5 5 5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: white" value="Killter Innovations" color="black" position="0 3 -9.9" rotation="0 0 0" align="center" visible="true"></a-text>
-
-        <a-text id="replaySign" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="Replay Station ->" color="white" position="7.5 2 -9.9" rotation="0 0 0" align="center" visible="true"></a-text>
-
-        <a-text id="recordSign" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="<- Record Station" color="white" position="-7.5 2 -9.9" rotation="0 0 0" align="center" visible="true"></a-text>
-
-        <a-text id="replaySign2" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="Replay Station ->" color="white" position="9.9 2 -7.5" rotation="0 -90 0" align="center" visible="true"></a-text>
-
-        <a-text id="recordSign2" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="<- Record Station" color="white" position="-9.9 2 -7.5" rotation="0 90 0" align="center" visible="true"></a-text>
 
         <a-text id="startText" class="links" scale="1 1 1" value="Record 3 animations to start!" color="white" position="-9.9 2.5 0" rotation="0 90 0" align="center" visible="true" button-intersect></a-text>
 
