@@ -572,6 +572,7 @@ function restartGame() {
   document.getElementById('startText').removeAttribute('material')
 
   document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 0.5')
+  document.getElementById('elevator1').setAttribute('elevator-doors', 'reverse: true; open: true;');
 }
 
 // Restarts game loop using the same replays but a new mutation
@@ -1254,29 +1255,67 @@ AFRAME.registerComponent('fade', {
 AFRAME.registerComponent('start-game', {
   init: function() {
     var scene = this.el; // The entity
-
     if (scene.is('vr-mode')) {
       document.getElementById('fadePlane').setAttribute('fade', '')
       hideTheChildren(document.getElementById('fadePlane'));
+      document.getElementById('elevator2').setAttribute('elevator-doors', 'open: true;');
+      document.getElementById('elevator1').setAttribute('elevator-doors', 'reverse: true; open: true;');
     } else {
       scene.addEventListener('enter-vr', function () {
         document.getElementById('fadePlane').setAttribute('fade', '')
         hideTheChildren(document.getElementById('fadePlane'));
+        document.getElementById('elevator2').setAttribute('elevator-doors', 'open: true;');
+        document.getElementById('elevator1').setAttribute('elevator-doors', 'reverse: true; open: true;');
       });
     }
   }
 });
 
-// animates elevator doors
-AFRAME.registerComponent('elevator-door', {
+// animate elevator doors
+AFRAME.registerComponent('elevator-doors', {
   schema: {
-    open: {type: 'bool', defaut: true}
+    open: {type: 'boolean', defaut: true},
+    reverse: {type: 'boolean', default: false}
   },
-  tick: function() {
+  init: function() {
+    var childNodes = this.el.children;
+    var id = this.el.id;
 
-  },
-  remove: function() {
+    for (i=0; i < childNodes.length; i++) {
+      if (childNodes[i].classList.contains('leftdoor')) {
+        var leftDoor = childNodes[i]
+        if (this.data.reverse) {
+          var animation = "to: " + (leftDoor.getAttribute('position').x + 1) + ' ' + leftDoor.getAttribute('position').y + ' ' + (leftDoor.getAttribute('position').z + 0.01) + "; dur: 3000; easing: linear; loop: false; property: position;"
+        } else {
+          var animation = "to: " + (leftDoor.getAttribute('position').x - 1) + ' ' + leftDoor.getAttribute('position').y + ' ' + (leftDoor.getAttribute('position').z + 0.01) + "; dur: 3000; easing: linear; loop: false; property: position;"
+        }
+        leftDoor.setAttribute('animation', animation)
+      } else if (childNodes[i].classList.contains('rightdoor')) {
+        var rightDoor = childNodes[i]
+        if (this.data.reverse) {
+          var animation = "to: " + (rightDoor.getAttribute('position').x - 1) + ' ' + rightDoor.getAttribute('position').y + ' ' + (rightDoor.getAttribute('position').z + 0.01) + "; dur: 3000; easing: linear; loop: false; property: position;"
+        } else {
+          var animation = "to: " + (rightDoor.getAttribute('position').x + 1) + ' ' + rightDoor.getAttribute('position').y + ' ' + (rightDoor.getAttribute('position').z + 0.01) + "; dur: 3000; easing: linear; loop: false; property: position;"
+        }
+        rightDoor.setAttribute('animation', animation)
+      }
+    }
 
+    setTimeout(function() {
+      document.getElementById(id).removeAttribute('elevator-doors');
+    }, 3100)
+
+    if (this.data.open) {
+      if (this.data.reverse) {
+        var dir = 'false'
+      } else {
+        var dir = 'true'
+      }
+
+      setTimeout(function() {
+        document.getElementById(id).setAttribute('elevator-doors', 'open: false; reverse: ' + dir + ';');
+      }, 25000)
+    }
   }
 });
 

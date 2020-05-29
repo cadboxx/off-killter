@@ -148,10 +148,16 @@
           <a-box static-body position="0 2 -3.75" rotation="0 0 0" width="0.8" height="4" depth="0.2" color="#001d29"></a-box>
 
           <!-- front doors -->
-          <a-box visible="false" elevator-door class="leftdoor" static-body position="1 2 -3.75" rotation="0 0 0" width="1.25" height="4" depth="0.2" color="#818282"></a-box>
-          <a-box visible="false" elevator-door class="rightdoor" static-body position="2.25 2 -3.75" rotation="0 0 0" width="1.25" height="4" depth="0.2" color="#818282"></a-box>
-          <a-box visible="false" elevator-door class="leftdoor" static-body position="-1 2 -3.75" rotation="0 0 0" width="1.25" height="4" depth="0.2" color="#818282"></a-box>
-          <a-box visible="false" elevator-door class="rightdoor" static-body position="-2.25 2 -3.75" rotation="0 0 0" width="1.25" height="4" depth="0.2" color="#818282"></a-box>
+          <a-entity id="elevator1">
+            <a-box class="rightdoor" static-body position="1 2 -3.75" rotation="0 0 0" width="1.25" height="4" depth="0.2" color="#818282"></a-box>
+            <a-box class="leftdoor" static-body position="2.25 2 -3.75" rotation="0 0 0" width="1.25" height="4" depth="0.2" color="#818282"></a-box>
+          </a-entity>
+
+          <a-entity id="elevator2">
+            <a-box class="rightdoor" static-body position="-1 2 -3.75" rotation="0 0 0" width="1.25" height="4" depth="0.2" color="#818282"></a-box>
+            <a-box class="leftdoor" static-body position="-2.25 2 -3.75" rotation="0 0 0" width="1.25" height="4" depth="0.2" color="#818282"></a-box>
+          </a-entity>
+
         </a-entity>
       </a-entity>
 
