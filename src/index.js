@@ -680,6 +680,12 @@ function addReplay(poses, index) {
 
 function addProp(prop, position, rotation, scale) {
   var scene = document.querySelector('a-scene');
+  if (!rotation) {
+    rotation = '0 0 0'
+  }
+  if (!scale) {
+    scale = '1 1 1'
+  }
 
   if (prop == 'light') {
     var newLight = document.createElement('a-entity')
@@ -758,6 +764,91 @@ function addProp(prop, position, rotation, scale) {
 
   } else if (prop == 'poster') {
 
+  } else if (prop == 'radio') {
+    var newRadio = document.createElement('a-entity')
+    newRadio.setAttribute('class', 'scenery radio')
+    scene.appendChild(newRadio)
+
+    // base
+    var newRadioThing = document.createElement('a-box')
+    newRadioThing.setAttribute('class', 'scenery radio-geom')
+    newRadioThing.setAttribute('width', '0.5')
+    newRadioThing.setAttribute('height', '0.2')
+    newRadioThing.setAttribute('depth', '0.2')
+    newRadioThing.setAttribute('color', '#303030')
+    newRadio.appendChild(newRadioThing)
+
+    // handle
+    newRadioThing = document.createElement('a-box')
+    newRadioThing.setAttribute('class', 'scenery radio-geom')
+    newRadioThing.setAttribute('width', '0.005')
+    newRadioThing.setAttribute('height', '0.05')
+    newRadioThing.setAttribute('depth', '0.025')
+    newRadioThing.setAttribute('color', '#a3a3a3')
+    newRadioThing.setAttribute('position', '0.2 0.125 0')
+    newRadio.appendChild(newRadioThing)
+
+    newRadioThing = document.createElement('a-box')
+    newRadioThing.setAttribute('class', 'scenery radio-geom')
+    newRadioThing.setAttribute('width', '0.005')
+    newRadioThing.setAttribute('height', '0.05')
+    newRadioThing.setAttribute('depth', '0.025')
+    newRadioThing.setAttribute('color', '#a3a3a3')
+    newRadioThing.setAttribute('position', '-0.2 0.125 0')
+    newRadio.appendChild(newRadioThing)
+
+    newRadioThing = document.createElement('a-box')
+    newRadioThing.setAttribute('class', 'scenery radio-geom')
+    newRadioThing.setAttribute('width', '0.405')
+    newRadioThing.setAttribute('height', '0.005')
+    newRadioThing.setAttribute('depth', '0.025')
+    newRadioThing.setAttribute('color', '#a3a3a3')
+    newRadioThing.setAttribute('position', '0 0.15 0')
+    newRadio.appendChild(newRadioThing)
+
+    // antenna
+    newRadioThing = document.createElement('a-cylinder')
+    newRadioThing.setAttribute('class', 'scenery radio-geom')
+    newRadioThing.setAttribute('height', '0.45')
+    newRadioThing.setAttribute('radius', '0.01')
+    newRadioThing.setAttribute('color', '#a3a3a3')
+    newRadioThing.setAttribute('position', '0.225 0.21 -0.06')
+    newRadioThing.setAttribute('rotation', '0 15 -15')
+    newRadio.appendChild(newRadioThing)
+
+    // grilles
+    newRadioThing = document.createElement('a-cylinder')
+    newRadioThing.setAttribute('class', 'scenery radio-geom')
+    newRadioThing.setAttribute('height', '0.025')
+    newRadioThing.setAttribute('radius', '0.07')
+    newRadioThing.setAttribute('color', '#a3a3a3')
+    newRadioThing.setAttribute('position', '0.155 0 0.1')
+    newRadioThing.setAttribute('rotation', '0 90 90')
+    newRadio.appendChild(newRadioThing)
+
+    newRadioThing = document.createElement('a-cylinder')
+    newRadioThing.setAttribute('class', 'scenery radio-geom')
+    newRadioThing.setAttribute('height', '0.025')
+    newRadioThing.setAttribute('radius', '0.07')
+    newRadioThing.setAttribute('color', '#a3a3a3')
+    newRadioThing.setAttribute('position', '-0.155 0 0.1')
+    newRadioThing.setAttribute('rotation', '0 90 90')
+    newRadio.appendChild(newRadioThing)
+
+    // Button
+    newRadioThing = document.createElement('a-box')
+    newRadioThing.setAttribute('class', 'scenery radio-geom')
+    newRadioThing.setAttribute('width', '0.15')
+    newRadioThing.setAttribute('height', '0.1')
+    newRadioThing.setAttribute('depth', '0.01')
+    newRadioThing.setAttribute('color', '#a3a3a3')
+    newRadioThing.setAttribute('position', '0 0 0.1')
+    newRadioThing.setAttribute('sound', 'src: #background-music; autoplay: true; loop: true; volume: 0.25; positional: true');
+    newRadio.appendChild(newRadioThing)
+
+    newRadio.setAttribute('position', position)
+    newRadio.setAttribute('rotation', rotation)
+    newRadio.setAttribute('scale', scale)
   }
 }
 
@@ -772,6 +863,8 @@ AFRAME.registerComponent('scenery', {
     // Box
     // Shelves
     // Posters
+    // Misc
+    addProp('radio', '1 1.15 -8.5', '0 -25 0')
   }
 })
 
@@ -1367,6 +1460,22 @@ AFRAME.registerComponent('fade', {
   }
 });
 
+// quick hacky way to fade in elevator sound
+function fadeSoundIn() {
+  setTimeout(function(){
+    document.getElementById('rig').setAttribute('sound', 'volume: 0.02')
+  }, 200);
+  setTimeout(function(){
+    document.getElementById('rig').setAttribute('sound', 'volume: 0.03')
+  }, 300);
+  setTimeout(function(){
+    document.getElementById('rig').setAttribute('sound', 'volume: 0.04')
+  }, 400);
+  setTimeout(function(){
+    document.getElementById('rig').setAttribute('sound', 'volume: 0.05')
+  }, 500);
+}
+
 AFRAME.registerComponent('start-game', {
   init: function() {
     var scene = this.el; // The entity
@@ -1375,6 +1484,7 @@ AFRAME.registerComponent('start-game', {
       hideTheChildren(document.getElementById('fadePlane'));
       document.getElementById('upperBlockWall').components.sound.playSound();
       setTimeout(function(){
+        fadeSoundIn();
         document.getElementById('elevator').components.sound.playSound();
         document.getElementById('elevator2').setAttribute('elevator-doors', 'open: true;');
         document.getElementById('elevator1').setAttribute('elevator-doors', 'reverse: true; open: true;');
@@ -1385,6 +1495,7 @@ AFRAME.registerComponent('start-game', {
         hideTheChildren(document.getElementById('fadePlane'));
         document.getElementById('upperBlockWall').components.sound.playSound();
         setTimeout(function(){
+          fadeSoundIn();
           document.getElementById('elevator').components.sound.playSound();
           document.getElementById('elevator2').setAttribute('elevator-doors', 'open: true;');
           document.getElementById('elevator1').setAttribute('elevator-doors', 'reverse: true; open: true;');
