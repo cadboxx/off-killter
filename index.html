@@ -22,6 +22,8 @@
         <img id="help-manual-page1" src="assets/robot_manual_page_4_off-killter.jpg">
         <img id="help-manual-page2" src="assets/robot_manual_page_3_off-killter.jpg">
         <img id="help-manual-page3" src="assets/robot_manual_off-killter.jpg">
+        <img id="concrete-wall-texture" src="assets/concrete_wall_texture.jpg">
+        <img id="floor-texture" src="assets/floor-texture.jpg">
       </a-assets>
 
       <!-- Scene props -->
@@ -92,24 +94,24 @@
 
         <a-text id="recordSign2" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="<- Record Station" color="white" position="-9.9 2 -7.5" rotation="0 90 0" align="center" visible="true"></a-text>
         <!-- floor -->
-        <a-plane static-body position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#474747"></a-plane>
+        <a-plane material="src: #concrete-wall-texture;" static-body position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#474747"></a-plane>
         <!-- ceiling -->
-        <a-plane static-body position="0 4 0" rotation="90 0 0" width="20" height="20" color="#FFFFFF"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="0 4 0" rotation="90 0 0" width="20" height="20" color="#FFFFFF"></a-plane>
         <!-- lower walls -->
-        <a-plane static-body position="0 1 -10" rotation="0 0 0" width="20" height="2" color="#001d29"></a-plane>
-        <a-plane static-body position="10 1 0" rotation="0 -90 0" width="20" height="2" color="#001d29"></a-plane>
-        <a-plane static-body position="-10 1 0" rotation="0 90 0" width="20" height="2" color="#001d29"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="0 1 -10" rotation="0 0 0" width="20" height="2" color="#001d29"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="10 1 0" rotation="0 -90 0" width="20" height="2" color="#001d29"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="-10 1 0" rotation="0 90 0" width="20" height="2" color="#001d29"></a-plane>
         <!-- upper walls -->
-        <a-plane static-body position="0 3 -10" rotation="0 0 0" width="20" height="2" color="#007eb0"></a-plane>
-        <a-plane static-body position="10 3 0" rotation="0 -90 0" width="20" height="2" color="#007eb0"></a-plane>
-        <a-plane static-body position="-10 3 0" rotation="0 90 0" width="20" height="2" color="#007eb0"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="0 3 -10" rotation="0 0 0" width="20" height="2" color="#007eb0"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="10 3 0" rotation="0 -90 0" width="20" height="2" color="#007eb0"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="-10 3 0" rotation="0 90 0" width="20" height="2" color="#007eb0"></a-plane>
         <!-- glass wall -->
         <a-box static-body position="-7 1 10" rotation="-180 0 0" depth="0.2" width="6" height="2" color="#001d29"></a-box>
-        <a-box static-body position="7 3 10" rotation="-180 0 0" depth="0.2" width="6" height="2" color="#007eb0"></a-box>
+        <a-box material="src: #floor-texture;" static-body position="7 3 10" rotation="-180 0 0" depth="0.2" width="6" height="2" color="#007eb0"></a-box>
         <a-box static-body position="7 1 10" rotation="-180 0 0" depth="0.2" width="6" height="2" color="#001d29"></a-box>
-        <a-box static-body position="-7 3 10" rotation="-180 0 0" depth="0.2" width="6" height="2" color="#007eb0"></a-box>
+        <a-box material="src: #floor-texture;" static-body position="-7 3 10" rotation="-180 0 0" depth="0.2" width="6" height="2" color="#007eb0"></a-box>
         <a-box static-body position="0 0.25 10" rotation="-180 0 0" depth="0.2" width="8" height="1" color="#001d29"></a-box>
-        <a-box static-body position="0 3.75 10" rotation="-180 0 0" depth="0.2"width="8" height="1" color="#007eb0"></a-box>
+        <a-box material="src: #floor-texture;" static-body position="0 3.75 10" rotation="-180 0 0" depth="0.2"width="8" height="1" color="#007eb0"></a-box>
         <!-- glass -->
         <!-- <a-box static-body position="0 2 10" rotation="-180 0 0" depth="0.05" width="8" height="2.5" color="#a8ccd7" opacity="0.25"></a-box> -->
         <!-- control panel -->
@@ -126,26 +128,26 @@
           <a-sphere static-body position="0 0.15 0" radius="0.03" color="red"></a-sphere>
         </a-cylinder>
         <!-- blocking walls -->
-        <a-box static-body position="0 1 6" rotation="0 0 0" width="20" height="2" depth="0.2" color="#001d29"></a-box>
-        <a-box static-body position="0 3 6" rotation="0 0 0" width="20" height="2" depth="0.2" color="#007eb0"></a-box>
+        <a-box material="src: #floor-texture;" static-body position="0 1 6" rotation="0 0 0" width="20" height="2" depth="0.2" color="#001d29"></a-box>
+        <a-box material="src: #floor-texture;" static-body position="0 3 6" rotation="0 0 0" width="20" height="2" depth="0.2" color="#007eb0"></a-box>
 
         <a-entity id="elevator">
-          <a-box static-body position="0 1 1" rotation="0 0 0" width="8" height="2" depth="0.2" color="#818282"></a-box>
-          <a-box static-body position="0 3 1" rotation="0 0 0" width="8" height="2" depth="0.2" color="#818282"></a-box>
+          <a-box material="src: #floor-texture;" static-body position="0 1 1" rotation="0 0 0" width="8" height="2" depth="0.2" color="#818282"></a-box>
+          <a-box material="src: #floor-texture;" static-body position="0 3 1" rotation="0 0 0" width="8" height="2" depth="0.2" color="#818282"></a-box>
 
           <!-- side walls -->
-          <a-box static-body position="-0.5 2 -2" rotation="0 90 0" width="4" height="4" depth="0.2" color="#818282"></a-box>
-          <a-box static-body position="0.5 2 -2" rotation="0 90 0" width="4" height="4" depth="0.2" color="#818282"></a-box>
-          <a-box static-body position="-2.75 2 -2" rotation="0 90 0" width="4" height="4" depth="0.2" color="#818282"></a-box>
-          <a-box static-body position="2.75 2 -2" rotation="0 90 0" width="4" height="4" depth="0.2" color="#818282"></a-box>
+          <a-box material="src: #floor-texture;" static-body position="-0.5 2 -2" rotation="0 90 0" width="4" height="4" depth="0.2" color="#818282"></a-box>
+          <a-box material="src: #floor-texture;" static-body position="0.5 2 -2" rotation="0 90 0" width="4" height="4" depth="0.2" color="#818282"></a-box>
+          <a-box material="src: #floor-texture;" static-body position="-2.75 2 -2" rotation="0 90 0" width="4" height="4" depth="0.2" color="#818282"></a-box>
+          <a-box material="src: #floor-texture;" static-body position="2.75 2 -2" rotation="0 90 0" width="4" height="4" depth="0.2" color="#818282"></a-box>
 
-          <a-box static-body position="1.25 2 0" rotation="0 0 0" width="3" height="4" depth="0.2" color="#001d29"></a-box>
-          <a-box static-body position="-1.25 2 0" rotation="0 0 0" width="3" height="4" depth="0.2" color="#001d29"></a-box>
+          <a-box material="src: #floor-texture;" static-body position="1.25 2 0" rotation="0 0 0" width="3" height="4" depth="0.2" color="#001d29"></a-box>
+          <a-box material="src: #floor-texture;" static-body position="-1.25 2 0" rotation="0 0 0" width="3" height="4" depth="0.2" color="#001d29"></a-box>
 
           <!-- filler pieces -->
-          <a-box static-body position="3.3 2 -3.75" rotation="0 0 0" width="1.225" height="4" depth="0.2" color="#001d29"></a-box>
-          <a-box static-body position="-3.3 2 -3.75" rotation="0 0 0" width="1.225" height="4" depth="0.2" color="#001d29"></a-box>
-          <a-box static-body position="0 2 -3.75" rotation="0 0 0" width="0.8" height="4" depth="0.2" color="#001d29"></a-box>
+          <a-box material="src: #floor-texture;" static-body position="3.3 2 -3.75" rotation="0 0 0" width="1.225" height="4" depth="0.2" color="#001d29"></a-box>
+          <a-box material="src: #floor-texture;" static-body position="-3.3 2 -3.75" rotation="0 0 0" width="1.225" height="4" depth="0.2" color="#001d29"></a-box>
+          <a-box material="src: #floor-texture;" static-body position="0 2 -3.75" rotation="0 0 0" width="0.8" height="4" depth="0.2" color="#001d29"></a-box>
 
           <!-- front doors -->
           <a-entity id="elevator1">
@@ -164,33 +166,33 @@
       <!-- Define Replay Room -->
       <a-entity id="replayRoom">
         <!-- floor -->
-        <a-plane static-body position="0 0 15" rotation="-90 0 0" width="30" height="10" color="#474747"></a-plane>
+        <a-plane material="src: #concrete-wall-texture;" static-body position="0 0 15" rotation="-90 0 0" width="30" height="10" color="#474747"></a-plane>
         <!-- ceiling -->
-        <a-plane static-body position="0 4 15" rotation="90 0 0" width="24" height="10" color="#FFFFFF"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="0 4 15" rotation="90 0 0" width="24" height="10" color="#FFFFFF"></a-plane>
         <!-- lower walls -->
-        <a-plane static-body position="0 1 20" rotation="0 180 0" width="20" height="2" color="#001d29"></a-plane>
-        <a-plane static-body position="10 1 15" rotation="0 -90 0" width="10" height="2" color="#001d29"></a-plane>
-        <a-plane static-body position="-10 1 15" rotation="0 90 0" width="10" height="2" color="#001d29"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="0 1 20" rotation="0 180 0" width="20" height="2" color="#001d29"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="10 1 15" rotation="0 -90 0" width="10" height="2" color="#001d29"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="-10 1 15" rotation="0 90 0" width="10" height="2" color="#001d29"></a-plane>
         <!-- upper walls -->
-        <a-plane static-body position="0 3 20" rotation="0 180 0" width="20" height="2" color="#007eb0"></a-plane>
-        <a-plane static-body position="10 3 15" rotation="0 -90 0" width="10" height="2" color="#007eb0"></a-plane>
-        <a-plane static-body position="-10 3 15" rotation="0 90 0" width="10" height="2" color="#007eb0"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="0 3 20" rotation="0 180 0" width="20" height="2" color="#007eb0"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="10 3 15" rotation="0 -90 0" width="10" height="2" color="#007eb0"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="-10 3 15" rotation="0 90 0" width="10" height="2" color="#007eb0"></a-plane>
         <!-- height board -->
         <a-plane static-body position="0 1.75 19.98" rotation="-180 0 0" width="8" height="3" color="#FFFFFF"></a-plane>
         <!-- dumpster -->
-        <a-box position="5 0.75 17.5" width="2" height="2" depth="3" material="color:#005703"></a-box>
+        <a-box material="src: #floor-texture; color:#005703;" position="5 0.75 17.5" width="2" height="2" depth="3"></a-box>
         <a-box rotation="0 0 110" position="5.6 2.7 16.75" width="2" height="0.15" depth="1.5" material="color:black"></a-box>
         <a-box position="5 1.825 18.25" width="2" height="0.15" depth="1.5" material="color:black"></a-box>
         <!-- robot machine -->
-        <a-box position="-8 1.5 15" width="3" height="3" depth="2"></a-box>
+        <a-box material="src: #floor-texture;" position="-8 1.5 15" width="3" height="3" depth="2"></a-box>
         <a-entity id="machine-entrance" position="0 1.25 0">
-          <a-box position="-6 0 15.75" width="4" height="2.5" depth="0.25" material="color:#595959"></a-box>
-          <a-box position="-6 0 14.25" width="4" height="2.5" depth="0.25" material="color:#595959"></a-box>
-          <a-box position="-6 -1.125 15" width="4" height="0.25" depth="1.5" material="color:#595959"></a-box>
-          <a-box position="-6 1.125 15" width="4" height="0.25" depth="1.5" material="color:#595959"></a-box>
+          <a-box position="-6 0 15.75" width="4" height="2.5" depth="0.25" material="src: #floor-texture; color:#595959"></a-box>
+          <a-box position="-6 0 14.25" width="4" height="2.5" depth="0.25" material="src: #floor-texture; color:#595959"></a-box>
+          <a-box position="-6 -1.125 15" width="4" height="0.25" depth="1.5" material="src: #floor-texture; color:#595959"></a-box>
+          <a-box position="-6 1.125 15" width="4" height="0.25" depth="1.5" material="src: #floor-texture; color:#595959"></a-box>
         </a-entity>
         <!-- conveyor belt -->
-        <a-box position="0 0.25 15" width="12.75" height="0.05" depth="1" material="color:black"></a-box>
+        <a-box position="0 0.25 15" width="12.75" height="0.05" depth="1" material="src: #floor-texture; color:black"></a-box>
         <!-- crane arm -->
         <a-cylinder static-body position="0 0 18" rotation="-180 0 0" radius="1.5" height="0.25" material="color:#818282"></a-cylinder>
         <a-cylinder static-body position="0 0.25 18" rotation="-180 0 0" radius="1" height="0.5" material="color:black"></a-cylinder>
