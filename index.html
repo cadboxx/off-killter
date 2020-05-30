@@ -14,9 +14,14 @@
   </head>
   <body>
     <a-scene start-game toggle-debug renderer="antialias: true; highRefreshrate: true;" physics="gravity: -1.6">
-      <a-assets timeout="10000">
+      <a-assets timeout="30000">
+        <!-- models -->
         <a-asset-item id="leftHandModel" src="assets/leftHand.glb"></a-asset-item>
         <a-asset-item id="rightHandModel" src="assets/rightHand.glb"></a-asset-item>
+        <!-- sounds -->
+        <audio id="elevator-arriving" src="assets/sounds/elevator_arriving.mp3" preload="auto"></audio>
+        <audio id="elevator-ding" src="assets/sounds/elevator_ding.mp3" preload="auto"></audio>
+        <!-- textures -->
         <img offset="{x: 50, y: 0}" id="face-texture" src="assets/facetext.jpg">
         <img id="help-manual-cover" src="assets/robot_manual_cover_off-killter.jpg">
         <img id="help-manual-page1" src="assets/robot_manual_page_4_off-killter.jpg">
@@ -129,9 +134,9 @@
         </a-cylinder>
         <!-- blocking walls -->
         <a-box material="src: #floor-texture;" static-body position="0 1 6" rotation="0 0 0" width="20" height="2" depth="0.2" color="#001d29"></a-box>
-        <a-box material="src: #floor-texture;" static-body position="0 3 6" rotation="0 0 0" width="20" height="2" depth="0.2" color="#007eb0"></a-box>
+        <a-box id="upperBlockWall" sound="src: #elevator-arriving; autoplay: false; volume: 0.35" material="src: #floor-texture;" static-body position="0 3 6" rotation="0 0 0" width="20" height="2" depth="0.2" color="#007eb0"></a-box>
 
-        <a-entity id="elevator">
+        <a-entity sound="src: #elevator-ding; autoplay: false; volume: 0.5" sound="src: #elevator-ding; autoplay: false" sound_ding="src: url(river.mp3); autoplay: true" id="elevator">
           <a-box material="src: #floor-texture;" static-body position="0 1 1" rotation="0 0 0" width="8" height="2" depth="0.2" color="#818282"></a-box>
           <a-box material="src: #floor-texture;" static-body position="0 3 1" rotation="0 0 0" width="8" height="2" depth="0.2" color="#818282"></a-box>
 

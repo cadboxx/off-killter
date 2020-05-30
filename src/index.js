@@ -579,8 +579,12 @@ function restartGame() {
   document.getElementById('startText').removeAttribute('geometry')
   document.getElementById('startText').removeAttribute('material')
 
-  document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 0.5')
-  document.getElementById('elevator1').setAttribute('elevator-doors', 'reverse: true; open: true;');
+  document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 3.0')
+  document.getElementById('upperBlockWall').components.sound.playSound();
+  setTimeout(function() {
+    document.getElementById('elevator1').setAttribute('elevator-doors', 'reverse: true; open: true;');
+    document.getElementById('elevator').components.sound.playSound();
+  }, 1000)
 }
 
 // Restarts game loop using the same replays but a new mutation
@@ -1266,14 +1270,22 @@ AFRAME.registerComponent('start-game', {
     if (scene.is('vr-mode')) {
       document.getElementById('fadePlane').setAttribute('fade', '')
       hideTheChildren(document.getElementById('fadePlane'));
-      document.getElementById('elevator2').setAttribute('elevator-doors', 'open: true;');
-      document.getElementById('elevator1').setAttribute('elevator-doors', 'reverse: true; open: true;');
+      document.getElementById('upperBlockWall').components.sound.playSound();
+      setTimeout(function(){
+        document.getElementById('elevator').components.sound.playSound();
+        document.getElementById('elevator2').setAttribute('elevator-doors', 'open: true;');
+        document.getElementById('elevator1').setAttribute('elevator-doors', 'reverse: true; open: true;');
+      }, 1500)
     } else {
       scene.addEventListener('enter-vr', function () {
         document.getElementById('fadePlane').setAttribute('fade', '')
         hideTheChildren(document.getElementById('fadePlane'));
-        document.getElementById('elevator2').setAttribute('elevator-doors', 'open: true;');
-        document.getElementById('elevator1').setAttribute('elevator-doors', 'reverse: true; open: true;');
+        document.getElementById('upperBlockWall').components.sound.playSound();
+        setTimeout(function(){
+          document.getElementById('elevator').components.sound.playSound();
+          document.getElementById('elevator2').setAttribute('elevator-doors', 'open: true;');
+          document.getElementById('elevator1').setAttribute('elevator-doors', 'reverse: true; open: true;');
+        }, 1500)
       });
     }
   }
@@ -1322,6 +1334,9 @@ AFRAME.registerComponent('elevator-doors', {
 
       setTimeout(function() {
         document.getElementById(id).setAttribute('elevator-doors', 'open: false; reverse: ' + dir + ';');
+        setTimeout(function() {
+          document.getElementById('upperBlockWall').components.sound.playSound();
+        }, 2000)
       }, 25000)
     }
   }
