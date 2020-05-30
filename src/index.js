@@ -578,6 +578,7 @@ function restartGame() {
   document.getElementById('startText').setAttribute('color', 'white')
   document.getElementById('startText').removeAttribute('geometry')
   document.getElementById('startText').removeAttribute('material')
+  document.getElementById('startText').removeAttribute('sound')
 
   document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 3.0')
   document.getElementById('upperBlockWall').components.sound.playSound();
@@ -633,6 +634,7 @@ function restartRound() {
   document.getElementById('newRoundButton').setAttribute('visible', false)
   document.getElementById('replayButton').setAttribute('visible', false)
   document.getElementById('startText').setAttribute('visible', false)
+  document.getElementById('startText').removeAttribute('sound')
   document.getElementById('ghostRing').setAttribute('visible', false)
   document.getElementById('diffButton').classList.remove('links')
   document.getElementById('diffButton').setAttribute('visible', false)
@@ -856,6 +858,8 @@ AFRAME.registerComponent('replayer', {
               document.getElementById('startText').setAttribute('rotation', '0 180 0')
               document.getElementById('startText').setAttribute('position', '0 3.5 ' + 14.5)
               document.getElementById('startText').setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
+              document.getElementById('startText').setAttribute('sound', 'src: #lose-sound; autoplay: true; volume: 1')
+              
               document.getElementById('leftHand').components.haptics.pulse(0.5, 1000);
               document.getElementById('rightHand').components.haptics.pulse(0.5, 1000);
               gameOver = true;
@@ -1058,21 +1062,23 @@ AFRAME.registerComponent('triggered', {
         if (!gameOver) {
           document.getElementById('startText').setAttribute('visible', true)
           if (ghostName == mutatedGhostName) {
-            startButton.setAttribute('value', 'YOU SHOT THE IMPOSTER!')
+            startButton.setAttribute('value', 'YOU PICKED THE DEFECTIVE ROBOT!')
             startButton.setAttribute('material', 'color: green')
             startButton.setAttribute('rotation', '0 180 0')
             startButton.setAttribute('position', '0 3.5 14.5')
             startButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
+            startButton.setAttribute('sound', 'src: #win-sound; autoplay: true; volume: 1')
             gameOver = true;
             gameEnd();
           } else {
             document.getElementById('leftHand').components.haptics.pulse(0.5, 500);
             document.getElementById('rightHand').components.haptics.pulse(0.5, 500);
-            startButton.setAttribute('value', 'YOU SHOT AN INNOCENT AVATAR!')
+            startButton.setAttribute('value', 'YOU PICKED A FUNCTIONING ROBOT!')
             startButton.setAttribute('material', 'color: red')
             startButton.setAttribute('rotation', '0 180 0')
             startButton.setAttribute('position', '0 3.5 14.5')
             startButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
+            startButton.setAttribute('sound', 'src: #lose-sound; autoplay: true; volume: 1')
             gameOver = true;
             gameEnd();
           }
