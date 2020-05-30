@@ -24,6 +24,7 @@
         <audio id="factory-ambient-noise" src="assets/sounds/factory_ambient_noise.mp3" preload="auto"></audio>
         <audio id="win-sound" src="assets/sounds/win_sound.mp3" preload="auto"></audio>
         <audio id="lose-sound" src="assets/sounds/lose_sound.mp3" preload="auto"></audio>
+        <audio id="background-music" src="assets/sounds/Podington_Bear_-_Twombly_shortened.mp3" preload="auto"></audio>
         <!-- textures -->
         <img offset="{x: 50, y: 0}" id="face-texture" src="assets/facetext.jpg">
         <img id="help-manual-cover" src="assets/robot_manual_cover_off-killter.jpg">
@@ -236,7 +237,7 @@
 
       <!-- Player -->
       <a-entity sound="src: #factory-ambient-noise; autoplay: true; loop: true; volume: 0.05; positional: false;" id="rig" position="-1.75 0 -2">
-        <a-entity static-body="shape: sphere; sphereRadius: 0.19;" id="camera" camera look-controls wasd-controls rotation="0 0 0" mirror-movement replayer>
+        <a-entity sound="src: #background-music; autoplay: true; loop: true; volume: 0.25; positional: false;" static-body="shape: sphere; sphereRadius: 0.19;" id="camera" camera look-controls wasd-controls rotation="0 0 0" mirror-movement replayer>
           <a-plane id="fadePlane" position="0 0 -0.01" width="10" height="10" opacity="1.0" color="black" visible="true">
             <a-text id="startTitleText" value="Off-Killter" scale="0.01 0.01 0.01" position="-0.005 0.004 0"></a-text>
             <a-text id="startGameText" value="Enter VR to begin" color="grey" scale="0.0025 0.0025 0.0025" position="-0.00035 0.0028 0"></a-text>
