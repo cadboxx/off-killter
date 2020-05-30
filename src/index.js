@@ -759,14 +759,91 @@ function addProp(prop, position, rotation, scale) {
     newLight.setAttribute('rotation', rotation)
     newLight.setAttribute('scale', scale)
   } else if (prop == 'box') {
+    var newBox = document.createElement('a-box')
+    newBox.setAttribute('class', 'grabbable scenery box')
+    newBox.setAttribute('width', '1.5')
+    newBox.setAttribute('height', '1.5')
+    newBox.setAttribute('depth', '1.5')
+    newBox.setAttribute('color', '#ad8762')
+    newBox.setAttribute('dynamic-body', 'shape: box; mass: 2.5;')
+    scene.appendChild(newBox)
 
+    newBox.setAttribute('position', position)
+    newBox.setAttribute('rotation', rotation)
+    newBox.setAttribute('scale', scale)
   } else if (prop == 'shelf') {
+    var newShelf = document.createElement('a-entity')
+    newShelf.setAttribute('class', 'scenery shelf')
+    newShelf.setAttribute('static-body', 'shape: box;')
+    scene.appendChild(newShelf)
 
+    var newShelfPiece = document.createElement('a-box')
+    newShelfPiece.setAttribute('class', 'scenery shelf-geom')
+    newShelfPiece.setAttribute('width', '2')
+    newShelfPiece.setAttribute('height', '0.15')
+    newShelfPiece.setAttribute('depth', '1')
+    newShelfPiece.setAttribute('color', '#ad8762')
+    newShelfPiece.setAttribute('position', '0 0.025 0')
+    newShelf.appendChild(newShelfPiece)
+
+    newShelfPiece = document.createElement('a-box')
+    newShelfPiece.setAttribute('class', 'scenery shelf-geom')
+    newShelfPiece.setAttribute('width', '2')
+    newShelfPiece.setAttribute('height', '0.15')
+    newShelfPiece.setAttribute('depth', '1')
+    newShelfPiece.setAttribute('color', '#ad8762')
+    newShelfPiece.setAttribute('position', '0 1.525 0')
+    newShelf.appendChild(newShelfPiece)
+
+    newShelfPiece = document.createElement('a-box')
+    newShelfPiece.setAttribute('class', 'scenery shelf-geom')
+    newShelfPiece.setAttribute('width', '2')
+    newShelfPiece.setAttribute('height', '0.15')
+    newShelfPiece.setAttribute('depth', '1')
+    newShelfPiece.setAttribute('color', '#ad8762')
+    newShelfPiece.setAttribute('position', '0 2.775 0')
+    newShelf.appendChild(newShelfPiece)
+
+    newShelfPiece = document.createElement('a-cylinder')
+    newShelfPiece.setAttribute('class', 'scenery shelf-geom')
+    newShelfPiece.setAttribute('height', '3.5')
+    newShelfPiece.setAttribute('radius', '0.05')
+    newShelfPiece.setAttribute('color', 'black')
+    newShelfPiece.setAttribute('position', '0.95 1.25 0.5')
+    newShelf.appendChild(newShelfPiece)
+
+    newShelfPiece = document.createElement('a-cylinder')
+    newShelfPiece.setAttribute('class', 'scenery shelf-geom')
+    newShelfPiece.setAttribute('height', '3.5')
+    newShelfPiece.setAttribute('radius', '0.05')
+    newShelfPiece.setAttribute('color', 'black')
+    newShelfPiece.setAttribute('position', '-0.95 1.25 0.5')
+    newShelf.appendChild(newShelfPiece)
+
+    newShelfPiece = document.createElement('a-cylinder')
+    newShelfPiece.setAttribute('class', 'scenery shelf-geom')
+    newShelfPiece.setAttribute('height', '3.5')
+    newShelfPiece.setAttribute('radius', '0.05')
+    newShelfPiece.setAttribute('color', 'black')
+    newShelfPiece.setAttribute('position', '-0.95 1.25 -0.5')
+    newShelf.appendChild(newShelfPiece)
+
+    newShelfPiece = document.createElement('a-cylinder')
+    newShelfPiece.setAttribute('class', 'scenery shelf-geom')
+    newShelfPiece.setAttribute('height', '3.5')
+    newShelfPiece.setAttribute('radius', '0.05')
+    newShelfPiece.setAttribute('color', 'black')
+    newShelfPiece.setAttribute('position', '0.95 1.25 -0.5')
+    newShelf.appendChild(newShelfPiece)
+
+    newShelf.setAttribute('position', position)
+    newShelf.setAttribute('rotation', rotation)
+    newShelf.setAttribute('scale', scale)
   } else if (prop == 'poster') {
 
   } else if (prop == 'radio') {
     var newRadio = document.createElement('a-entity')
-    newRadio.setAttribute('class', 'scenery radio')
+    newRadio.setAttribute('class', 'grabbable scenery radio')
     scene.appendChild(newRadio)
 
     // base
@@ -849,6 +926,7 @@ function addProp(prop, position, rotation, scale) {
     newRadio.setAttribute('position', position)
     newRadio.setAttribute('rotation', rotation)
     newRadio.setAttribute('scale', scale)
+    newRadio.setAttribute('dynamic-body', 'shape: box;')
   }
 }
 
@@ -856,12 +934,21 @@ function addProp(prop, position, rotation, scale) {
 AFRAME.registerComponent('scenery', {
   init: function() {
     // Lights
-    addProp('light', '3.5 3.5 -6.5', '0 0 0', '1.5 1 1')
-    addProp('light', '-3.5 3.5 -6.5', '0 0 0', '1.5 1 1')
+    addProp('light', '3 3.5 -6.5', '0 0 0', '1.5 1 1')
+    addProp('light', '-3 3.5 -6.5', '0 0 0', '1.5 1 1')
     addProp('light', '-7.5 3.5 -6.5', '0 90 0', '1.5 1 1')
     addProp('light', '7.5 3.5 -6.5', '0 90 0', '1.5 1 1')
-    // Box
+    // Boxes
+    addProp('box', '-9 1 -9')
+    addProp('box', '-9 1 -7.5', '0 10 0', '0.75 0.75 0.75')
+    addProp('box', '-7.5 1 -9', '0 20 0', '0.75 0.75 0.75')
+    addProp('box', '9 1 -9')
+    addProp('box', '9 1 -7.5', '0 15 0', '0.75 0.75 0.75')
     // Shelves
+    addProp('shelf', '-8.5 0.5 5.25', '0 0 0', '1.25 1 1')
+    addProp('shelf', '-5.5 0.5 5.25', '0 0 0', '1.25 1 1')
+
+    addProp('shelf', '7 0.5 5.25', '0 0 0', '2.5 1 1')
     // Posters
     // Misc
     addProp('radio', '1 1.15 -8.5', '0 -25 0')
