@@ -13,11 +13,11 @@
     <script src="./src/index.js"></script>
   </head>
   <body>
-    <a-scene start-game toggle-debug renderer="antialias: true; highRefreshrate: true;" physics="gravity: -1.6">
+    <a-scene scenery start-game toggle-debug renderer="antialias: true; highRefreshrate: true;" physics="gravity: -1.6">
       <a-assets timeout="30000">
         <!-- models -->
-        <a-asset-item id="leftHandModel" src="assets/leftHand.glb"></a-asset-item>
-        <a-asset-item id="rightHandModel" src="assets/rightHand.glb"></a-asset-item>
+        <a-asset-item id="leftHandModel" src="assets/models/leftHand.glb"></a-asset-item>
+        <a-asset-item id="rightHandModel" src="assets/models/rightHand.glb"></a-asset-item>
         <!-- sounds -->
         <audio id="elevator-arriving" src="assets/sounds/elevator_arriving.mp3" preload="auto"></audio>
         <audio id="elevator-ding" src="assets/sounds/elevator_ding.mp3" preload="auto"></audio>
@@ -26,13 +26,14 @@
         <audio id="lose-sound" src="assets/sounds/lose_sound.mp3" preload="auto"></audio>
         <audio id="background-music" src="assets/sounds/Podington_Bear_-_Twombly_shortened.mp3" preload="auto"></audio>
         <!-- textures -->
-        <img offset="{x: 50, y: 0}" id="face-texture" src="assets/facetext.jpg">
-        <img id="help-manual-cover" src="assets/robot_manual_cover_off-killter.jpg">
-        <img id="help-manual-page1" src="assets/robot_manual_page_4_off-killter.jpg">
-        <img id="help-manual-page2" src="assets/robot_manual_page_3_off-killter.jpg">
-        <img id="help-manual-page3" src="assets/robot_manual_off-killter.jpg">
-        <img id="concrete-wall-texture" src="assets/concrete_wall_texture.jpg">
-        <img id="floor-texture" src="assets/floor-texture.jpg">
+        <img offset="{x: 50, y: 0}" id="face-texture" src="assets/images/facetext.jpg">
+        <img id="help-manual-cover" src="assets/images/robot_manual_cover_off-killter.jpg">
+        <img id="help-manual-page1" src="assets/images/robot_manual_page_4_off-killter.jpg">
+        <img id="help-manual-page2" src="assets/images/robot_manual_page_3_off-killter.jpg">
+        <img id="help-manual-page3" src="assets/images/robot_manual_off-killter.jpg">
+        <img id="concrete-wall-texture" src="assets/images/concrete_wall_texture.jpg">
+        <img id="floor-texture" src="assets/images/floor-texture.jpg">
+        <img id="text-logo" src="assets/images/text_logo_transparent.png">
       </a-assets>
 
       <!-- Scene props -->
@@ -97,17 +98,18 @@
         <!-- signs -->
         <a-text id="replaySign" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="Replay Station ->" color="white" position="7.5 2 -9.9" rotation="0 0 0" align="center" visible="true"></a-text>
 
+        <a-text id="replaySign2" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="Replay Station ->" color="white" position="9.9 2 -6.5" rotation="0 -90 0" align="center" visible="true"></a-text>
+
         <a-text id="recordSign" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="<- Record Station" color="white" position="-7.5 2 -9.9" rotation="0 0 0" align="center" visible="true"></a-text>
 
-        <a-text id="replaySign2" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="Replay Station ->" color="white" position="9.9 2 -7.5" rotation="0 -90 0" align="center" visible="true"></a-text>
-
-        <a-text id="recordSign2" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="<- Record Station" color="white" position="-9.9 2 -7.5" rotation="0 90 0" align="center" visible="true"></a-text>
+        <a-text id="recordSign2" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="<- Record Station" color="white" position="-9.9 2 -6.5" rotation="0 90 0" align="center" visible="true"></a-text>
         <!-- floor -->
         <a-plane material="src: #concrete-wall-texture;" static-body position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#474747"></a-plane>
         <!-- ceiling -->
         <a-plane material="src: #floor-texture;" static-body position="0 4 0" rotation="90 0 0" width="20" height="20" color="#FFFFFF"></a-plane>
         <!-- lower walls -->
         <a-plane material="src: #floor-texture;" static-body position="0 1 -10" rotation="0 0 0" width="20" height="2" color="#001d29"></a-plane>
+        <a-plane material="src: #text-logo; alphaTest: 0.5" static-body position="0 3 -9.999" width="1.75" height="1.75"></a-plane>
         <a-plane material="src: #floor-texture;" static-body position="10 1 0" rotation="0 -90 0" width="20" height="2" color="#001d29"></a-plane>
         <a-plane material="src: #floor-texture;" static-body position="-10 1 0" rotation="0 90 0" width="20" height="2" color="#001d29"></a-plane>
         <!-- upper walls -->
@@ -292,7 +294,7 @@
           <a-text id="diffButtonText" value="(Click to change difficulty)" align="center" position="0 -0.2 0" scale="0.5 0.5 0.5" button-intersect></a-text>
         </a-text>
 
-        <a-text id="titleText" scale="5 5 5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: white" value="Killter Innovations" color="black" position="0 3 -9.9" rotation="0 0 0" align="center" visible="true"></a-text>
+        <!-- <a-text id="titleText" scale="5 5 5" value="Killter Innovations" color="black" position="0 3 -9.9" rotation="0 0 0" align="center" visible="true"></a-text> -->
 
         <a-text id="startText" class="links" scale="1 1 1" value="Record 3 animations to start!" color="white" position="-9.9 2.5 0" rotation="0 90 0" align="center" visible="true" button-intersect></a-text>
 

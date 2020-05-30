@@ -444,7 +444,7 @@ function gameEnd() {
   // Setup button to compare mutated replay to original
   replayButton.setAttribute('position', '3.25 1 14')
   replayButton.setAttribute('rotation', '0 -150 0')
-  replayButton.setAttribute('value', 'REPLAY IMPOSTER')
+  replayButton.setAttribute('value', 'REPLAY MUTATION')
   replayButton.setAttribute('class', 'links')
   replayButton.setAttribute('visible', true)
 
@@ -605,7 +605,7 @@ function restartRound() {
   startTick = 0;
   rewindMut = false;
 
-  // Reset position of ghosts
+  // Reset position of avatars
   savedRecordings.forEach(function(element, index) {
     rotateObject(document.getElementById('replayHead' + index), element[0][tick], index * 2 - spaceBuffer, 0, 15)
     rotateObject(document.getElementById('replayLeftHand' + index), element[1][tick], index * 2 - spaceBuffer, 0, 15)
@@ -678,7 +678,104 @@ function addReplay(poses, index) {
   }
 }
 
-// Ghost replayer
+function addProp(prop, position, rotation, scale) {
+  var scene = document.querySelector('a-scene');
+
+  if (prop == 'light') {
+    var newLight = document.createElement('a-entity')
+    newLight.setAttribute('class', 'scenery light')
+    scene.appendChild(newLight)
+
+    // I think we can just clone these for duplicates...
+    var newLightBox = document.createElement('a-box')
+    newLightBox.setAttribute('class', 'scenery light-geom')
+    newLightBox.setAttribute('width', '2')
+    newLightBox.setAttribute('height', '0.1')
+    newLightBox.setAttribute('depth', '1')
+    newLightBox.setAttribute('color', '#a3a3a3')
+    newLight.appendChild(newLightBox)
+
+    var newLightBar = document.createElement('a-cylinder')
+    newLightBar.setAttribute('class', 'scenery light-geom')
+    newLightBar.setAttribute('radius', '0.05')
+    newLightBar.setAttribute('height', '1')
+    newLightBar.setAttribute('color', '#a1a1a1')
+    newLightBar.setAttribute('rotation', '0 0 0')
+    newLightBar.setAttribute('position', '-0.75 0.49 0')
+    newLight.appendChild(newLightBar)
+
+    newLightBar = document.createElement('a-cylinder')
+    newLightBar.setAttribute('class', 'scenery light-geom')
+    newLightBar.setAttribute('radius', '0.05')
+    newLightBar.setAttribute('height', '1')
+    newLightBar.setAttribute('color', '#a1a1a1')
+    newLightBar.setAttribute('rotation', '0 0 0')
+    newLightBar.setAttribute('position', '0.75 0.49 0')
+    newLight.appendChild(newLightBar)
+
+    var newLightBulb = document.createElement('a-cylinder')
+    newLightBulb.setAttribute('class', 'scenery light-geom')
+    newLightBulb.setAttribute('radius', '0.025')
+    newLightBulb.setAttribute('height', '1.5')
+    newLightBulb.setAttribute('color', '#ffffcc')
+    newLightBulb.setAttribute('rotation', '90 0 90')
+    newLightBulb.setAttribute('position', '0 -0.05 -0.15')
+    newLight.appendChild(newLightBulb)
+
+    newLightBulb = document.createElement('a-cylinder')
+    newLightBulb.setAttribute('class', 'scenery light-geom')
+    newLightBulb.setAttribute('radius', '0.025')
+    newLightBulb.setAttribute('height', '1.5')
+    newLightBulb.setAttribute('color', '#ffffcc')
+    newLightBulb.setAttribute('rotation', '90 0 90')
+    newLightBulb.setAttribute('position', '0 -0.05 0.15')
+    newLight.appendChild(newLightBulb)
+
+    newLightBulb = document.createElement('a-cylinder')
+    newLightBulb.setAttribute('class', 'scenery light-geom')
+    newLightBulb.setAttribute('radius', '0.025')
+    newLightBulb.setAttribute('height', '1.5')
+    newLightBulb.setAttribute('color', '#ffffcc')
+    newLightBulb.setAttribute('rotation', '90 0 90')
+    newLightBulb.setAttribute('position', '0 -0.05 -0.35')
+    newLight.appendChild(newLightBulb)
+
+    newLightBulb = document.createElement('a-cylinder')
+    newLightBulb.setAttribute('class', 'scenery light-geom')
+    newLightBulb.setAttribute('radius', '0.025')
+    newLightBulb.setAttribute('height', '1.5')
+    newLightBulb.setAttribute('color', '#ffffcc')
+    newLightBulb.setAttribute('rotation', '90 0 90')
+    newLightBulb.setAttribute('position', '0 -0.05 0.35')
+    newLight.appendChild(newLightBulb)
+
+    newLight.setAttribute('position', position)
+    newLight.setAttribute('rotation', rotation)
+    newLight.setAttribute('scale', scale)
+  } else if (prop == 'box') {
+
+  } else if (prop == 'shelf') {
+
+  } else if (prop == 'poster') {
+
+  }
+}
+
+// Setup scene
+AFRAME.registerComponent('scenery', {
+  init: function() {
+    // Lights
+    addProp('light', '3.5 3.5 -6.5', '0 0 0', '1.5 1 1')
+    addProp('light', '-3.5 3.5 -6.5', '0 0 0', '1.5 1 1')
+    addProp('light', '-7.5 3.5 -6.5', '0 90 0', '1.5 1 1')
+    addProp('light', '7.5 3.5 -6.5', '0 90 0', '1.5 1 1')
+    // Box
+    // Shelves
+    // Posters
+  }
+})
+
+// Robot replayer
 AFRAME.registerComponent('replayer', {
   tick: function () {
     var headCube = document.getElementById("headCube");
