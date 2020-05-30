@@ -927,31 +927,89 @@ function addProp(prop, position, rotation, scale) {
     newRadio.setAttribute('rotation', rotation)
     newRadio.setAttribute('scale', scale)
     newRadio.setAttribute('dynamic-body', 'shape: box;')
+  } else if (prop == 'table') {
+    var newTable = document.createElement('a-entity')
+    newTable.setAttribute('class', 'scenery table')
+    scene.appendChild(newTable)
+
+    // slab
+    var newTableThing = document.createElement('a-box')
+    newTableThing.setAttribute('class', 'scenery table-geom')
+    newTableThing.setAttribute('width', '3')
+    newTableThing.setAttribute('height', '0.05')
+    newTableThing.setAttribute('depth', '2')
+    newTableThing.setAttribute('position', '-1 1 -3')
+    newTableThing.setAttribute('opacity', '0.25')
+    newTableThing.setAttribute('color', '#a8ccd7')
+    newTableThing.setAttribute('static-body', '')
+    newTable.appendChild(newTableThing)
+
+    // legs
+    newTableThing = document.createElement('a-cylinder')
+    newTableThing.setAttribute('class', 'scenery table-geom')
+    newTableThing.setAttribute('radius', '0.05')
+    newTableThing.setAttribute('height', '1')
+    newTableThing.setAttribute('position', '0.25 0.5 -3.75')
+    newTableThing.setAttribute('color', '#000000')
+    newTableThing.setAttribute('static-body', '')
+    newTable.appendChild(newTableThing)
+
+    newTableThing = document.createElement('a-cylinder')
+    newTableThing.setAttribute('class', 'scenery table-geom')
+    newTableThing.setAttribute('radius', '0.05')
+    newTableThing.setAttribute('height', '1')
+    newTableThing.setAttribute('position', '0.25 0.5 -2.25')
+    newTableThing.setAttribute('color', '#000000')
+    newTableThing.setAttribute('static-body', '')
+    newTable.appendChild(newTableThing)
+
+    newTableThing = document.createElement('a-cylinder')
+    newTableThing.setAttribute('class', 'scenery table-geom')
+    newTableThing.setAttribute('radius', '0.05')
+    newTableThing.setAttribute('height', '1')
+    newTableThing.setAttribute('position', '-2.25 0.5 -3.75')
+    newTableThing.setAttribute('color', '#000000')
+    newTableThing.setAttribute('static-body', '')
+    newTable.appendChild(newTableThing)
+
+    newTableThing = document.createElement('a-cylinder')
+    newTableThing.setAttribute('class', 'scenery table-geom')
+    newTableThing.setAttribute('radius', '0.05')
+    newTableThing.setAttribute('height', '1')
+    newTableThing.setAttribute('position', '-2.25 0.5 -2.25')
+    newTableThing.setAttribute('color', '#000000')
+    newTableThing.setAttribute('static-body', '')
+    newTable.appendChild(newTableThing)
+
+    newTable.setAttribute('position', position)
+    newTable.setAttribute('rotation', rotation)
+    newTable.setAttribute('scale', scale)
   }
 }
 
 // Setup scene
 AFRAME.registerComponent('scenery', {
   init: function() {
+    // Tables
+    addProp('table', '1 0 -6')
     // Lights
     addProp('light', '3 3.5 -6.5', '0 0 0', '1.5 1 1')
     addProp('light', '-3 3.5 -6.5', '0 0 0', '1.5 1 1')
     addProp('light', '-7.5 3.5 -6.5', '0 90 0', '1.5 1 1')
     addProp('light', '7.5 3.5 -6.5', '0 90 0', '1.5 1 1')
     // Boxes
-    addProp('box', '-9 1 -9')
-    addProp('box', '-9 1 -7.5', '0 10 0', '0.75 0.75 0.75')
-    addProp('box', '-7.5 1 -9', '0 20 0', '0.75 0.75 0.75')
-    addProp('box', '9 1 -9')
-    addProp('box', '9 1 -7.5', '0 15 0', '0.75 0.75 0.75')
+    addProp('box', '-9 1 -9', '0 0 0', '0.75 0.75 0.75')
+    addProp('box', '-9 1 -7.5', '0 10 0', '0.25 0.25 0.25')
+    addProp('box', '-7.5 1 -9', '0 20 0', '0.25 0.25 0.25')
+    addProp('box', '9 1 -9', '0 0 0', '0.75 0.75 0.75')
+    addProp('box', '9 1 -7.5', '0 15 0', '0.25 0.25 0.25')
     // Shelves
     addProp('shelf', '-8.5 0.5 5.25', '0 0 0', '1.25 1 1')
     addProp('shelf', '-5.5 0.5 5.25', '0 0 0', '1.25 1 1')
-
     addProp('shelf', '7 0.5 5.25', '0 0 0', '2.5 1 1')
     // Posters
     // Misc
-    addProp('radio', '1 1.15 -8.5', '0 -25 0')
+    addProp('radio', '0.85 1.15 -9', '0 -25 0')
   }
 })
 
@@ -1574,7 +1632,6 @@ AFRAME.registerComponent('start-game', {
         fadeSoundIn();
         document.getElementById('elevator').components.sound.playSound();
         document.getElementById('elevator2').setAttribute('elevator-doors', 'open: true;');
-        document.getElementById('elevator1').setAttribute('elevator-doors', 'reverse: true; open: true;');
       }, 1500)
     } else {
       scene.addEventListener('enter-vr', function () {
@@ -1585,7 +1642,6 @@ AFRAME.registerComponent('start-game', {
           fadeSoundIn();
           document.getElementById('elevator').components.sound.playSound();
           document.getElementById('elevator2').setAttribute('elevator-doors', 'open: true;');
-          document.getElementById('elevator1').setAttribute('elevator-doors', 'reverse: true; open: true;');
         }, 1500)
       });
     }
