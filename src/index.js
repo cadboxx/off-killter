@@ -4,20 +4,20 @@ let toggleDebug = false;
 // Gameplay tweak vars
 const numReqReplays = 3; // Replays required to start game
 const maxRecordingTime = 4; // recording time in seconds for replays
-let recordedPoses = [ [], [], [] ]; // Position & rotation
-let recordedEvents = []; // Button presses
-let defParts = ['head', 'leftHand', 'rightHand'];
-let randAxes = ['x', 'y'];
 const defMutRotAmt = 40; // "normal" difficulty
 const defMutPosAmt = 0.2; // "normal" difficulty
+let defParts = ['head', 'leftHand', 'rightHand'];
+let randAxes = ['x', 'y'];
+let difficulty = 'easy';
 
+let recordedPoses = [ [], [], [] ]; // Position & rotation
+let recordedEvents = []; // Button presses
 let rewindMut = false;
 var highlighted = false;
 let mutRotAmt = 0;
 let mutPosAmt = 0;
 let currMutRotAmt = 0;
 let currMutPosAmt = 0;
-let difficulty = 'easy';
 let diffMet = false;
 let gameStarted = false;
 let gameOver = false;
@@ -28,6 +28,7 @@ let leftTriggerDown = false;
 let rightTriggerDown = false;
 let triggerDown = false;
 let recordButtonSelected = false;
+let recTeleportButtonSelected = false;
 let replayButtonSelected = false;
 let startButtonSelected = false;
 let restartButtonSelected = false;
@@ -678,7 +679,7 @@ function addReplay(poses, index) {
   }
 }
 
-function addProp(prop, position, rotation, scale) {
+function addProp(prop, position, rotation, scale, physics) {
   var scene = document.querySelector('a-scene');
   if (!rotation) {
     rotation = '0 0 0'
@@ -765,7 +766,11 @@ function addProp(prop, position, rotation, scale) {
     newBox.setAttribute('height', '1.5')
     newBox.setAttribute('depth', '1.5')
     newBox.setAttribute('color', '#ad8762')
-    newBox.setAttribute('dynamic-body', 'mass: 2.5;')
+    if (physics) {
+      newBox.setAttribute('dynamic-body', 'mass: 2.5;')
+    } else {
+      newBox.setAttribute('static-body', 'mass: 0;')
+    }
     scene.appendChild(newBox)
 
     newBox.setAttribute('position', position)
@@ -845,8 +850,6 @@ function addProp(prop, position, rotation, scale) {
     newShelf.setAttribute('position', position)
     newShelf.setAttribute('rotation', rotation)
     newShelf.setAttribute('scale', scale)
-  } else if (prop == 'poster') {
-
   } else if (prop == 'radio') {
     var newRadio = document.createElement('a-entity')
     newRadio.setAttribute('class', 'grabbable scenery radio')
@@ -1001,7 +1004,7 @@ function addProp(prop, position, rotation, scale) {
     newChairPiece.setAttribute('height', '0.05')
     newChairPiece.setAttribute('depth', '0.5')
     newChairPiece.setAttribute('color', '#bd0d0d')
-    newChairPiece.setAttribute('position', '0 0.75 0')
+    newChairPiece.setAttribute('position', '0 0.65 0')
     newChairPiece.setAttribute('static-body', '')
     newChair.appendChild(newChairPiece)
 
@@ -1028,18 +1031,18 @@ function addProp(prop, position, rotation, scale) {
     newChairPiece = document.createElement('a-cylinder')
     newChairPiece.setAttribute('class', 'scenery chair-geom')
     newChairPiece.setAttribute('radius', '0.015')
-    newChairPiece.setAttribute('height', '0.75')
+    newChairPiece.setAttribute('height', '0.65')
     newChairPiece.setAttribute('color', 'black')
-    newChairPiece.setAttribute('position', '-0.225 0.375 -0.225')
+    newChairPiece.setAttribute('position', '-0.225 0.325 -0.225')
     newChairPiece.setAttribute('static-body', '')
     newChair.appendChild(newChairPiece)
 
     newChairPiece = document.createElement('a-cylinder')
     newChairPiece.setAttribute('class', 'scenery chair-geom')
     newChairPiece.setAttribute('radius', '0.015')
-    newChairPiece.setAttribute('height', '0.75')
+    newChairPiece.setAttribute('height', '0.65')
     newChairPiece.setAttribute('color', 'black')
-    newChairPiece.setAttribute('position', '-0.225 0.375 0.225')
+    newChairPiece.setAttribute('position', '-0.225 0.325 0.225')
     newChairPiece.setAttribute('static-body', '')
     newChair.appendChild(newChairPiece)
 
@@ -1109,37 +1112,37 @@ AFRAME.registerComponent('scenery', {
       addProp('light', '7.5 3.5 -6.5', '0 90 0', '1.5 1 1')
 
       // Boxes
-      addProp('box', '-9 1 -9', '0 0 0', '0.5 0.5 0.5')
-      addProp('box', '-9 1 -7.5', '0 10 0', '0.25 0.25 0.25')
-      addProp('box', '-7.5 1 -9', '0 20 0', '0.25 0.25 0.25')
-      addProp('box', '9 1 -9', '0 0 0', '0.5 0.5 0.5')
-      addProp('box', '9 1 -7.5', '0 15 0', '0.25 0.25 0.25')
+      addProp('box', '-9 1 -9', '0 0 0', '0.5 0.5 0.5', true)
+      addProp('box', '-9 1 -7.5', '0 10 0', '0.25 0.25 0.25', true)
+      addProp('box', '-7.5 1 -9', '0 20 0', '0.25 0.25 0.25', true)
+      addProp('box', '9 1 -9', '0 0 0', '0.5 0.5 0.5', true)
+      addProp('box', '9 1 -7.5', '0 15 0', '0.25 0.25 0.25', true)
 
       // Shelves
       addProp('shelf', '-8.5 0.5 5.25', '0 0 0', '1.25 1 1')
             // Boxes on shelves
-            addProp('box', '-6.5 1.5 5', '0 0 0', '0.5 0.5 0.5')
-            addProp('box', '-8.75 1.5 5.3', '0 0 0', '0.5 0.5 0.5')
-            addProp('box', '-5 1.5 5.2', '0 0 0', '0.5 0.5 0.5')
+            addProp('box', '-6 1 5', '0 0 0', '0.5 0.5 0.5')
+            addProp('box', '-8.75 1 5.3', '0 0 0', '0.5 0.5 0.5')
+            addProp('box', '-5 1 5.2', '0 0 0', '0.5 0.5 0.5')
       addProp('shelf', '-5.5 0.5 5.25', '0 0 0', '1.25 1 1')
             // Boxes on shelves
-            addProp('box', '-6 2.5 5.2', '0 0 0', '0.25 0.25 0.25')
-            addProp('box', '-5.5 2.5 5.2', '0 0 0', '0.2 0.2 0.2')
+            addProp('box', '-6 2.25 5.2', '0 0 0', '0.25 0.25 0.25')
+            addProp('box', '-5.5 2.25 5.2', '0 0 0', '0.2 0.2 0.2')
             addProp('box', '-5 2.5 5.2', '0 30 0', '0.25 0.6 0.3')
-            addProp('box', '-8.5 2.5 5.2', '0 0 0', '0.5 0.25 0.5')
-            addProp('box', '-9 2.5 5.2', '0 0 0', '0.25 0.25 0.5')
+            addProp('box', '-8.5 2.25 5.2', '0 0 0', '0.5 0.25 0.5')
+            addProp('box', '-9 2.25 5.2', '0 0 0', '0.25 0.25 0.5')
       addProp('shelf', '8.5 0.5 5.25', '0 0 0', '1.25 1 1')
             // Boxes on shelves
-            addProp('box', '6 2.5 5.2', '0 0 0', '0.25 0.25 0.25')
-            addProp('box', '5.5 2.5 5.2', '0 0 0', '0.2 0.2 0.2')
+            addProp('box', '6 2.3 5.2', '0 0 0', '0.25 0.25 0.25')
+            addProp('box', '5.5 2.25 5.2', '0 0 0', '0.2 0.2 0.2')
             addProp('box', '5 2.5 5.2', '0 30 0', '0.25 0.6 0.3')
-            addProp('box', '8.5 2.5 5.2', '0 0 0', '0.5 0.25 0.5')
-            addProp('box', '9 2.5 5.2', '0 0 0', '0.25 0.25 0.5')
+            addProp('box', '8 2.25 5.2', '0 0 0', '0.5 0.25 0.5')
+            addProp('box', '9 2.25 5.2', '0 0 0', '0.25 0.25 0.5')
       addProp('shelf', '5.5 0.5 5.25', '0 0 0', '1.25 1 1')
             // Boxes on shelves
-            addProp('box', '6.5 1.5 5', '0 0 0', '0.5 0.5 0.5')
-            addProp('box', '8.75 1.5 5.3', '0 0 0', '0.5 0.5 0.5')
-            addProp('box', '5 1.5 5.2', '0 0 0', '0.5 0.5 0.5')
+            addProp('box', '6 1 5.1', '0 0 0', '0.5 0.5 0.5')
+            addProp('box', '8.75 1 5.3', '0 0 0', '0.5 0.5 0.5')
+            addProp('box', '5 1 5.2', '0 0 0', '0.5 0.5 0.5')
 
       // Posters
       addProp('poster2', '4.105 2 0', '0 90 0')
@@ -1175,10 +1178,10 @@ AFRAME.registerComponent('scenery', {
       addProp('light', '2.5 3.5 18', '0 0 0', '1.5 1 1')
 
       // Boxes
-      addProp('box', '-9 1 7', '0 0 0', '0.8 0.8 0.8')
-      addProp('box', '-9 1 9', '0 60 0', '0.5 0.5 0.5')
-      addProp('box', '-9.25 1 7.9', '0 45 0', '0.25 0.25 0.25')
-      addProp('box', '-9 2 9', '0 25 0', '0.65 0.65 0.65')
+      addProp('box', '-9 0.5 7', '0 0 0', '0.8 0.8 0.8')
+      addProp('box', '-9 0.375 9', '0 60 0', '0.5 0.5 0.5')
+      addProp('box', '-9.25 0.125 7.9', '0 45 0', '0.25 0.25 0.25')
+      addProp('box', '-9 1.225 9', '0 25 0', '0.65 0.65 0.65')
 
       addProp('box', '8.5 0.75 17.5', '0 25 0', '1 1 1')
       addProp('box', '8.5 2.26 17.5', '0 75 0', '1 1 1')
@@ -1553,6 +1556,9 @@ AFRAME.registerComponent('triggered', {
         }
       } else if (difficultyButtonSelected) {
         changeDifficulty();
+      } else if (recTeleportButtonSelected) {
+        lockRig('record');
+        lockRig(null, false);
       } else if (recordButtonSelected) {
         if (!replaying && savedRecordings.length < numReqReplays ) {
           document.getElementById('diffMeter').setAttribute('visible', true)
@@ -1566,8 +1572,7 @@ AFRAME.registerComponent('triggered', {
           tick = 0;
           currRecordingTime = 0;
         } else {
-          document.getElementById('rig').setAttribute('position', '5 0 0')
-          document.getElementById('rig').setAttribute('rotation', '0 -90 0')
+          lockRig('replay');
         }
       } else if (startButtonSelected) {
         if (savedRecordings.length >= numReqReplays) {
@@ -1674,6 +1679,7 @@ AFRAME.registerComponent('button-intersect', {
     var restartButton = document.getElementById("restartButton");
     var newRoundButton = document.getElementById("newRoundButton");
     var difficultyButton = document.getElementById("diffButton");
+    var recTelButton = document.getElementById("recTeleportButton");
 
     this.el.addEventListener('raycaster-intersected', function() {
       if (el.object3D == recordButton.object3D) {
@@ -1694,6 +1700,9 @@ AFRAME.registerComponent('button-intersect', {
       } else if (el.object3D == difficultyButton.object3D) {
         buttonEvent(difficultyButton, 'int')
         difficultyButtonSelected = true;
+      } else if (el.object3D == recTelButton.object3D) {
+        buttonEvent(recTelButton, 'int')
+        recTeleportButtonSelected = true;
       } else {
         if (buttonName == 'restart') {
           restartButtonSelected = true;
@@ -1723,6 +1732,9 @@ AFRAME.registerComponent('button-intersect', {
       } else if (el.object3D == difficultyButton.object3D) {
         buttonEvent(difficultyButton, 'noInt')
         difficultyButtonSelected = false;
+      } else if (el.object3D == recTelButton.object3D) {
+        buttonEvent(recTelButton, 'noInt')
+        recTeleportButtonSelected = false;
       } else {
         if (buttonName.slice(0, 10) == 'replayHead') {
           ghostSelected = false;
