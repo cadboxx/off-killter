@@ -765,7 +765,7 @@ function addProp(prop, position, rotation, scale) {
     newBox.setAttribute('height', '1.5')
     newBox.setAttribute('depth', '1.5')
     newBox.setAttribute('color', '#ad8762')
-    newBox.setAttribute('dynamic-body', 'shape: box; mass: 2.5;')
+    newBox.setAttribute('dynamic-body', 'mass: 2.5;')
     scene.appendChild(newBox)
 
     newBox.setAttribute('position', position)
@@ -932,7 +932,7 @@ function addProp(prop, position, rotation, scale) {
     newRadio.setAttribute('position', position)
     newRadio.setAttribute('rotation', rotation)
     newRadio.setAttribute('scale', scale)
-    newRadio.setAttribute('dynamic-body', 'shape: box;')
+    newRadio.setAttribute('dynamic-body', '')
   } else if (prop == 'table') {
     var newTable = document.createElement('a-entity')
     newTable.setAttribute('class', 'scenery table')
@@ -1962,12 +1962,28 @@ AFRAME.registerComponent('highlight', {
   }
 });
 
+AFRAME.registerComponent('joymove', {
+  tick: function() {
+    if (this.el.body.previousPosition.x.toFixed(3) != this.el.body.position.x.toFixed(3)) {
+      if (this.el.body.position.x > 0 ) {
+        if (document.getElementById('crane').object3D.position.x < 2) {
+          document.getElementById('crane').object3D.position.x += this.el.body.position.x
+        }
+      } else {
+        if (document.getElementById('crane').object3D.position.x > -2) {
+          document.getElementById('crane').object3D.position.x += this.el.body.position.x
+        }
+      }
+    }
+  }
+});
+
 // Dev tools
 AFRAME.registerComponent('toggle-debug', {
   init: function() {
     if (toggleDebug) {
       document.querySelector('a-scene').setAttribute('stats', '')
-      document.querySelector('a-scene').setAttribute('physics', 'debug: true; gravity: -1.6')
+      document.querySelector('a-scene').setAttribute('physics', 'debug: true;')
     }
   }
 });
