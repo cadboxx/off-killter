@@ -206,7 +206,7 @@ function lockRig(position=null, lock=true) {
       rig.setAttribute('position', '0 0 9')
       rig.setAttribute('rotation', '0 180 0')
     } else if (position == 'start') {
-      rig.setAttribute('position', '1.75 0 -2')
+      rig.setAttribute('position', '1.75 0 -2.5')
       rig.setAttribute('rotation', '0 0 0')
     }
   } else {
@@ -774,7 +774,6 @@ function addProp(prop, position, rotation, scale) {
   } else if (prop == 'shelf') {
     var newShelf = document.createElement('a-entity')
     newShelf.setAttribute('class', 'scenery shelf')
-    newShelf.setAttribute('static-body', 'shape: box;')
     scene.appendChild(newShelf)
 
     var newShelfPiece = document.createElement('a-box')
@@ -782,8 +781,9 @@ function addProp(prop, position, rotation, scale) {
     newShelfPiece.setAttribute('width', '2')
     newShelfPiece.setAttribute('height', '0.15')
     newShelfPiece.setAttribute('depth', '1')
-    newShelfPiece.setAttribute('color', '#ad8762')
+    newShelfPiece.setAttribute('color', '#2b1d00')
     newShelfPiece.setAttribute('position', '0 0.025 0')
+    newShelfPiece.setAttribute('static-body', '')
     newShelf.appendChild(newShelfPiece)
 
     newShelfPiece = document.createElement('a-box')
@@ -791,8 +791,9 @@ function addProp(prop, position, rotation, scale) {
     newShelfPiece.setAttribute('width', '2')
     newShelfPiece.setAttribute('height', '0.15')
     newShelfPiece.setAttribute('depth', '1')
-    newShelfPiece.setAttribute('color', '#ad8762')
+    newShelfPiece.setAttribute('color', '#2b1d00')
     newShelfPiece.setAttribute('position', '0 1.525 0')
+    newShelfPiece.setAttribute('static-body', '')
     newShelf.appendChild(newShelfPiece)
 
     newShelfPiece = document.createElement('a-box')
@@ -800,8 +801,9 @@ function addProp(prop, position, rotation, scale) {
     newShelfPiece.setAttribute('width', '2')
     newShelfPiece.setAttribute('height', '0.15')
     newShelfPiece.setAttribute('depth', '1')
-    newShelfPiece.setAttribute('color', '#ad8762')
+    newShelfPiece.setAttribute('color', '#2b1d00')
     newShelfPiece.setAttribute('position', '0 2.775 0')
+    newShelfPiece.setAttribute('static-body', '')
     newShelf.appendChild(newShelfPiece)
 
     newShelfPiece = document.createElement('a-cylinder')
@@ -810,6 +812,7 @@ function addProp(prop, position, rotation, scale) {
     newShelfPiece.setAttribute('radius', '0.05')
     newShelfPiece.setAttribute('color', 'black')
     newShelfPiece.setAttribute('position', '0.95 1.25 0.5')
+    newShelfPiece.setAttribute('static-body', '')
     newShelf.appendChild(newShelfPiece)
 
     newShelfPiece = document.createElement('a-cylinder')
@@ -818,6 +821,7 @@ function addProp(prop, position, rotation, scale) {
     newShelfPiece.setAttribute('radius', '0.05')
     newShelfPiece.setAttribute('color', 'black')
     newShelfPiece.setAttribute('position', '-0.95 1.25 0.5')
+    newShelfPiece.setAttribute('static-body', '')
     newShelf.appendChild(newShelfPiece)
 
     newShelfPiece = document.createElement('a-cylinder')
@@ -826,6 +830,7 @@ function addProp(prop, position, rotation, scale) {
     newShelfPiece.setAttribute('radius', '0.05')
     newShelfPiece.setAttribute('color', 'black')
     newShelfPiece.setAttribute('position', '-0.95 1.25 -0.5')
+    newShelfPiece.setAttribute('static-body', '')
     newShelf.appendChild(newShelfPiece)
 
     newShelfPiece = document.createElement('a-cylinder')
@@ -834,6 +839,7 @@ function addProp(prop, position, rotation, scale) {
     newShelfPiece.setAttribute('radius', '0.05')
     newShelfPiece.setAttribute('color', 'black')
     newShelfPiece.setAttribute('position', '0.95 1.25 -0.5')
+    newShelfPiece.setAttribute('static-body', '')
     newShelf.appendChild(newShelfPiece)
 
     newShelf.setAttribute('position', position)
@@ -984,32 +990,216 @@ function addProp(prop, position, rotation, scale) {
     newTable.setAttribute('position', position)
     newTable.setAttribute('rotation', rotation)
     newTable.setAttribute('scale', scale)
+  } else if (prop == 'chair') {
+    var newChair = document.createElement('a-entity')
+    newChair.setAttribute('class', 'scenery chair')
+    scene.appendChild(newChair)
+
+    var newChairPiece = document.createElement('a-box')
+    newChairPiece.setAttribute('class', 'scenery chair-geom')
+    newChairPiece.setAttribute('width', '0.5')
+    newChairPiece.setAttribute('height', '0.05')
+    newChairPiece.setAttribute('depth', '0.5')
+    newChairPiece.setAttribute('color', '#bd0d0d')
+    newChairPiece.setAttribute('position', '0 0.75 0')
+    newChairPiece.setAttribute('static-body', '')
+    newChair.appendChild(newChairPiece)
+
+    newChairPiece = document.createElement('a-box')
+    newChairPiece.setAttribute('class', 'scenery chair-geom')
+    newChairPiece.setAttribute('width', '0.5')
+    newChairPiece.setAttribute('height', '0.025')
+    newChairPiece.setAttribute('depth', '0.5')
+    newChairPiece.setAttribute('color', '#bd0d0d')
+    newChairPiece.setAttribute('position', '0.2 1.25 0')
+    newChairPiece.setAttribute('rotation', '0 0 90')
+    newChairPiece.setAttribute('static-body', '')
+    newChair.appendChild(newChairPiece)
+
+    newChairPiece = document.createElement('a-cylinder')
+    newChairPiece.setAttribute('class', 'scenery chair-geom')
+    newChairPiece.setAttribute('radius', '0.015')
+    newChairPiece.setAttribute('height', '1.5')
+    newChairPiece.setAttribute('color', 'black')
+    newChairPiece.setAttribute('position', '0.225 0.725 0.225')
+    newChairPiece.setAttribute('static-body', '')
+    newChair.appendChild(newChairPiece)
+
+    newChairPiece = document.createElement('a-cylinder')
+    newChairPiece.setAttribute('class', 'scenery chair-geom')
+    newChairPiece.setAttribute('radius', '0.015')
+    newChairPiece.setAttribute('height', '0.75')
+    newChairPiece.setAttribute('color', 'black')
+    newChairPiece.setAttribute('position', '-0.225 0.375 -0.225')
+    newChairPiece.setAttribute('static-body', '')
+    newChair.appendChild(newChairPiece)
+
+    newChairPiece = document.createElement('a-cylinder')
+    newChairPiece.setAttribute('class', 'scenery chair-geom')
+    newChairPiece.setAttribute('radius', '0.015')
+    newChairPiece.setAttribute('height', '0.75')
+    newChairPiece.setAttribute('color', 'black')
+    newChairPiece.setAttribute('position', '-0.225 0.375 0.225')
+    newChairPiece.setAttribute('static-body', '')
+    newChair.appendChild(newChairPiece)
+
+    newChairPiece = document.createElement('a-cylinder')
+    newChairPiece.setAttribute('class', 'scenery chair-geom')
+    newChairPiece.setAttribute('radius', '0.015')
+    newChairPiece.setAttribute('height', '1.5')
+    newChairPiece.setAttribute('color', 'black')
+    newChairPiece.setAttribute('position', '0.225 0.725 -0.225')
+    newChairPiece.setAttribute('static-body', '')
+    newChair.appendChild(newChairPiece)
+
+    newChair.setAttribute('position', position)
+    newChair.setAttribute('rotation', rotation)
+    newChair.setAttribute('scale', scale)
+  } else if (prop == 'poster1') { // make these a single poster prop
+    var newPoster = document.createElement('a-plane')
+    newPoster.setAttribute('class', 'scenery poster')
+    newPoster.setAttribute('width', '1.75')
+    newPoster.setAttribute('height', '2')
+    newPoster.setAttribute('material', 'src: #poster1; color: #eb3458;')
+
+    scene.appendChild(newPoster)
+    newPoster.setAttribute('position', position)
+    newPoster.setAttribute('rotation', rotation)
+    newPoster.setAttribute('scale', scale)
+  } else if (prop == 'poster2') {
+    var newPoster = document.createElement('a-plane')
+    newPoster.setAttribute('class', 'scenery poster')
+    newPoster.setAttribute('width', '1.75')
+    newPoster.setAttribute('height', '2')
+    newPoster.setAttribute('material', 'src: #poster2; color: #eb3458;')
+
+    scene.appendChild(newPoster)
+    newPoster.setAttribute('position', position)
+    newPoster.setAttribute('rotation', rotation)
+    newPoster.setAttribute('scale', scale)
+  } else if (prop == 'poster3') {
+    var newPoster = document.createElement('a-plane')
+    newPoster.setAttribute('class', 'scenery poster')
+    newPoster.setAttribute('width', '1.75')
+    newPoster.setAttribute('height', '2')
+    newPoster.setAttribute('material', 'src: #poster3; color: #eb3458;')
+
+    scene.appendChild(newPoster)
+    newPoster.setAttribute('position', position)
+    newPoster.setAttribute('rotation', rotation)
+    newPoster.setAttribute('scale', scale)
   }
 }
 
 // Setup scene
 AFRAME.registerComponent('scenery', {
   init: function() {
-    // Tables
-    addProp('table', '1 0 -6')
-    // Lights
-    addProp('light', '3 3.5 -6.5', '0 0 0', '1.5 1 1')
-    addProp('light', '-3 3.5 -6.5', '0 0 0', '1.5 1 1')
-    addProp('light', '-7.5 3.5 -6.5', '0 90 0', '1.5 1 1')
-    addProp('light', '7.5 3.5 -6.5', '0 90 0', '1.5 1 1')
-    // Boxes
-    addProp('box', '-9 1 -9', '0 0 0', '0.75 0.75 0.75')
-    addProp('box', '-9 1 -7.5', '0 10 0', '0.25 0.25 0.25')
-    addProp('box', '-7.5 1 -9', '0 20 0', '0.25 0.25 0.25')
-    addProp('box', '9 1 -9', '0 0 0', '0.75 0.75 0.75')
-    addProp('box', '9 1 -7.5', '0 15 0', '0.25 0.25 0.25')
-    // Shelves
-    addProp('shelf', '-8.5 0.5 5.25', '0 0 0', '1.25 1 1')
-    addProp('shelf', '-5.5 0.5 5.25', '0 0 0', '1.25 1 1')
-    addProp('shelf', '7 0.5 5.25', '0 0 0', '2.5 1 1')
-    // Posters
-    // Misc
-    addProp('radio', '0.85 1.15 -9', '0 -25 0')
+    function replayRoomScenery() {
+      // Tables
+      addProp('table', '1 0 -6')
+
+      // Chairs
+      addProp('chair', '-1.45 0 -9', '0 165 0')
+      addProp('chair', '1.4 0 -9.1', '0 -3 0')
+
+      // Lights
+      addProp('light', '3 3.5 -6.5', '0 0 0', '1.5 1 1')
+      addProp('light', '-3 3.5 -6.5', '0 0 0', '1.5 1 1')
+      addProp('light', '-7.5 3.5 -6.5', '0 90 0', '1.5 1 1')
+      addProp('light', '7.5 3.5 -6.5', '0 90 0', '1.5 1 1')
+
+      // Boxes
+      addProp('box', '-9 1 -9', '0 0 0', '0.5 0.5 0.5')
+      addProp('box', '-9 1 -7.5', '0 10 0', '0.25 0.25 0.25')
+      addProp('box', '-7.5 1 -9', '0 20 0', '0.25 0.25 0.25')
+      addProp('box', '9 1 -9', '0 0 0', '0.5 0.5 0.5')
+      addProp('box', '9 1 -7.5', '0 15 0', '0.25 0.25 0.25')
+
+      // Shelves
+      addProp('shelf', '-8.5 0.5 5.25', '0 0 0', '1.25 1 1')
+            // Boxes on shelves
+            addProp('box', '-6.5 1.5 5', '0 0 0', '0.5 0.5 0.5')
+            addProp('box', '-8.75 1.5 5.3', '0 0 0', '0.5 0.5 0.5')
+            addProp('box', '-5 1.5 5.2', '0 0 0', '0.5 0.5 0.5')
+      addProp('shelf', '-5.5 0.5 5.25', '0 0 0', '1.25 1 1')
+            // Boxes on shelves
+            addProp('box', '-6 2.5 5.2', '0 0 0', '0.25 0.25 0.25')
+            addProp('box', '-5.5 2.5 5.2', '0 0 0', '0.2 0.2 0.2')
+            addProp('box', '-5 2.5 5.2', '0 30 0', '0.25 0.6 0.3')
+            addProp('box', '-8.5 2.5 5.2', '0 0 0', '0.5 0.25 0.5')
+            addProp('box', '-9 2.5 5.2', '0 0 0', '0.25 0.25 0.5')
+      addProp('shelf', '8.5 0.5 5.25', '0 0 0', '1.25 1 1')
+            // Boxes on shelves
+            addProp('box', '6 2.5 5.2', '0 0 0', '0.25 0.25 0.25')
+            addProp('box', '5.5 2.5 5.2', '0 0 0', '0.2 0.2 0.2')
+            addProp('box', '5 2.5 5.2', '0 30 0', '0.25 0.6 0.3')
+            addProp('box', '8.5 2.5 5.2', '0 0 0', '0.5 0.25 0.5')
+            addProp('box', '9 2.5 5.2', '0 0 0', '0.25 0.25 0.5')
+      addProp('shelf', '5.5 0.5 5.25', '0 0 0', '1.25 1 1')
+            // Boxes on shelves
+            addProp('box', '6.5 1.5 5', '0 0 0', '0.5 0.5 0.5')
+            addProp('box', '8.75 1.5 5.3', '0 0 0', '0.5 0.5 0.5')
+            addProp('box', '5 1.5 5.2', '0 0 0', '0.5 0.5 0.5')
+
+      // Posters
+      addProp('poster2', '4.105 2 0', '0 90 0')
+      addProp('poster3', '-2.64 1.75 -2.75', '0 90 0', '0.5 0.5 0.5')
+      addProp('poster1', '2.645 1.75 -2.75', '0 -90 0', '0.5 0.5 0.5')
+
+      // Misc
+      addProp('radio', '0.85 1.15 -9', '0 -25 0')
+    }
+
+    function factoryRoomScenery() {
+      // Shelves
+      addProp('shelf', '8.5 0 9.35', '0 0 0')
+      addProp('shelf', '8.5 0 6.65', '0 0 0')
+
+      // Tables
+      addProp('table', '-5 0 21.5', '0 0 0')
+
+      // Chairs
+      addProp('chair', '-4.5 0 18.75', '0 -10 0')
+      addProp('chair', '-6 0 17.5', '0 100 0')
+
+      // Lights
+      addProp('light', '-7.5 3.5 8', '0 90 0', '1.5 1 1')
+      addProp('light', '7.5 3.5 8', '0 90 0', '1.5 1 1')
+      addProp('light', '-2 3.5 8', '0 0 0', '1.5 1 1')
+      addProp('light', '2 3.5 8', '0 0 0', '1.5 1 1')
+
+      addProp('light', '-2.5 3.5 13', '0 0 0', '1.5 1 1')
+      addProp('light', '-2.5 3.5 18', '0 0 0', '1.5 1 1')
+
+      addProp('light', '2.5 3.5 13', '0 0 0', '1.5 1 1')
+      addProp('light', '2.5 3.5 18', '0 0 0', '1.5 1 1')
+
+      // Boxes
+      addProp('box', '-9 1 7', '0 0 0', '0.8 0.8 0.8')
+      addProp('box', '-9 1 9', '0 60 0', '0.5 0.5 0.5')
+      addProp('box', '-9.25 1 7.9', '0 45 0', '0.25 0.25 0.25')
+      addProp('box', '-9 2 9', '0 25 0', '0.65 0.65 0.65')
+
+      addProp('box', '8.5 0.75 17.5', '0 25 0', '1 1 1')
+      addProp('box', '8.5 2.26 17.5', '0 75 0', '1 1 1')
+      addProp('box', '-5 0.5 13.45', '0 25 0', '0.5 0.5 0.5')
+      addProp('box', '-5.5 1.25 13.47', '0 75 0', '0.5 0.5 0.5')
+      addProp('box', '-6 0.5 13.45', '0 75 0', '0.5 0.5 0.5')
+
+      // Posters
+      addProp('poster1', '9.95 2.5 8', '0 -90 0')
+      addProp('poster2', '-9.95 2.5 8', '0 90 0')
+    }
+
+    replayRoomScenery();
+    factoryRoomScenery();
+
+    // Add grab controls after we add scenery
+    document.getElementById('rightHand').setAttribute('sphere-collider', 'objects: .grabbable');
+    document.getElementById('rightHand').setAttribute('grab', '');
+
+    document.getElementById('leftHand').setAttribute('sphere-collider', 'objects: .grabbable');
+    document.getElementById('leftHand').setAttribute('grab', '');
   }
 })
 

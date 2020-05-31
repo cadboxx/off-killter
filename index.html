@@ -13,7 +13,7 @@
     <script src="./src/index.js"></script>
   </head>
   <body>
-    <a-scene scenery start-game toggle-debug renderer="antialias: true; highRefreshrate: true;" physics="gravity: -1.6">
+    <a-scene scenery start-game toggle-debug renderer="antialias: true; highRefreshrate: true;" physics="gravity: -2;">
       <a-assets timeout="30000">
         <!-- models -->
         <a-asset-item id="leftHandModel" src="assets/models/leftHand.glb"></a-asset-item>
@@ -34,6 +34,9 @@
         <img id="concrete-wall-texture" src="assets/images/concrete_wall_texture.jpg">
         <img id="floor-texture" src="assets/images/floor-texture.jpg">
         <img id="text-logo" src="assets/images/text_logo_transparent.png">
+        <img id="poster1" src="assets/images/motivational_poster_1_off-killter.jpg">
+        <img id="poster2" src="assets/images/motivational_poster_2_off-killter.jpg">
+        <img id="poster3" src="assets/images/motivational_poster_3_off-killter.jpg">
       </a-assets>
 
       <!-- Scene props -->
@@ -80,7 +83,7 @@
         <a-box id="helpManDefault" constraint="target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.115 0 0; targetPivot: 0.115 0 0; axis: 0 1 0; targetAxis: 0 1 0;" material='color: #f5f5f5; src: #help-manual-page3; flatShading: true;' class="grabbable" rotation='0 0 0' width='0.2159' height='0.2794' depth='0.005' dynamic-body="mass: 1" position='0 1.205 -8.27'></a-box>
 
         <!-- Cover -->
-        <a-box constraint="target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.11 0 0; targetPivot: 0.11 0 0; axis: 0 1 0; targetAxis: 0 1 0;" id="folder" material='color: #fffbb5; src: #help-manual-cover; flatShading: true;' class="grabbable" rotation='0 0 0' width='0.2413' height='0.295275' depth='0.006' position='0 1.22 -8.25' dynamic-body></a-box>
+        <a-box constraint="target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.11 0 0; targetPivot: 0.11 0 0; axis: 0 1 0; targetAxis: 0 1 0;" id="folder1" material='color: #fffbb5; src: #help-manual-cover; flatShading: true;' class="grabbable" rotation='0 0 0' width='0.2413' height='0.295275' depth='0.006' position='0 1.22 -8.25' dynamic-body></a-box>
 
         <a-box id="folder2" material='color: #fffbb5; src: #help-manual-cover; flatShading: true;' class="grabbable" rotation='0 0 0' width='0.2413' height='0.295275' depth='0.006' position='0 1.2 -8.25' dynamic-body></a-box>
       </a-entity>
@@ -159,6 +162,15 @@
           <a-box material="src: #floor-texture;" static-body position="1.625 2.9 -3.9" rotation="0 0 0" width="2.45" height="0.2" depth="0.2" color="#007eb0"></a-box>
           <a-box material="src: #floor-texture;" static-body position="-1.625 2.9 -3.9" rotation="0 0 0" width="2.45" height="0.2" depth="0.2" color="#007eb0"></a-box>
 
+          <!-- railings -->
+          <a-cylinder static-body position="-2.625 1.1 -2.725" rotation="90 0 0" height="1.5" radius="0.01"></a-cylinder>
+          <a-cylinder static-body position="-0.65 1.1 -2.725" rotation="90 0 0" height="1.5" radius="0.01"></a-cylinder>
+          <a-cylinder static-body position="-1.625 1.1 -1.875" rotation="90 90 0" height="1.75" radius="0.01"></a-cylinder>
+
+          <a-cylinder static-body position="2.625 1.1 -2.725" rotation="90 0 0" height="1.5" radius="0.01"></a-cylinder>
+          <a-cylinder static-body position="0.65 1.1 -2.725" rotation="90 0 0" height="1.5" radius="0.01"></a-cylinder>
+          <a-cylinder static-body position="1.65 1.1 -1.875" rotation="90 90 0" height="1.75" radius="0.01"></a-cylinder>
+
           <!-- front doors -->
           <a-entity id="elevator1">
             <a-box class="rightdoor" static-body position="0.99 1.35 -3.7" rotation="0 0 0" width="1.25" height="2.85" depth="0.2" color="#818282"></a-box>
@@ -175,6 +187,12 @@
 
       <!-- Define Replay Room -->
       <a-entity id="replayRoom">
+        <!-- angled walls -->
+        <a-plane material="src: #floor-texture;" static-body position="-7.275 3 12" rotation="0 30 0" width="7.675" height="2" color="#007eb0"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="-7.275 1 12" rotation="0 30 0" width="7.675" height="2" color="#001d29"></a-plane>
+
+        <a-plane material="src: #floor-texture;" static-body position="7.275 3 12" rotation="0 -30 0" width="7.675" height="2" color="#007eb0"></a-plane>
+        <a-plane material="src: #floor-texture;" static-body position="7.275 1 12" rotation="0 -30 0" width="7.675" height="2" color="#001d29"></a-plane>
         <!-- floor -->
         <a-plane material="src: #concrete-wall-texture;" static-body position="0 0 15" rotation="-90 0 0" width="20" height="10" color="#474747"></a-plane>
         <!-- ceiling -->
@@ -189,6 +207,8 @@
         <a-plane material="src: #floor-texture;" static-body position="-10 3 15" rotation="0 90 0" width="10" height="2" color="#007eb0"></a-plane>
         <!-- height board -->
         <a-plane static-body position="0 1.75 19.98" rotation="-180 0 0" width="8" height="3" color="#FFFFFF"></a-plane>
+        <a-plane static-body position="2 1.75 19.95" rotation="-180 0 180" width="2" height="2" material="src: #text-logo; alphaTest: 0.5;"></a-plane>
+        <a-plane static-body position="-2 1.75 19.95" rotation="-180 0 180" width="2" height="2" material="src: #text-logo; alphaTest: 0.5;"></a-plane>
         <!-- dumpster -->
         <a-box material="src: #floor-texture; color:#005703;" position="5 0.75 17.5" width="2" height="2" depth="3"></a-box>
         <a-box rotation="0 0 110" position="5.6 2.7 16.75" width="2" height="0.15" depth="1.5" material="color:black"></a-box>
@@ -247,8 +267,10 @@
             <a-text id="startSocialTextAction" value="Follow me on Twitter and send me feedback with the hashtag #OffKillter!" wrap-count="75" color="grey" scale="0.005 0.005 0.005" position="-0.0095 -0.006 0"></a-text>
           </a-plane>
         </a-entity>
-        <a-entity id="leftHand" teleport-controls="cameraRig: #rig; teleportOrigin: #camera;" hand-controls="hand: left; handModelStyle: lowPoly;" mirror-movement haptics static-body="shape: sphere; sphereRadius: 0.01; mass: 10;" sphere-collider="objects: .grabbable" grab></a-entity>
-        <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement haptics triggered static-body="shape: sphere; sphereRadius: 0.01; mass: 10;" sphere-collider="objects: .grabbable" grab camera-rotation></a-entity>
+
+        <a-entity id="leftHand" teleport-controls="cameraRig: #rig; teleportOrigin: #camera;" hand-controls="hand: left; handModelStyle: lowPoly;" mirror-movement haptics static-body="shape: sphere; sphereRadius: 0.02;"></a-entity>
+
+        <a-entity id="rightHand" camera-rotation hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement haptics triggered static-body="shape: sphere; sphereRadius: 0.02;"></a-entity>
 
         <!-- NOTE: For something to be intersected, needs to have class="links"! -->
         <a-entity laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 20" line="color: blue; opacity: 0.25"></a-entity>
