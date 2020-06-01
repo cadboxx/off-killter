@@ -13,7 +13,7 @@
     <script src="./src/index.js"></script>
   </head>
   <body>
-    <a-scene scenery start-game toggle-debug renderer="antialias: true; highRefreshrate: true;" physics="gravity: -2;">
+    <a-scene scenery start-game toggle-debug physics="gravity: -2;">
       <a-assets timeout="30000">
         <!-- models -->
         <a-asset-item id="leftHandModel" src="assets/models/leftHand.glb"></a-asset-item>
@@ -119,14 +119,14 @@
         <a-box material="src: #floor-texture;" static-body position="0 0.25 10" rotation="-180 0 0" depth="0.2" width="8" height="1" color="#001d29"></a-box>
         <a-box material="src: #floor-texture;" static-body position="0 3.75 10" rotation="-180 0 0" depth="0.2"width="8" height="1" color="#007eb0"></a-box>
         <!-- glass -->
-        <!-- <a-box static-body position="0 2 10" rotation="-180 0 0" depth="0.05" width="8" height="2.5" color="#a8ccd7" opacity="0.25"></a-box> -->
+        <a-box static-body position="0 2 10" rotation="-180 0 0" depth="0.05" width="8" height="2.5" color="#a8ccd7" opacity="0.2"></a-box>
         <!-- control panel -->
         <a-box static-body position="0 0.5 9.75" depth="0.3" width="1" height="1" color="#595959"></a-box>
         <a-box static-body position="0 1 9.6" rotation="-45 0 0" depth="0.4" width="1" height="0.01" color="#818282"></a-box>
         <!-- joystick -->
         <a-box id="joystickpanel" static-body position="0 1 9.59" rotation="-45 0 0" depth="0.3" width="0.85" height="0.001" color="#595959"></a-box>
 
-        <a-box id="craneButton" static-body position="0.25 1.001 9.59" rotation="-45 0 0" depth="0.05" width="0.1" height="0.001" color="#FFFFFF"></a-box>
+        <a-box crane-button class="grabbable" id="craneButton" static-body position="0.325 1.0 9.575" rotation="-45 0 0" depth="0.15" width="0.2" height="0.05" color="red"></a-box>
 
         <a-cylinder joymove id="joystickleft" constraint="target: #joystickpanel; type: hinge; axis: 0 1 0; targetAxis: 0 1 0; targetPivot: 0 0.1 0;" dynamic-body="shape: cylinder;" class="grabbable" position="0 1.01 9.59" radius="0.01" rotation="-45 0 0" height="0.25" color="#FFFFFF">
           <a-sphere static-body position="0 0.15 0" radius="0.03" color="red"></a-sphere>
@@ -232,7 +232,9 @@
           <a-cylinder position="0 3.15 15.5" rotation="90 0 0" radius="0.1" height="0.75" material="color:#818282"></a-cylinder>
           <a-sphere position="0 3.15 15" radius="0.15" material="color:yellow"></a-sphere>
           <a-cylinder position="0 2.75 15" rotation="-180 0 0" radius="0.1" height="1" material="color:#818282"></a-cylinder>
-          <a-cylinder position="0 2.25 15" rotation="-180 0 0" radius="0.5" height="0.1" material="color:black"></a-cylinder>
+          <a-cylinder position="0 2.25 15" rotation="-180 0 0" radius="0.5" height="0.1" material="color:black">
+            <a-entity id="thing" raycaster="objects: .replayHeads; showLine: true;" position="0 -0.9 0" rotation="90 0 0"></a-entity>
+          </a-cylinder>
         </a-entity>
         <!-- truck -->
         <a-entity id="truck" position="4 2.5 0">
@@ -273,7 +275,7 @@
         <a-entity id="rightHand" camera-rotation hand-controls="hand: right; handModelStyle: lowPoly;" mirror-movement haptics triggered static-body="shape: sphere; sphereRadius: 0.02;"></a-entity>
 
         <!-- NOTE: For something to be intersected, needs to have class="links"! -->
-        <a-entity laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 20" line="color: blue; opacity: 0.25"></a-entity>
+        <a-entity laser-controls="hand: right; model: false;" raycaster="objects: .links; far: 10" line="color: blue; opacity: 0.25"></a-entity>
       </a-entity>
 
       <!-- Replay body -->

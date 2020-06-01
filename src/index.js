@@ -28,6 +28,7 @@ let leftTriggerDown = false;
 let rightTriggerDown = false;
 let triggerDown = false;
 let recordButtonSelected = false;
+let craneButtonHit = false;
 let recTeleportButtonSelected = false;
 let replayButtonSelected = false;
 let startButtonSelected = false;
@@ -380,11 +381,6 @@ function gameStart() {
   document.querySelector('a-scene').setAttribute('countdown', '')
   setTimeout(function() {
     gameStarted = true
-    // Make heads clickable
-    var replayHeads = document.querySelectorAll(".replayHeads");
-    for (i = 0; i < replayHeads.length; i++) {
-      replayHeads[i].classList.add('links');
-    }
   }, 3000)
 }
 
@@ -454,12 +450,6 @@ function gameEnd() {
   difficultyButton.setAttribute('rotation', '0 -210 0')
   difficultyButton.setAttribute('class', 'links')
   difficultyButton.setAttribute('visible', true)
-
-  // Make heads unclickable
-  var replayObjects = document.querySelectorAll('.replayHeads');
-  for (i = 0; i < replayObjects.length; i++) {
-    replayObjects[i].classList.remove('links');
-  }
 
   // Add text
   //console.log('Mutating replay: ' + mutatedGhostName + '; randsecond: ' + randSecond + '; randBodyParts: ' + randBodyParts +'; randAxes: ' + randAxes)
@@ -647,11 +637,6 @@ function restartRound() {
   // Don't start until after the countdown
   setTimeout( function() {
     gameStarted = true
-    // Make heads clickable
-    var replayHeads = document.querySelectorAll(".replayHeads");
-    for (i = 0; i < replayHeads.length; i++) {
-      replayHeads[i].classList.add('links');
-    }
   }, 3000);
 }
 
@@ -1587,32 +1572,6 @@ AFRAME.registerComponent('triggered', {
       } else if (newRoundButtonSelected) {
         document.getElementById('fadePlane').setAttribute('fade', 'fadeIn: false; fadeSeconds: 0.5')
         setTimeout(function() { restartRound(); }, 600);
-      } else if (ghostName) {
-        vibrate = false;
-        if (!gameOver) {
-          document.getElementById('startText').setAttribute('visible', true)
-          if (ghostName == mutatedGhostName) {
-            startButton.setAttribute('value', 'YOU PICKED THE DEFECTIVE ROBOT!')
-            startButton.setAttribute('material', 'color: green')
-            startButton.setAttribute('rotation', '0 180 0')
-            startButton.setAttribute('position', '0 3.5 14.5')
-            startButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
-            startButton.setAttribute('sound', 'src: #win-sound; autoplay: true; volume: 1')
-            gameOver = true;
-            gameEnd();
-          } else {
-            document.getElementById('leftHand').components.haptics.pulse(0.5, 500);
-            document.getElementById('rightHand').components.haptics.pulse(0.5, 500);
-            startButton.setAttribute('value', 'YOU PICKED A FUNCTIONING ROBOT!')
-            startButton.setAttribute('material', 'color: red')
-            startButton.setAttribute('rotation', '0 180 0')
-            startButton.setAttribute('position', '0 3.5 14.5')
-            startButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
-            startButton.setAttribute('sound', 'src: #lose-sound; autoplay: true; volume: 1')
-            gameOver = true;
-            gameEnd();
-          }
-        }
       } else {
         if (cursorOverRecording && !replaying) {
           selectedRecording = parseInt(cursorOverRecording.slice(6), 10);
@@ -1987,6 +1946,50 @@ AFRAME.registerComponent('joymove', {
         }
       }
     }
+  }
+});
+
+AFRAME.registerComponent('crane-button', {
+  init: function() {
+    this.el.addEventListener('hit', function () {
+      var startButton = document.getElementById("startText");
+      if (gameStarted && ghostName && !gameOver) {
+        if (!gameOver) {
+          startButton.setAttribute('visible', true)
+          if (ghostName == mutatedGhostName) {
+            startButton.setAttribute('value', 'YOU PICKED THE DEFECTIVE ROBOT!')
+            startButton.setAttribute('material', 'color: green')
+            startButton.setAttribute('rotation', '0 180 0')
+            startButton.setAttribute('position', '0 3.5 14.5')
+            startButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
+            startButton.setAttribute('sound', 'src: #win-sound; autoplay: true; volume: 1')
+            gameOver = true;
+            gameEnd();
+          } else {
+            document.getElementById('leftHand').components.haptics.pulse(0.5, 500);
+            document.getElementById('rightHand').components.haptics.pulse(0.5, 500);
+            startButton.setAttribute('value', 'YOU PICKED A FUNCTIONING ROBOT!')
+            startButton.setAttribute('material', 'color: red')
+            startButton.setAttribute('rotation', '0 180 0')
+            startButton.setAttribute('position', '0 3.5 14.5')
+            startButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
+            startButton.setAttribute('sound', 'src: #lose-sound; autoplay: true; volume: 1')
+            gameOver = true;
+            gameEnd();
+          }
+        }
+      } else if (gameStarted && !gameOver) {
+        // pop up saying didn't hit a ghost..should hide after a short period
+        startButton.setAttribute('visible', true)
+        document.getElementById('leftHand').components.haptics.pulse(0.5, 500);
+        document.getElementById('rightHand').components.haptics.pulse(0.5, 500);
+        startButton.setAttribute('value', 'ERROR: NO AVATAR SELECTED!')
+        startButton.setAttribute('material', 'color: red')
+        startButton.setAttribute('rotation', '0 180 0')
+        startButton.setAttribute('position', '0 3.5 14.5')
+        startButton.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
+      }
+    })
   }
 });
 
