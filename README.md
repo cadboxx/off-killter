@@ -1,18 +1,30 @@
-<a href="https://elocnat.itch.io/off-killter"><img src="https://i.imgur.com/OD9Lp52.jpg" title="Play Off-Killter now at elocnat.itch.io!" alt="elocnat logo" width="256">
+<a href="https://elocnat.itch.io/off-killter"><img src="https://i.imgur.com/7r37ODN.png" title="Play Off-Killter now at elocnat.itch.io!" alt="elocnat logo" width="256">
 
 # Off-Killter
 
-> A VR game prototype that records, replays, and mutates player movements using the headset and motion controllers.
+> A WebVR game built with A-Frame.
 
 ## Gameplay Synopsis
 
-As soon as you enter VR your movement input will be mirrored back to you in real time by the onscreen avatar. Click the record button to capture three recordings that track your headset and motion controller positions. Make sure to move enough so that the recording is saved!
+Playing as a QA tester at Killter Innovations, your job is to spot defects in newly manufactured robots. You have to make three recordings that the new robots will playback to verify their functionality as they roll off the assembly line. Once you start the factory you can observe the assembly line from the control panel. If you see a defective robot you must move the crane over it and press the big red button to select it.
 
-You can watch these recordings back as many times as you want to memorize them. Be aware that while the onscreen avatar is mirrored back to you in real time, your recordings are not.
+<br/>
 
-When you're ready to start, the game will spawn avatars to play all the recordings three times each; but one of the replays has been mutated. Spot the mutated recording before playback finishes to win! The harder the difficulty the harder it is to spot the mutation.
+#### Controls
 
-When the game is over you can see what body parts were mutated, at what point the mutation started, and along what axes the mutations were applied. Start a new round to replay the same recordings with a new mutation or restart the game to record new ones!
+* Use the left motion controller and touchpad to teleport.
+* Use the right motion controller touchpad to rotate the camera.
+  * Try to keep facing forward and rotate by only using hand controls
+* Use the right trigger to select UI buttons.
+
+#### Tips and Known Issues
+
+* Currently only tested in Firefox using the HTC Vive.
+* Currently the game works best if you are always facing forward (with the exception of recording) and use the motion controllers for camera rotation and navigation.
+* Manual physics are a little funky.
+* If you're not standing in the middle of your play space while recording, the crane might not recognize the avatar you have selected.
+* Poor optimization might = bad FPS which might = fast forwarded/slowed down replays/recordings.
+* I am actively working on optimizing the scene and refactoring the code.
 
 <br/>
 
