@@ -1,5 +1,5 @@
 // Dev tools
-let toggleDebug = false;
+let toggleDebug = false
 
 // Gameplay tweak vars
 const numReqReplays = 3; // Replays required to start game
@@ -57,6 +57,7 @@ var oldPoint = {};
 var diffMeterTotal = 0;
 var trackpadAxis;
 var rigLocked = false;
+let playerReady = false;
 
 let startTime = 0;
 let randRecord; // Ghost that is modified during game
@@ -148,8 +149,10 @@ function recordEntity(el, index) {
     if (diffMeterTotal < barTotal) {
       document.getElementById('diffMeter').setAttribute('geometry', 'primitive:plane; width: ' + diffMeterTotal + '; height: 0.5')
       if (diffMeterTotal > (barTotal / 2) ) {
-        document.getElementById('diffMeter').setAttribute('material', 'color: gold');
-        document.getElementById('diffMeter').setAttribute('value', 'KEEP MOVING');
+        if (document.getElementById('diffMeter').value != 'KEEP MOVING') {
+          document.getElementById('diffMeter').setAttribute('material', 'color: gold');
+          document.getElementById('diffMeter').setAttribute('value', 'KEEP MOVING');
+        }
       }
     } else if (!diffMet) {
       diffMet = true;
@@ -498,6 +501,22 @@ function gameEnd() {
   }
 }
 
+// quick hacky way to fade in elevator sound
+function fadeSoundIn() {
+  setTimeout(function(){
+    document.getElementById('rig').setAttribute('sound', 'volume: 0.02')
+  }, 200);
+  setTimeout(function(){
+    document.getElementById('rig').setAttribute('sound', 'volume: 0.03')
+  }, 300);
+  setTimeout(function(){
+    document.getElementById('rig').setAttribute('sound', 'volume: 0.04')
+  }, 400);
+  setTimeout(function(){
+    document.getElementById('rig').setAttribute('sound', 'volume: 0.05')
+  }, 500);
+}
+
 // Resets everything
 function restartGame() {
   document.getElementById('mutateStatsAxes').setAttribute('visible', false)
@@ -516,6 +535,7 @@ function restartGame() {
 
   // reset all vars
   gameStarted = false;
+  playerReady = false;
   gameOver = false;
   recording = false;
   replaying = false;
@@ -1442,7 +1462,8 @@ AFRAME.registerComponent('mirror-movement', {
 
             addReplay(recordedPoses, savedRecordings.length)
 
-            if (savedRecordings.length >= numReqReplays) {
+            if (savedRecordings.length >= numReqReplays && playerReady == false) {
+              playerReady = true;
               startButton.setAttribute('value', 'START!')
               startButton.setAttribute('geometry', 'primitive:plane; width: 1.4; height:0.7')
               startButton.setAttribute('material', 'color: green')
@@ -1456,24 +1477,31 @@ AFRAME.registerComponent('mirror-movement', {
               recordButton.setAttribute('material', 'color: orange')
               document.getElementById('diffMeter').setAttribute('visible', false)
             } else {
-              startButton.setAttribute('value', 'Record ' + (numReqReplays - savedRecordings.length) + ' more animations to start...')
+              if (startButton.getAttribute('value') != 'Record ' + (numReqReplays - savedRecordings.length) + ' more animations to start...') {
+                startButton.setAttribute('value', 'Record ' + (numReqReplays - savedRecordings.length) + ' more animations to start...')
+              }
             }
           } else {
-            startButton.setAttribute('value', 'You need to move enough to fill the bar!')
+            if (startButton.getAttribute('value') != 'You need to move enough to fill the bar!') {
+              startButton.setAttribute('value', 'You need to move enough to fill the bar!')
+            }
           }
-
-          recording = false;
-          lockRig(null, false);
-          document.getElementById('diffMeter').setAttribute('geometry', 'width: 0; height: 0;')
-          document.getElementById('diffMeter').setAttribute('material', 'color: pink');
-          document.getElementById('diffMeter').setAttribute('value', 'MOVE TO FILL');
-          document.getElementById('diffMeter').setAttribute('visible', false)
-          oldPoint = {};
-          diffMeterTotal = 0;
-          diffMet = false;
+          if (recording) {
+            recording = false;
+            lockRig(null, false);
+            document.getElementById('diffMeter').setAttribute('geometry', 'width: 0; height: 0;')
+            document.getElementById('diffMeter').setAttribute('material', 'color: pink');
+            document.getElementById('diffMeter').setAttribute('value', 'MOVE TO FILL');
+            document.getElementById('diffMeter').setAttribute('visible', false)
+            oldPoint = {};
+            diffMeterTotal = 0;
+            diffMet = false;
+          }
         } else {
-          recordButton.setAttribute('material', 'color:lightgreen')
-          recordButton.setAttribute('value', 'RECORDING')
+          if (recordButton.getAttribute('value') != 'RECORDING') {
+            recordButton.setAttribute('material', 'color:lightgreen')
+            recordButton.setAttribute('value', 'RECORDING')
+          }
           let timeFormat = endRecordingTime - currRecordingTime
           startButton.setAttribute('value', timeFormat.toString() + 'ms left')
           recordEntity(el, index);
@@ -1487,14 +1515,18 @@ AFRAME.registerComponent('mirror-movement', {
           document.getElementById('mirrorHead').removeAttribute('highlight')
           highlighted = false;
         }
-        recordButton.setAttribute('material', 'color:red')
-        if (savedRecordings.length < numReqReplays) {
+
+        if (recordButton.getAttribute('material').color != 'red') {
+          recordButton.setAttribute('material', 'color:red')
+        }
+
+        if (savedRecordings.length < numReqReplays && recordButton.getAttribute('value') != 'START RECORDING') {
           recordButton.setAttribute('value', 'START RECORDING')
         }
       }
 
-      if (!replaying) {
-        if (savedRecordings.length == 0) {
+      if (!replaying && !gameStarted) {
+        if (savedRecordings.length == 0 && cube.object3D.position.y != staticpos[1]) {
           cube.object3D.position.x = staticpos[0];
           cube.object3D.position.y = staticpos[1];
           cube.object3D.position.z = staticpos[2];
@@ -1504,12 +1536,21 @@ AFRAME.registerComponent('mirror-movement', {
         }
 
         // mirror current player actions to recording area "monitor"
-        tvcube.object3D.position.x = el.object3D.position.x * -1;
-        tvcube.object3D.position.y = el.object3D.position.y;
-        tvcube.object3D.position.z = el.object3D.position.z;
-        tvcube.object3D.rotation.x = el.object3D.rotation.x;
-        tvcube.object3D.rotation.y = el.object3D.rotation.y * -1;
-        tvcube.object3D.rotation.z = el.object3D.rotation.z * -1;
+        if (recording) {
+          if (document.getElementById('tvBody').getAttribute('visible') == false) {
+            document.getElementById('tvBody').setAttribute('visible', true);
+          }
+          tvcube.object3D.position.x = el.object3D.position.x * -1;
+          tvcube.object3D.position.y = el.object3D.position.y;
+          tvcube.object3D.position.z = el.object3D.position.z;
+          tvcube.object3D.rotation.x = el.object3D.rotation.x;
+          tvcube.object3D.rotation.y = el.object3D.rotation.y * -1;
+          tvcube.object3D.rotation.z = el.object3D.rotation.z * -1;
+        } else {
+          if (document.getElementById('tvBody').getAttribute('visible') == true) {
+            document.getElementById('tvBody').setAttribute('visible', false);
+          }
+        }
       }
     }
   }
@@ -1519,9 +1560,7 @@ AFRAME.registerComponent('mirror-movement', {
 AFRAME.registerComponent('triggered', {
   init: function () {
     var el = this.el; // The entity
-    var startButton = document.getElementById('startText')
 
-    // Ensure support for all controllers
     el.addEventListener('triggerdown', function (evt) {
       triggerDown = true
       var vibrate = true;
@@ -1536,7 +1575,6 @@ AFRAME.registerComponent('triggered', {
           currMutPosAmt = 0;
           rewindMut = false;
         } else {
-          // lock rig at replay position
           lockRig('replay');
         }
       } else if (difficultyButtonSelected) {
@@ -1545,7 +1583,7 @@ AFRAME.registerComponent('triggered', {
         lockRig('record');
         lockRig(null, false);
       } else if (recordButtonSelected) {
-        if (!replaying && savedRecordings.length < numReqReplays ) {
+        if (!replaying && savedRecordings.length < numReqReplays) {
           document.getElementById('diffMeter').setAttribute('visible', true)
           document.getElementById('startText').setAttribute('position', '-5 2.5 0')
           document.getElementById('startText').setAttribute('rotation', '0 -90 0')
@@ -1765,22 +1803,6 @@ AFRAME.registerComponent('fade', {
     fading = false;
   }
 });
-
-// quick hacky way to fade in elevator sound
-function fadeSoundIn() {
-  setTimeout(function(){
-    document.getElementById('rig').setAttribute('sound', 'volume: 0.02')
-  }, 200);
-  setTimeout(function(){
-    document.getElementById('rig').setAttribute('sound', 'volume: 0.03')
-  }, 300);
-  setTimeout(function(){
-    document.getElementById('rig').setAttribute('sound', 'volume: 0.04')
-  }, 400);
-  setTimeout(function(){
-    document.getElementById('rig').setAttribute('sound', 'volume: 0.05')
-  }, 500);
-}
 
 AFRAME.registerComponent('start-game', {
   init: function() {

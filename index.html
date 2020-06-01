@@ -292,7 +292,7 @@
       </a-entity>
 
       <!-- TV screen recording mirror body -->
-      <a-entity id="tvBody" position="-5.25 0.75 -1.5" scale="0.5 0.5 0.5" rotation="0 115 0" visible="true">
+      <a-entity id="tvBody" position="-5.25 0.75 -1.5" scale="0.5 0.5 0.5" rotation="0 115 0" visible="false">
         <a-entity id="tvleftCube">
           <a-entity id="mirrorLeftHand" rotation="0 0 90" gltf-model="#leftHandModel"></a-entity>
         </a-entity>
@@ -307,10 +307,10 @@
       <!-- UI -->
       <a-entity id="ui">
         <a-text id="diffMeter" color="black" value="MOVE TO FILL" align="center" position="-5.5 0.25 0" rotation="-25 270 0" material="color: pink" scale="0.7 0.7 0.7" visible='false'>
-          <a-plane id="topBar" position="0 0.25 0" width="4" height="0.05" color="black"></a-plane>
-          <a-plane id="bottomBar" position="0 -0.25 0" width="4" height="0.05" color="black"></a-plane>
-          <a-plane id="leftBar" position="-2 0 0" width="0.05" height="0.5" color="black"></a-plane>
-          <a-plane id="rightBar" position="2 0 0" width="0.05" height="0.5" color="black"></a-plane>
+          <a-plane id="topBar" position="0 0.275 0" width="4.1" height="0.05" color="black"></a-plane>
+          <a-plane id="bottomBar" position="0 -0.275 0" width="4.1" height="0.05" color="black"></a-plane>
+          <a-plane id="leftBar" position="-2.025 0 0" width="0.05" height="0.5" color="black"></a-plane>
+          <a-plane id="rightBar" position="2.025 0 0" width="0.05" height="0.5" color="black"></a-plane>
         </a-text>
 
         <a-text id="diffButton" class="links" value="EASY" geometry="primitive:plane; width: 2; height: 1" align="center" position="1 1.55 -9.95" rotation="0 0 0" material="color: green" scale="0.7 0.7 0.7" visible="false" button-intersect>
