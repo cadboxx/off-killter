@@ -106,6 +106,8 @@ function recordEntity(el, index) {
   var pointDiff = 0;
   var entId = el.id;
 
+  var diffMeter = document.getElementById('diffMeter');
+
   // Check oldpoint delta against newpoint
   function calcDiff() {
     // Apply a percentage of movement to balance body parts
@@ -147,17 +149,17 @@ function recordEntity(el, index) {
     pointDiff = 0;
 
     if (diffMeterTotal < barTotal) {
-      document.getElementById('diffMeter').setAttribute('geometry', 'primitive:plane; width: ' + diffMeterTotal + '; height: 0.5')
+      diffMeter.setAttribute('geometry', 'primitive:plane; width: ' + diffMeterTotal + '; height: 0.5')
       if (diffMeterTotal > (barTotal / 2) ) {
-        if (document.getElementById('diffMeter').value != 'KEEP MOVING') {
-          document.getElementById('diffMeter').setAttribute('material', 'color: gold');
-          document.getElementById('diffMeter').setAttribute('value', 'KEEP MOVING');
+        if (diffMeter.value != 'KEEP MOVING') {
+          diffMeter.setAttribute('material', 'color: gold');
+          diffMeter.setAttribute('value', 'KEEP MOVING');
         }
       }
     } else if (!diffMet) {
       diffMet = true;
-      document.getElementById('diffMeter').setAttribute('material', 'color: lightgreen');
-      document.getElementById('diffMeter').setAttribute('value', 'FILLED!');
+      diffMeter.setAttribute('material', 'color: lightgreen');
+      diffMeter.setAttribute('value', 'FILLED!');
     }
   }
 
@@ -196,9 +198,10 @@ function buttonEvent(button, event) {
 
 function lockRig(position=null, lock=true) {
   var rig = document.getElementById('rig');
+  var leftHand = document.getElementById('leftHand');
   if (lock) {
     rigLocked = true;
-    document.getElementById('leftHand').setAttribute('teleport-controls', 'cameraRig: null; teleportOrigin: null;');
+    leftHand.setAttribute('teleport-controls', 'cameraRig: null; teleportOrigin: null;');
 
     // need to get original rotation and set based on that
     if (position == 'replay') {
@@ -216,7 +219,7 @@ function lockRig(position=null, lock=true) {
     }
   } else {
     rigLocked = false;
-    document.getElementById('leftHand').setAttribute('teleport-controls', 'cameraRig: #rig; teleportOrigin: #camera;')
+    leftHand.setAttribute('teleport-controls', 'cameraRig: #rig; teleportOrigin: #camera;')
   }
 }
 
@@ -231,21 +234,22 @@ function hideTheChildren(node) {
 }
 
 function changeDifficulty() {
+  var diffButton = document.getElementById('diffButton')
   if (difficulty == 'turing') {
-    document.getElementById('diffButton').setAttribute('material', 'color: green')
-    document.getElementById('diffButton').setAttribute('value', 'EASY')
+    diffButton.setAttribute('material', 'color: green')
+    diffButton.setAttribute('value', 'EASY')
     difficulty = 'easy'
   } else if (difficulty == 'easy') {
-    document.getElementById('diffButton').setAttribute('material', 'color: gold')
-    document.getElementById('diffButton').setAttribute('value', 'NORMAL')
+    diffButton.setAttribute('material', 'color: gold')
+    diffButton.setAttribute('value', 'NORMAL')
     difficulty = 'normal'
   } else if (difficulty == 'normal') {
-    document.getElementById('diffButton').setAttribute('material', 'color: orange')
-    document.getElementById('diffButton').setAttribute('value', 'HARD')
+    diffButton.setAttribute('material', 'color: orange')
+    diffButton.setAttribute('value', 'HARD')
     difficulty = 'hard'
   } else if (difficulty == 'hard') {
-    document.getElementById('diffButton').setAttribute('material', 'color: red')
-    document.getElementById('diffButton').setAttribute('value', 'TURING TEST')
+    diffButton.setAttribute('material', 'color: red')
+    diffButton.setAttribute('value', 'TURING TEST')
     difficulty = 'turing'
   }
 }
@@ -293,6 +297,9 @@ function rotateObject(obj, ref, px = 0, py = 0, pz = 0, rx = 0, ry = 0, rz = 0) 
 function gameStart() {
   // Move player in front of ghosteses
   lockRig('startgame');
+
+  // Add joystick control
+  document.getElementById('joystickleft').setAttribute('joymove', '');
 
   document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 1.5')
 
@@ -503,22 +510,30 @@ function gameEnd() {
 
 // quick hacky way to fade in elevator sound
 function fadeSoundIn() {
+  var rig = document.getElementById('rig')
   setTimeout(function(){
-    document.getElementById('rig').setAttribute('sound', 'volume: 0.02')
+    rig.setAttribute('sound', 'volume: 0.02')
   }, 200);
   setTimeout(function(){
-    document.getElementById('rig').setAttribute('sound', 'volume: 0.03')
+    rig.setAttribute('sound', 'volume: 0.03')
   }, 300);
   setTimeout(function(){
-    document.getElementById('rig').setAttribute('sound', 'volume: 0.04')
+    rig.setAttribute('sound', 'volume: 0.04')
   }, 400);
   setTimeout(function(){
-    document.getElementById('rig').setAttribute('sound', 'volume: 0.05')
+    rig.setAttribute('sound', 'volume: 0.05')
   }, 500);
 }
 
 // Resets everything
 function restartGame() {
+  var restartButton = document.getElementById('restartButton');
+  var startText = document.getElementById('startText');
+  var diffButton = document.getElementById('diffButton');
+  var replayButton = document.getElementById('replayButton');
+  var recordButton = document.getElementById('recordButton');
+  var newRoundButton = document.getElementById('newRoundButton');
+
   document.getElementById('mutateStatsAxes').setAttribute('visible', false)
   document.getElementById('mutateStatsSeconds').setAttribute('visible', false)
   document.getElementById('mutateStatsParts').setAttribute('visible', false)
@@ -526,6 +541,7 @@ function restartGame() {
   // reset player positon
   lockRig('start');
   lockRig(null, false);
+  document.getElementById('camera').removeAttribute('replayer');
 
   // delete everything in the 'replay' class
   var replayObjects = document.querySelectorAll(".replay");
@@ -561,35 +577,35 @@ function restartGame() {
   currMutPosAmt = 0;
 
   // reset buttons
-  document.getElementById('restartButton').setAttribute('class', '')
-  document.getElementById('restartButton').setAttribute('visible', false)
+  restartButton.setAttribute('class', '')
+  restartButton.setAttribute('visible', false)
 
-  document.getElementById('newRoundButton').setAttribute('class', '')
-  document.getElementById('newRoundButton').setAttribute('visible', false)
+  newRoundButton.setAttribute('class', '')
+  newRoundButton.setAttribute('visible', false)
 
-  document.getElementById('recordButton').setAttribute('visible', true)
-  document.getElementById('recordButton').setAttribute('class', 'links')
-  document.getElementById('recordButton').setAttribute('rotation', '0 115 0')
-  document.getElementById('recordButton').setAttribute('position', '-9 1.25 3')
-  document.getElementById('recordButton').setAttribute('geometry', 'primitive:circle')
+  recordButton.setAttribute('visible', true)
+  recordButton.setAttribute('class', 'links')
+  recordButton.setAttribute('rotation', '0 115 0')
+  recordButton.setAttribute('position', '-9 1.25 3')
+  recordButton.setAttribute('geometry', 'primitive:circle')
 
-  document.getElementById('replayButton').setAttribute('visible', false)
-  document.getElementById('replayButton').setAttribute('position', '9 1.25 3')
-  document.getElementById('replayButton').setAttribute('rotation', '0 -100 0')
-  document.getElementById('replayButton').setAttribute('value', 'REPLAY RECORDING')
+  replayButton.setAttribute('visible', false)
+  replayButton.setAttribute('position', '9 1.25 3')
+  replayButton.setAttribute('rotation', '0 -100 0')
+  replayButton.setAttribute('value', 'REPLAY RECORDING')
 
-  document.getElementById('diffButton').setAttribute('visible', false)
-  document.getElementById('diffButton').setAttribute('rotation', '0 0 0')
-  document.getElementById('diffButton').setAttribute('position', '1 1.55 -9.95')
+  diffButton.setAttribute('visible', false)
+  diffButton.setAttribute('rotation', '0 0 0')
+  diffButton.setAttribute('position', '1 1.55 -9.95')
 
-  document.getElementById('startText').setAttribute('value', 'Record ' + numReqReplays + ' animations to start!')
-  document.getElementById('startText').setAttribute('class', 'links')
-  document.getElementById('startText').setAttribute('rotation', '0 90 0')
-  document.getElementById('startText').setAttribute('position', '-9.9 2.5 0')
-  document.getElementById('startText').setAttribute('color', 'white')
-  document.getElementById('startText').removeAttribute('geometry')
-  document.getElementById('startText').removeAttribute('material')
-  document.getElementById('startText').removeAttribute('sound')
+  startText.setAttribute('value', 'Record ' + numReqReplays + ' animations to start!')
+  startText.setAttribute('class', 'links')
+  startText.setAttribute('rotation', '0 90 0')
+  startText.setAttribute('position', '-9.9 2.5 0')
+  startText.setAttribute('color', 'white')
+  startText.removeAttribute('geometry')
+  startText.removeAttribute('material')
+  startText.removeAttribute('sound')
 
   document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 3.0')
   document.getElementById('upperBlockWall').components.sound.playSound();
@@ -615,6 +631,11 @@ function restartRound() {
   startTime = 0;
   startTick = 0;
   rewindMut = false;
+  var restartButton = document.getElementById('restartButton');
+  var startText = document.getElementById('startText');
+  var diffButton = document.getElementById('diffButton');
+  var replayButton = document.getElementById('replayButton');
+  var newRoundButton = document.getElementById('newRoundButton');
 
   // Reset position of avatars
   savedRecordings.forEach(function(element, index) {
@@ -639,16 +660,16 @@ function restartRound() {
   document.getElementById('mutateStatsParts').setAttribute('visible', false)
 
   // reset buttons
-  document.getElementById('restartButton').classList.remove('links')
-  document.getElementById('restartButton').setAttribute('visible', false)
-  document.getElementById('newRoundButton').classList.remove('links')
-  document.getElementById('newRoundButton').setAttribute('visible', false)
-  document.getElementById('replayButton').setAttribute('visible', false)
-  document.getElementById('startText').setAttribute('visible', false)
-  document.getElementById('startText').removeAttribute('sound')
+  restartButton.classList.remove('links')
+  restartButton.setAttribute('visible', false)
+  newRoundButton.classList.remove('links')
+  newRoundButton.setAttribute('visible', false)
+  replayButton.setAttribute('visible', false)
+  startText.setAttribute('visible', false)
+  startText.removeAttribute('sound')
   document.getElementById('ghostRing').setAttribute('visible', false)
-  document.getElementById('diffButton').classList.remove('links')
-  document.getElementById('diffButton').setAttribute('visible', false)
+  diffButton.classList.remove('links')
+  diffButton.setAttribute('visible', false)
 
   // Fade back in with countdown
   document.getElementById('fadePlane').setAttribute('fade', 'fadeSeconds: 0.5');
@@ -1099,131 +1120,144 @@ function addProp(prop, position, rotation, scale, physics) {
   }
 }
 
+function replayRoomScenery() {
+  // Tables
+  addProp('table', '1 0 -6')
+
+  // Chairs
+  addProp('chair', '-1.45 0 -9', '0 165 0')
+  addProp('chair', '1.4 0 -9.1', '0 -3 0')
+
+  // Lights
+  addProp('light', '3 3.5 -6.5', '0 0 0', '1.5 1 1')
+  addProp('light', '-3 3.5 -6.5', '0 0 0', '1.5 1 1')
+  addProp('light', '-7.5 3.5 -6.5', '0 90 0', '1.5 1 1')
+  addProp('light', '7.5 3.5 -6.5', '0 90 0', '1.5 1 1')
+
+  // Boxes
+  addProp('box', '-9 1 -9', '0 0 0', '0.5 0.5 0.5', true)
+  addProp('box', '-9 1 -7.5', '0 10 0', '0.25 0.25 0.25', true)
+  addProp('box', '-7.5 1 -9', '0 20 0', '0.25 0.25 0.25', true)
+  addProp('box', '9 1 -9', '0 0 0', '0.5 0.5 0.5', true)
+  addProp('box', '9 1 -7.5', '0 15 0', '0.25 0.25 0.25', true)
+
+  // Shelves
+  addProp('shelf', '-8.5 0.5 5.25', '0 0 0', '1.25 1 1')
+        // Boxes on shelves
+        addProp('box', '-6 1 5', '0 0 0', '0.5 0.5 0.5')
+        addProp('box', '-8.75 1 5.3', '0 0 0', '0.5 0.5 0.5')
+        addProp('box', '-5 1 5.2', '0 0 0', '0.5 0.5 0.5')
+  addProp('shelf', '-5.5 0.5 5.25', '0 0 0', '1.25 1 1')
+        // Boxes on shelves
+        addProp('box', '-6 2.25 5.2', '0 0 0', '0.25 0.25 0.25')
+        addProp('box', '-5.5 2.25 5.2', '0 0 0', '0.2 0.2 0.2')
+        addProp('box', '-5 2.5 5.2', '0 30 0', '0.25 0.6 0.3')
+        addProp('box', '-8.5 2.25 5.2', '0 0 0', '0.5 0.25 0.5')
+        addProp('box', '-9 2.25 5.2', '0 0 0', '0.25 0.25 0.5')
+  addProp('shelf', '8.5 0.5 5.25', '0 0 0', '1.25 1 1')
+        // Boxes on shelves
+        addProp('box', '6 2.3 5.2', '0 0 0', '0.25 0.25 0.25')
+        addProp('box', '5.5 2.25 5.2', '0 0 0', '0.2 0.2 0.2')
+        addProp('box', '5 2.5 5.2', '0 30 0', '0.25 0.6 0.3')
+        addProp('box', '8 2.25 5.2', '0 0 0', '0.5 0.25 0.5')
+        addProp('box', '9 2.25 5.2', '0 0 0', '0.25 0.25 0.5')
+  addProp('shelf', '5.5 0.5 5.25', '0 0 0', '1.25 1 1')
+        // Boxes on shelves
+        addProp('box', '6 1 5.1', '0 0 0', '0.5 0.5 0.5')
+        addProp('box', '8.75 1 5.3', '0 0 0', '0.5 0.5 0.5')
+        addProp('box', '5 1 5.2', '0 0 0', '0.5 0.5 0.5')
+
+  // Posters
+  addProp('poster2', '4.105 2 0', '0 90 0')
+  addProp('poster3', '-2.64 1.75 -2.75', '0 90 0', '0.5 0.5 0.5')
+  addProp('poster1', '2.645 1.75 -2.75', '0 -90 0', '0.5 0.5 0.5')
+
+  // Misc
+  addProp('radio', '0.85 1.15 -9', '0 -25 0')
+}
+
+function factoryRoomScenery() {
+  // Shelves
+  addProp('shelf', '8.5 0 9.35', '0 0 0')
+  addProp('shelf', '8.5 0 6.65', '0 0 0')
+
+  // Tables
+  addProp('table', '-5 0 21.5', '0 0 0')
+
+  // Chairs
+  addProp('chair', '-4.5 0 18.75', '0 -10 0')
+  addProp('chair', '-6 0 17.5', '0 100 0')
+
+  // Lights
+  addProp('light', '-7.5 3.5 8', '0 90 0', '1.5 1 1')
+  addProp('light', '7.5 3.5 8', '0 90 0', '1.5 1 1')
+  addProp('light', '-2 3.5 8', '0 0 0', '1.5 1 1')
+  addProp('light', '2 3.5 8', '0 0 0', '1.5 1 1')
+
+  addProp('light', '-2.5 3.5 13', '0 0 0', '1.5 1 1')
+  addProp('light', '-2.5 3.5 18', '0 0 0', '1.5 1 1')
+
+  addProp('light', '2.5 3.5 13', '0 0 0', '1.5 1 1')
+  addProp('light', '2.5 3.5 18', '0 0 0', '1.5 1 1')
+
+  // Boxes
+  addProp('box', '-9 0.5 7', '0 0 0', '0.8 0.8 0.8')
+  addProp('box', '-9 0.375 9', '0 60 0', '0.5 0.5 0.5')
+  addProp('box', '-9.25 0.125 7.9', '0 45 0', '0.25 0.25 0.25')
+  addProp('box', '-9 1.225 9', '0 25 0', '0.65 0.65 0.65')
+
+  addProp('box', '8.5 0.75 17.5', '0 25 0', '1 1 1')
+  addProp('box', '8.5 2.26 17.5', '0 75 0', '1 1 1')
+  addProp('box', '-5 0.5 13.45', '0 25 0', '0.5 0.5 0.5')
+  addProp('box', '-5.5 1.25 13.47', '0 75 0', '0.5 0.5 0.5')
+  addProp('box', '-6 0.5 13.45', '0 75 0', '0.5 0.5 0.5')
+
+  // Posters
+  addProp('poster1', '9.95 2.5 8', '0 -90 0')
+  addProp('poster2', '-9.95 2.5 8', '0 90 0')
+}
+
 // Setup scene
 AFRAME.registerComponent('scenery', {
   init: function() {
-    function replayRoomScenery() {
-      // Tables
-      addProp('table', '1 0 -6')
-
-      // Chairs
-      addProp('chair', '-1.45 0 -9', '0 165 0')
-      addProp('chair', '1.4 0 -9.1', '0 -3 0')
-
-      // Lights
-      addProp('light', '3 3.5 -6.5', '0 0 0', '1.5 1 1')
-      addProp('light', '-3 3.5 -6.5', '0 0 0', '1.5 1 1')
-      addProp('light', '-7.5 3.5 -6.5', '0 90 0', '1.5 1 1')
-      addProp('light', '7.5 3.5 -6.5', '0 90 0', '1.5 1 1')
-
-      // Boxes
-      addProp('box', '-9 1 -9', '0 0 0', '0.5 0.5 0.5', true)
-      addProp('box', '-9 1 -7.5', '0 10 0', '0.25 0.25 0.25', true)
-      addProp('box', '-7.5 1 -9', '0 20 0', '0.25 0.25 0.25', true)
-      addProp('box', '9 1 -9', '0 0 0', '0.5 0.5 0.5', true)
-      addProp('box', '9 1 -7.5', '0 15 0', '0.25 0.25 0.25', true)
-
-      // Shelves
-      addProp('shelf', '-8.5 0.5 5.25', '0 0 0', '1.25 1 1')
-            // Boxes on shelves
-            addProp('box', '-6 1 5', '0 0 0', '0.5 0.5 0.5')
-            addProp('box', '-8.75 1 5.3', '0 0 0', '0.5 0.5 0.5')
-            addProp('box', '-5 1 5.2', '0 0 0', '0.5 0.5 0.5')
-      addProp('shelf', '-5.5 0.5 5.25', '0 0 0', '1.25 1 1')
-            // Boxes on shelves
-            addProp('box', '-6 2.25 5.2', '0 0 0', '0.25 0.25 0.25')
-            addProp('box', '-5.5 2.25 5.2', '0 0 0', '0.2 0.2 0.2')
-            addProp('box', '-5 2.5 5.2', '0 30 0', '0.25 0.6 0.3')
-            addProp('box', '-8.5 2.25 5.2', '0 0 0', '0.5 0.25 0.5')
-            addProp('box', '-9 2.25 5.2', '0 0 0', '0.25 0.25 0.5')
-      addProp('shelf', '8.5 0.5 5.25', '0 0 0', '1.25 1 1')
-            // Boxes on shelves
-            addProp('box', '6 2.3 5.2', '0 0 0', '0.25 0.25 0.25')
-            addProp('box', '5.5 2.25 5.2', '0 0 0', '0.2 0.2 0.2')
-            addProp('box', '5 2.5 5.2', '0 30 0', '0.25 0.6 0.3')
-            addProp('box', '8 2.25 5.2', '0 0 0', '0.5 0.25 0.5')
-            addProp('box', '9 2.25 5.2', '0 0 0', '0.25 0.25 0.5')
-      addProp('shelf', '5.5 0.5 5.25', '0 0 0', '1.25 1 1')
-            // Boxes on shelves
-            addProp('box', '6 1 5.1', '0 0 0', '0.5 0.5 0.5')
-            addProp('box', '8.75 1 5.3', '0 0 0', '0.5 0.5 0.5')
-            addProp('box', '5 1 5.2', '0 0 0', '0.5 0.5 0.5')
-
-      // Posters
-      addProp('poster2', '4.105 2 0', '0 90 0')
-      addProp('poster3', '-2.64 1.75 -2.75', '0 90 0', '0.5 0.5 0.5')
-      addProp('poster1', '2.645 1.75 -2.75', '0 -90 0', '0.5 0.5 0.5')
-
-      // Misc
-      addProp('radio', '0.85 1.15 -9', '0 -25 0')
-    }
-
-    function factoryRoomScenery() {
-      // Shelves
-      addProp('shelf', '8.5 0 9.35', '0 0 0')
-      addProp('shelf', '8.5 0 6.65', '0 0 0')
-
-      // Tables
-      addProp('table', '-5 0 21.5', '0 0 0')
-
-      // Chairs
-      addProp('chair', '-4.5 0 18.75', '0 -10 0')
-      addProp('chair', '-6 0 17.5', '0 100 0')
-
-      // Lights
-      addProp('light', '-7.5 3.5 8', '0 90 0', '1.5 1 1')
-      addProp('light', '7.5 3.5 8', '0 90 0', '1.5 1 1')
-      addProp('light', '-2 3.5 8', '0 0 0', '1.5 1 1')
-      addProp('light', '2 3.5 8', '0 0 0', '1.5 1 1')
-
-      addProp('light', '-2.5 3.5 13', '0 0 0', '1.5 1 1')
-      addProp('light', '-2.5 3.5 18', '0 0 0', '1.5 1 1')
-
-      addProp('light', '2.5 3.5 13', '0 0 0', '1.5 1 1')
-      addProp('light', '2.5 3.5 18', '0 0 0', '1.5 1 1')
-
-      // Boxes
-      addProp('box', '-9 0.5 7', '0 0 0', '0.8 0.8 0.8')
-      addProp('box', '-9 0.375 9', '0 60 0', '0.5 0.5 0.5')
-      addProp('box', '-9.25 0.125 7.9', '0 45 0', '0.25 0.25 0.25')
-      addProp('box', '-9 1.225 9', '0 25 0', '0.65 0.65 0.65')
-
-      addProp('box', '8.5 0.75 17.5', '0 25 0', '1 1 1')
-      addProp('box', '8.5 2.26 17.5', '0 75 0', '1 1 1')
-      addProp('box', '-5 0.5 13.45', '0 25 0', '0.5 0.5 0.5')
-      addProp('box', '-5.5 1.25 13.47', '0 75 0', '0.5 0.5 0.5')
-      addProp('box', '-6 0.5 13.45', '0 75 0', '0.5 0.5 0.5')
-
-      // Posters
-      addProp('poster1', '9.95 2.5 8', '0 -90 0')
-      addProp('poster2', '-9.95 2.5 8', '0 90 0')
-    }
-
     replayRoomScenery();
     factoryRoomScenery();
 
     // Add grab controls after we add scenery
-    document.getElementById('rightHand').setAttribute('sphere-collider', 'objects: .grabbable');
-    document.getElementById('rightHand').setAttribute('grab', '');
+    var rightHand = document.getElementById('rightHand');
+    rightHand.setAttribute('sphere-collider', 'objects: .grabbable');
+    rightHand.setAttribute('grab', '');
 
-    document.getElementById('leftHand').setAttribute('sphere-collider', 'objects: .grabbable');
-    document.getElementById('leftHand').setAttribute('grab', '');
+    var leftHand = document.getElementById('leftHand');
+    leftHand.setAttribute('sphere-collider', 'objects: .grabbable');
+    leftHand.setAttribute('grab', '');
   }
 })
 
 // Robot replayer
 AFRAME.registerComponent('replayer', {
   tick: function () {
-    var headCube = document.getElementById("headCube");
-    var leftCube = document.getElementById("leftCube");
-    var rightCube = document.getElementById("rightCube");
-    var currReplay = savedRecordings[selectedRecording];
     var replayButton = document.getElementById('replayButton');
+    var startText = document.getElementById('startText');
+    var currReplay;
+
+    var headCube;
+    var leftCube;
+    var rightCube;
+
+    var newHeadModel;
+    var newLeftHandModel;
+    var newRightHandModel;
 
     if (!gameStarted) {
+      currReplay = savedRecordings[selectedRecording];
       // Handle replay of single ghost before starting game
       if (replaying) {
         if (tick < currReplay[0].length) {
+          headCube = document.getElementById("headCube");
+          leftCube = document.getElementById("leftCube");
+          rightCube = document.getElementById("rightCube");
+
           replayButton.setAttribute('material', 'color:lightgreen')
           replayButton.setAttribute('value', 'REPLAYING')
 
@@ -1250,10 +1284,13 @@ AFRAME.registerComponent('replayer', {
 
       // Loop through all and play all recordings by tick
       savedRecordings.forEach(function(element, index) {
-        var headCube = document.getElementById(('replayHead' + index));
-        var leftCube = document.getElementById(('replayLeftHand' + index));
-        var rightCube = document.getElementById(('replayRightHand' + index));
-        var currReplay = savedRecordings[index];
+        headCube = document.getElementById(('replayHead' + index));
+        leftCube = document.getElementById(('replayLeftHand' + index));
+        rightCube = document.getElementById(('replayRightHand' + index));
+        currReplay = savedRecordings[index];
+        newHeadModel = document.getElementById('newHeadModel' + index);
+        newLeftHandModel = document.getElementById('newLeftHandModel' + index);
+        newRightHandModel = document.getElementById('newRightHandModel' + index);
 
         function move() {
           if (!replaying) {
@@ -1323,18 +1360,18 @@ AFRAME.registerComponent('replayer', {
               for (i = 0; i < randBodyParts.length; i++) {
                 if (randBodyParts[i] == 'head') {
                   rotateObject(headCube, currReplay[0][tick], randPX, randPY, (randPZ + 15), randRX, randRY, randRZ)
-                  if (gameOver && !document.getElementById('newHeadModel' + index).getAttribute('highlight')) {
-                    document.getElementById('newHeadModel' + index).setAttribute('highlight', '')
+                  if (gameOver && !newHeadModel.getAttribute('highlight')) {
+                    newHeadModel.setAttribute('highlight', '')
                   }
                 } else if (randBodyParts[i] == 'leftHand') {
                   rotateObject(leftCube, currReplay[1][tick], randPX, randPY, (randPZ + 15), randRX, randRY, randRZ)
-                  if (gameOver && !document.getElementById('newLeftHandModel' + index).getAttribute('highlight')) {
-                    document.getElementById('newLeftHandModel' + index).setAttribute('highlight', '')
+                  if (gameOver && !newLeftHandModel.getAttribute('highlight')) {
+                    newLeftHandModel.setAttribute('highlight', '')
                   }
                 } else if (randBodyParts[i] == 'rightHand') {
                   rotateObject(rightCube, currReplay[2][tick], randPX, randPY, (randPZ + 15), randRX, randRY, randRZ)
-                  if (gameOver && !document.getElementById('newRightHandModel' + index).getAttribute('highlight')) {
-                    document.getElementById('newRightHandModel' + index).setAttribute('highlight', '')
+                  if (gameOver && !newRightHandModel.getAttribute('highlight')) {
+                    newRightHandModel.setAttribute('highlight', '')
                   }
                 }
               }
@@ -1353,27 +1390,27 @@ AFRAME.registerComponent('replayer', {
               // Move all body parts normally if current timestamp is not within our randomized range
               move();
               if (gameOver) {
-                document.getElementById('newRightHandModel' + index).removeAttribute('highlight')
-                document.getElementById('newLeftHandModel' + index).removeAttribute('highlight')
-                document.getElementById('newHeadModel' + index).removeAttribute('highlight')
+                newRightHandModel.removeAttribute('highlight')
+                newLeftHandModel.removeAttribute('highlight')
+                newHeadModel.removeAttribute('highlight')
               }
             }
           } else {
             // Move !randRecord pieces normally if game isn't over
             move();
             if (gameOver) {
-              document.getElementById('newRightHandModel' + index).removeAttribute('highlight')
-              document.getElementById('newLeftHandModel' + index).removeAttribute('highlight')
-              document.getElementById('newHeadModel' + index).removeAttribute('highlight')
+              newRightHandModel.removeAttribute('highlight')
+              newLeftHandModel.removeAttribute('highlight')
+              newLeftHandModel.removeAttribute('highlight')
             }
           }
         } else {
           rewindMut = false;
           startTick = 0;
           if (gameOver) {
-            document.getElementById('newRightHandModel' + index).removeAttribute('highlight')
-            document.getElementById('newLeftHandModel' + index).removeAttribute('highlight')
-            document.getElementById('newHeadModel' + index).removeAttribute('highlight')
+            newRightHandModel.removeAttribute('highlight')
+            newLeftHandModel.removeAttribute('highlight')
+            newHeadModel.removeAttribute('highlight')
           }
           if (!gameOver && tick > currReplay[0].length) {
             replayCount += 1;
@@ -1385,13 +1422,13 @@ AFRAME.registerComponent('replayer', {
               startTick = 0;
               rewindMut = false;
             } else {
-              document.getElementById('startText').setAttribute('visible', true)
-              document.getElementById('startText').setAttribute('value', 'YOU RAN OUT OF TIME, BE FASTER!')
-              document.getElementById('startText').setAttribute('material', 'color: red')
-              document.getElementById('startText').setAttribute('rotation', '0 180 0')
-              document.getElementById('startText').setAttribute('position', '0 3.5 ' + 14.5)
-              document.getElementById('startText').setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
-              document.getElementById('startText').setAttribute('sound', 'src: #lose-sound; autoplay: true; volume: 1')
+              startText.setAttribute('visible', true)
+              startText.setAttribute('value', 'YOU RAN OUT OF TIME, BE FASTER!')
+              startText.setAttribute('material', 'color: red')
+              startText.setAttribute('rotation', '0 180 0')
+              startText.setAttribute('position', '0 3.5 ' + 14.5)
+              startText.setAttribute('geometry', 'primitive:plane; height:0.5; width:4;')
+              startText.setAttribute('sound', 'src: #lose-sound; autoplay: true; volume: 1')
               
               document.getElementById('leftHand').components.haptics.pulse(0.5, 1000);
               document.getElementById('rightHand').components.haptics.pulse(0.5, 1000);
@@ -1418,26 +1455,33 @@ AFRAME.registerComponent('mirror-movement', {
       var rightHand = document.getElementById("rightHand");
       var replayButton = document.getElementById('replayButton');
       var recordButton = document.getElementById('recordButton');
-      var startButton = document.getElementById('startText')
+      var startButton = document.getElementById('startText');
+      var diffMeter = document.getElementById('diffMeter');
+
+      var cube;
+      var tvcube;
+      var index;
+      var staticpos;
+      var staticrot;
 
       if (el.object3D == camera.object3D) {
-        var cube = headCube;
-        var tvcube = tvheadCube;
-        var index = 0;
-        var staticpos = [0, 1.65, -0.230]
-        var staticrot = [0, 0, 0]
+        cube = headCube;
+        tvcube = tvheadCube;
+        index = 0;
+        staticpos = [0, 1.65, -0.230]
+        staticrot = [0, 0, 0]
       } else if (el.object3D == leftHand.object3D) {
-        var cube = rightCube;
-        var tvcube = tvrightCube;
-        var index = 1;
-        var staticpos = [0.327, 1.25, -0.575]
-        var staticrot = [0, 0, 0]
+        cube = rightCube;
+        tvcube = tvrightCube;
+        index = 1;
+        staticpos = [0.327, 1.25, -0.575]
+        staticrot = [0, 0, 0]
       } else if (el.object3D == rightHand.object3D) {
-        var cube = leftCube;
-        var tvcube = tvleftCube;
-        var index = 2;
-        var staticpos = [-0.327, 1.25, -0.575]
-        var staticrot = [0, 0, 0]
+        cube = leftCube;
+        tvcube = tvleftCube;
+        index = 2;
+        staticpos = [-0.327, 1.25, -0.575]
+        staticrot = [0, 0, 0]
       } else {
         console.log("Error: not arm or head.")
       }
@@ -1478,6 +1522,9 @@ AFRAME.registerComponent('mirror-movement', {
               document.getElementById('diffMeter').setAttribute('visible', false)
             } else {
               if (startButton.getAttribute('value') != 'Record ' + (numReqReplays - savedRecordings.length) + ' more animations to start...') {
+                if (savedRecordings.length == 1) {
+                  document.getElementById('camera').setAttribute('replayer', '')
+                }
                 startButton.setAttribute('value', 'Record ' + (numReqReplays - savedRecordings.length) + ' more animations to start...')
               }
             }
@@ -1489,10 +1536,10 @@ AFRAME.registerComponent('mirror-movement', {
           if (recording) {
             recording = false;
             lockRig(null, false);
-            document.getElementById('diffMeter').setAttribute('geometry', 'width: 0; height: 0;')
-            document.getElementById('diffMeter').setAttribute('material', 'color: pink');
-            document.getElementById('diffMeter').setAttribute('value', 'MOVE TO FILL');
-            document.getElementById('diffMeter').setAttribute('visible', false)
+            diffMeter.setAttribute('geometry', 'width: 0; height: 0;')
+            diffMeter.setAttribute('material', 'color: pink');
+            diffMeter.setAttribute('value', 'MOVE TO FILL');
+            diffMeter.setAttribute('visible', false)
             oldPoint = {};
             diffMeterTotal = 0;
             diffMet = false;
@@ -1564,6 +1611,10 @@ AFRAME.registerComponent('triggered', {
     el.addEventListener('triggerdown', function (evt) {
       triggerDown = true
       var vibrate = true;
+      var startText = document.getElementById('startText');
+      var recordButton = document.getElementById('recordButton');
+      var diffMeter = document.getElementById('diffMeter');
+      var fadePlane = document.getElementById('fadePlane');
 
       if (replayButtonSelected) {
         replaying = true;
@@ -1584,11 +1635,11 @@ AFRAME.registerComponent('triggered', {
         lockRig(null, false);
       } else if (recordButtonSelected) {
         if (!replaying && savedRecordings.length < numReqReplays) {
-          document.getElementById('diffMeter').setAttribute('visible', true)
-          document.getElementById('startText').setAttribute('position', '-5 2.5 0')
-          document.getElementById('startText').setAttribute('rotation', '0 -90 0')
-          document.getElementById('recordButton').setAttribute('position', '-5 1.25 1')
-          document.getElementById('recordButton').setAttribute('rotation', '0 -100 0')
+          diffMeter.setAttribute('visible', true)
+          startText.setAttribute('position', '-5 2.5 0')
+          startText.setAttribute('rotation', '0 -90 0')
+          recordButton.setAttribute('position', '-5 1.25 1')
+          recordButton.setAttribute('rotation', '0 -100 0')
           recording = true;
           lockRig('record')
           recordedPoses = [ [], [], [] ];
@@ -1599,16 +1650,16 @@ AFRAME.registerComponent('triggered', {
         }
       } else if (startButtonSelected) {
         if (savedRecordings.length >= numReqReplays) {
-          document.getElementById('fadePlane').setAttribute('fade', 'fadeIn: false; fadeSeconds: 1.5')
+          fadePlane.setAttribute('fade', 'fadeIn: false; fadeSeconds: 1.5')
           setTimeout(() => {
             gameStart()
           }, 1600);
         }
       } else if (restartButtonSelected) {
-        document.getElementById('fadePlane').setAttribute('fade', 'fadeIn: false; fadeSeconds: 0.5')
+        fadePlane.setAttribute('fade', 'fadeIn: false; fadeSeconds: 0.5')
         setTimeout(function() { restartGame(); }, 600);
       } else if (newRoundButtonSelected) {
-        document.getElementById('fadePlane').setAttribute('fade', 'fadeIn: false; fadeSeconds: 0.5')
+        fadePlane.setAttribute('fade', 'fadeIn: false; fadeSeconds: 0.5')
         setTimeout(function() { restartRound(); }, 600);
       } else {
         if (cursorOverRecording && !replaying) {
@@ -1957,14 +2008,15 @@ AFRAME.registerComponent('highlight', {
 
 AFRAME.registerComponent('joymove', {
   tick: function() {
+    var crane = document.getElementById('crane');
     if (this.el.body.previousPosition.x.toFixed(3) != this.el.body.position.x.toFixed(3)) {
       if (this.el.body.position.x > 0 ) {
-        if (document.getElementById('crane').object3D.position.x < 2) {
-          document.getElementById('crane').object3D.position.x += this.el.body.position.x
+        if (crane.object3D.position.x < 2) {
+          crane.object3D.position.x += this.el.body.position.x;
         }
       } else {
-        if (document.getElementById('crane').object3D.position.x > -2) {
-          document.getElementById('crane').object3D.position.x += this.el.body.position.x
+        if (crane.object3D.position.x > -2) {
+          crane.object3D.position.x += this.el.body.position.x;
         }
       }
     }
@@ -1975,6 +2027,9 @@ AFRAME.registerComponent('crane-button', {
   init: function() {
     this.el.addEventListener('hit', function () {
       var startButton = document.getElementById("startText");
+      var leftHand = document.getElementById('leftHand');
+      var rightHand = document.getElementById('rightHand');
+
       if (gameStarted && ghostName && !gameOver) {
         if (!gameOver) {
           startButton.setAttribute('visible', true)
@@ -1988,8 +2043,8 @@ AFRAME.registerComponent('crane-button', {
             gameOver = true;
             gameEnd();
           } else {
-            document.getElementById('leftHand').components.haptics.pulse(0.5, 500);
-            document.getElementById('rightHand').components.haptics.pulse(0.5, 500);
+            leftHand.components.haptics.pulse(0.5, 500);
+            rightHand.components.haptics.pulse(0.5, 500);
             startButton.setAttribute('value', 'YOU PICKED A FUNCTIONING ROBOT!')
             startButton.setAttribute('material', 'color: red')
             startButton.setAttribute('rotation', '0 180 0')
@@ -2003,8 +2058,8 @@ AFRAME.registerComponent('crane-button', {
       } else if (gameStarted && !gameOver) {
         // pop up saying didn't hit a ghost..should hide after a short period
         startButton.setAttribute('visible', true)
-        document.getElementById('leftHand').components.haptics.pulse(0.5, 500);
-        document.getElementById('rightHand').components.haptics.pulse(0.5, 500);
+        leftHand.components.haptics.pulse(0.5, 500);
+        rightHand.components.haptics.pulse(0.5, 500);
         startButton.setAttribute('value', 'ERROR: NO AVATAR SELECTED!')
         startButton.setAttribute('material', 'color: red')
         startButton.setAttribute('rotation', '0 180 0')

@@ -7,9 +7,9 @@
     <script src="https://unpkg.com/aframe-render-order-component@1.1.0/dist/aframe-render-order-component.min.js"></script>
     <script src="https://unpkg.com/aframe-randomizer-components@3.0.2/dist/aframe-randomizer-components.min.js"></script>
     <script src="https://unpkg.com/aframe-haptics-component/dist/aframe-haptics-component.min.js"></script>
+    <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v4.0.1/dist/aframe-physics-system.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.0/dist/aframe-extras.min.js"></script>
     <script src="https://rawgit.com/fernandojsg/aframe-teleport-controls/master/dist/aframe-teleport-controls.min.js"></script>
-    <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v4.0.1/dist/aframe-physics-system.min.js"></script>
     <script src="./src/index.js"></script>
   </head>
   <body>
@@ -128,7 +128,7 @@
 
         <a-box crane-button class="grabbable" id="craneButton" static-body position="0.325 1.0 9.575" rotation="-45 0 0" depth="0.15" width="0.2" height="0.05" color="red"></a-box>
 
-        <a-cylinder joymove id="joystickleft" constraint="target: #joystickpanel; type: hinge; axis: 0 1 0; targetAxis: 0 1 0; targetPivot: 0 0.1 0;" dynamic-body="shape: cylinder;" class="grabbable" position="0 1.01 9.59" radius="0.01" rotation="-45 0 0" height="0.25" color="#FFFFFF">
+        <a-cylinder id="joystickleft" constraint="target: #joystickpanel; type: hinge; axis: 0 1 0; targetAxis: 0 1 0; targetPivot: 0 0.1 0;" dynamic-body="shape: cylinder;" class="grabbable" position="0 1.01 9.59" radius="0.01" rotation="-45 0 0" height="0.25" color="#FFFFFF">
           <a-sphere static-body position="0 0.15 0" radius="0.03" color="red"></a-sphere>
         </a-cylinder>
         <!-- blocking walls -->
@@ -260,7 +260,7 @@
 
       <!-- Player -->
       <a-entity sound="src: #factory-ambient-noise; autoplay: true; loop: true; volume: 0.01; positional: false;" id="rig" position="-1.75 0 -2.5">
-        <a-entity static-body="shape: sphere; sphereRadius: 0.19;" id="camera" camera look-controls wasd-controls rotation="0 0 0" mirror-movement replayer>
+        <a-entity id="camera" camera mirror-movement static-body="shape: sphere; sphereRadius: 0.19;">
           <a-plane id="fadePlane" position="0 0 -0.01" width="10" height="10" opacity="1.0" color="black" visible="true">
             <a-text id="startTitleText" value="Off-Killter" scale="0.01 0.01 0.01" position="-0.005 0.004 0"></a-text>
             <a-text id="startGameText" value="Enter VR to begin" color="grey" scale="0.0025 0.0025 0.0025" position="-0.00035 0.0028 0"></a-text>
