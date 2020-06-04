@@ -514,9 +514,15 @@ function factoryRoomScenery() {
 
 // Setup scene
 AFRAME.registerComponent('scenery', {
+  schema: {
+    room: {type: 'string', default: null}
+  },
   init: function() {
-    replayRoomScenery();
-    factoryRoomScenery();
+    if (this.data.room == 'replay') {
+      replayRoomScenery();
+    } else if (this.data.room == 'factory') {
+      factoryRoomScenery();
+    }
 
     // Add grab controls after we add scenery
     var rightHand = document.getElementById('rightHand');

@@ -14,7 +14,7 @@
     <script src="./src/scenery.js"></script>
   </head>
   <body>
-    <a-scene scenery start-game toggle-debug physics="gravity: -2;">
+    <a-scene start-game toggle-debug physics="gravity: -1.6;">
       <a-assets>
         <!-- models -->
         <a-asset-item id="leftHandModel" src="assets/models/leftHand.glb"></a-asset-item>
@@ -90,7 +90,7 @@
       </a-entity>
 
       <!-- Define Scene Room -->
-      <a-entity id="intRoom">
+      <a-entity id="replayRoom" scenery="room: replay;">
         <!-- signs -->
         <a-text id="replaySign" scale="1.5 1.5 1.5" geometry="primitive: plane; width: 1.9; height: 0.3;" material="color: #ad7f00" value="Replay Station ->" color="white" position="7.5 2 -9.9" rotation="0 0 0" align="center" visible="true"></a-text>
 
@@ -185,7 +185,7 @@
       </a-entity>
 
       <!-- Define Replay Room -->
-      <a-entity id="replayRoom">
+      <a-entity id="factoryRoom">
         <!-- angled walls -->
         <a-plane material="src: #floor-texture;" static-body position="-7.275 3 12" rotation="0 30 0" width="7.675" height="2" color="#007eb0"></a-plane>
         <a-plane material="src: #floor-texture;" static-body position="-7.275 1 12" rotation="0 30 0" width="7.675" height="2" color="#001d29"></a-plane>

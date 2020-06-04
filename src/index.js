@@ -297,6 +297,7 @@ function rotateObject(obj, ref, px = 0, py = 0, pz = 0, rx = 0, ry = 0, rz = 0) 
 function gameStart() {
   // Move player in front of ghosteses
   lockRig('startgame');
+  document.getElementById('factoryRoom').setAttribute('scenery', 'room: factory;');
 
   // Add joystick control
   document.getElementById('joystickleft').setAttribute('joymove', '');
@@ -918,6 +919,7 @@ AFRAME.registerComponent('mirror-movement', {
   tick: function () {
     if (!gameStarted) {
       var el = this.el; // `this.el` is the element.
+      var tvBody = document.getElementById('tvBody');
       var headCube = document.getElementById("headCube");
       var leftCube = document.getElementById("leftCube");
       var rightCube = document.getElementById("rightCube");
@@ -1055,8 +1057,8 @@ AFRAME.registerComponent('mirror-movement', {
 
         // mirror current player actions to recording area "monitor"
         if (recording) {
-          if (document.getElementById('tvBody').getAttribute('visible') == false) {
-            document.getElementById('tvBody').setAttribute('visible', true);
+          if (tvBody.getAttribute('visible') == false) {
+            tvBody.setAttribute('visible', true);
           }
           tvcube.object3D.position.x = el.object3D.position.x * -1;
           tvcube.object3D.position.y = el.object3D.position.y;
@@ -1065,8 +1067,8 @@ AFRAME.registerComponent('mirror-movement', {
           tvcube.object3D.rotation.y = el.object3D.rotation.y * -1;
           tvcube.object3D.rotation.z = el.object3D.rotation.z * -1;
         } else {
-          if (document.getElementById('tvBody').getAttribute('visible') == true) {
-            document.getElementById('tvBody').setAttribute('visible', false);
+          if (tvBody.getAttribute('visible') == true) {
+            tvBody.setAttribute('visible', false);
           }
         }
       }
