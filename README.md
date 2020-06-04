@@ -1,4 +1,4 @@
-<a href="https://elocnat.itch.io/off-killter"><img src="https://i.imgur.com/7r37ODN.png" title="Play Off-Killter now at elocnat.itch.io!" alt="elocnat logo" width="256">
+<a href="https://elocnat.itch.io/off-killter"><img src="https://i.imgur.com/Sl0Du6Al.png" title="Play Off-Killter now at elocnat.itch.io!" alt="Off-Killter Thumbnail">
 
 # Off-Killter
 
