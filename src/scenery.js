@@ -666,6 +666,135 @@ function addProp(prop, position, rotation, scale, physics) {
     newProp.setAttribute('position', position)
     newProp.setAttribute('rotation', rotation)
     newProp.setAttribute('scale', scale)
+  } else if (prop == 'helpManual') {
+    var newProp = document.createElement('a-entity')
+    newProp.setAttribute('class', 'scenery help-manual')
+    scene.appendChild(newProp)
+
+    // Pages
+    var newPropThing = document.createElement('a-box')
+    newPropThing.setAttribute('class', 'grabbable scenery help-manual-geom')
+    newPropThing.setAttribute('constraint', 'target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.123 0 0; targetPivot: 0.123 0 0; axis: 0 1 0; targetAxis: 0 1 0;')
+    newPropThing.setAttribute('height', '0.2794')
+    newPropThing.setAttribute('width', '0.2159')
+    newPropThing.setAttribute('depth', '0.005')
+    newPropThing.setAttribute('material', 'color: #f5f5f5; src: #help-manual-page1; flatShading: true;')
+    newPropThing.setAttribute('dynamic-body', 'mass: 0.01;')
+    newPropThing.setAttribute('position', '0 1.215 -8.25')
+    newProp.appendChild(newPropThing)
+
+    newPropThing = document.createElement('a-box')
+    newPropThing.setAttribute('class', 'grabbable scenery help-manual-geom')
+    newPropThing.setAttribute('constraint', 'target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.124 0 0; targetPivot: 0.124 0 0; axis: 0 1 0; targetAxis: 0 1 0;')
+    newPropThing.setAttribute('height', '0.2794')
+    newPropThing.setAttribute('width', '0.2159')
+    newPropThing.setAttribute('depth', '0.005')
+    newPropThing.setAttribute('material', 'color: #f5f5f5; src: #help-manual-page2; flatShading: true;')
+    newPropThing.setAttribute('dynamic-body', 'mass: 0.01;')
+    newPropThing.setAttribute('position', '0 1.210 -8.26')
+    newProp.appendChild(newPropThing)
+
+    newPropThing = document.createElement('a-box')
+    newPropThing.setAttribute('class', 'grabbable scenery help-manual-geom')
+    newPropThing.setAttribute('constraint', 'target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.125 0 0; targetPivot: 0.125 0 0; axis: 0 1 0; targetAxis: 0 1 0;')
+    newPropThing.setAttribute('height', '0.2794')
+    newPropThing.setAttribute('width', '0.2159')
+    newPropThing.setAttribute('depth', '0.005')
+    newPropThing.setAttribute('material', 'color: #f5f5f5; src: #help-manual-page3; flatShading: true;')
+    newPropThing.setAttribute('dynamic-body', 'mass: 0.01;')
+    newPropThing.setAttribute('position', '0 1.205 -8.27')
+    newProp.appendChild(newPropThing)
+
+    // Cover
+    newPropThing = document.createElement('a-box')
+    newPropThing.setAttribute('class', 'grabbable scenery help-manual-geom')
+    newPropThing.setAttribute('constraint', 'target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.12 0 0; targetPivot: 0.12 0 0; axis: 0 1 0; targetAxis: 0 1 0;')
+    newPropThing.setAttribute('id', 'folder1')
+    newPropThing.setAttribute('height', '0.295275')
+    newPropThing.setAttribute('width', '0.2413')
+    newPropThing.setAttribute('depth', '0.006')
+    newPropThing.setAttribute('material', 'color: #fffbb5; src: #help-manual-cover; flatShading: true;')
+    newPropThing.setAttribute('dynamic-body', 'mass: 0.02;')
+    newPropThing.setAttribute('position', '0 1.22 -8.25')
+    newProp.appendChild(newPropThing)
+
+    newPropThing = document.createElement('a-box')
+    newPropThing.setAttribute('class', 'grabbable scenery help-manual-geom')
+    newPropThing.setAttribute('id', 'folder2')
+    newPropThing.setAttribute('height', '0.295275')
+    newPropThing.setAttribute('width', '0.2413')
+    newPropThing.setAttribute('depth', '0.006')
+    newPropThing.setAttribute('material', 'color: #fffbb5; src: #help-manual-cover; flatShading: true;')
+    newPropThing.setAttribute('dynamic-body', 'mass: 0.02;')
+    newPropThing.setAttribute('position', '0 1.22 -8.25')
+    newProp.appendChild(newPropThing)
+
+    // newProp.setAttribute('position', position)
+    // newProp.setAttribute('rotation', rotation)
+    // newProp.setAttribute('scale', scale)
+  } else if (prop == 'logoWall') {
+    var newProp = document.createElement('a-entity')
+    newProp.setAttribute('class', 'scenery logo-wall')
+    scene.appendChild(newProp)
+
+    var newPropThing = document.createElement('a-plane')
+    newPropThing.setAttribute('class', 'scenery logo-wall-geom')
+    newPropThing.setAttribute('height', '3')
+    newPropThing.setAttribute('width', '8')
+    newPropThing.setAttribute('color', '#FFFFFF')
+    newPropThing.setAttribute('rotation', '-180 0 0')
+    newPropThing.setAttribute('position', '0 1.75 19.98')
+    newProp.appendChild(newPropThing)
+
+    newPropThing = document.createElement('a-plane')
+    newPropThing.setAttribute('class', 'scenery logo-wall-geom')
+    newPropThing.setAttribute('height', '2')
+    newPropThing.setAttribute('width', '2')
+    newPropThing.setAttribute('material', 'src: #text-logo; alphaTest: 0.5;')
+    newPropThing.setAttribute('rotation', '-180 0 180')
+    newPropThing.setAttribute('position', '2 1.75 19.95')
+    newProp.appendChild(newPropThing)
+
+    newPropThing = document.createElement('a-plane')
+    newPropThing.setAttribute('class', 'scenery logo-wall-geom')
+    newPropThing.setAttribute('height', '2')
+    newPropThing.setAttribute('width', '2')
+    newPropThing.setAttribute('material', 'src: #text-logo; alphaTest: 0.5;')
+    newPropThing.setAttribute('rotation', '-180 0 180')
+    newPropThing.setAttribute('position', '-2 1.75 19.95')
+    newProp.appendChild(newPropThing)
+  } else if (prop == 'dumpster') {
+    var newProp = document.createElement('a-entity')
+    newProp.setAttribute('class', 'scenery dumpster')
+    scene.appendChild(newProp)
+
+    var newPropThing = document.createElement('a-box')
+    newPropThing.setAttribute('class', 'scenery dumpster-geom')
+    newPropThing.setAttribute('height', '2')
+    newPropThing.setAttribute('width', '2')
+    newPropThing.setAttribute('depth', '3')
+    newPropThing.setAttribute('position', '5 0.75 17.5')
+    newPropThing.setAttribute('material', 'src: #floor-texture; color:#005703;')
+    newProp.appendChild(newPropThing)
+
+    newPropThing = document.createElement('a-box')
+    newPropThing.setAttribute('class', 'scenery dumpster-geom')
+    newPropThing.setAttribute('height', '0.15')
+    newPropThing.setAttribute('width', '2')
+    newPropThing.setAttribute('depth', '1.5')
+    newPropThing.setAttribute('position', '5.6 2.7 16.75')
+    newPropThing.setAttribute('rotation', '0 0 110')
+    newPropThing.setAttribute('material', 'color: black;')
+    newProp.appendChild(newPropThing)
+
+    newPropThing = document.createElement('a-box')
+    newPropThing.setAttribute('class', 'scenery dumpster-geom')
+    newPropThing.setAttribute('height', '0.15')
+    newPropThing.setAttribute('width', '2')
+    newPropThing.setAttribute('depth', '1.5')
+    newPropThing.setAttribute('position', '5 1.825 18.25')
+    newPropThing.setAttribute('material', 'color: black;')
+    newProp.appendChild(newPropThing)
   }
 }
 
@@ -727,6 +856,7 @@ function replayRoomScenery() {
   addProp('replayMonitor', '-5 0 -1.5', '0 100 0')
   addProp('greenScreen', '-10 2 0', '0 90 0')
   addProp('replayScreen', '10 2 0', '0 -90 0')
+  addProp('helpManual') // Currently positioning is set during prop creation
 }
 
 function factoryRoomScenery() {
@@ -768,6 +898,10 @@ function factoryRoomScenery() {
   // Posters
   addProp('poster1', '9.95 2.5 8', '0 -90 0')
   addProp('poster2', '-9.95 2.5 8', '0 90 0')
+
+  // Misc
+  addProp('logoWall') // prop currently sets position
+  addProp('dumpster') // prop currently sets position
 }
 
 // Setup scene
@@ -791,4 +925,4 @@ AFRAME.registerComponent('scenery', {
     leftHand.setAttribute('sphere-collider', 'objects: .grabbable');
     leftHand.setAttribute('grab', '');
   }
-})
+});

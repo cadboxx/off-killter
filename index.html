@@ -39,22 +39,6 @@
         <img id="poster2" src="assets/images/motivational_poster_2_off-killter.jpg">
         <img id="poster3" src="assets/images/motivational_poster_3_off-killter.jpg">
       </a-assets>
-
-      <!-- Scene props -->
-      <a-entity id='help-manual'>
-        <!-- Pages -->
-        <a-box id="helpManTitle" constraint="target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.123 0 0; targetPivot: 0.123 0 0; axis: 0 1 0; targetAxis: 0 1 0;" material='color: #f5f5f5; src: #help-manual-page1; flatShading: true;' class="grabbable" rotation='0 0 0' width='0.2159' height='0.2794' depth='0.005' dynamic-body="mass: 0.01" position='0 1.215 -8.25'></a-box>
-
-        <a-box id="helpManFirstDay" constraint="target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.124 0 0; targetPivot: 0.124 0 0; axis: 0 1 0; targetAxis: 0 1 0;" material='color: #f5f5f5; src: #help-manual-page2; flatShading: true;' class="grabbable" rotation='0 0 0' width='0.2159' height='0.2794' depth='0.005' dynamic-body="mass: 0.01" position='0 1.210 -8.26'></a-box>
-
-        <a-box id="helpManDefault" constraint="target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.125 0 0; targetPivot: 0.125 0 0; axis: 0 1 0; targetAxis: 0 1 0;" material='color: #f5f5f5; src: #help-manual-page3; flatShading: true;' class="grabbable" rotation='0 0 0' width='0.2159' height='0.2794' depth='0.005' dynamic-body="mass: 0.01" position='0 1.205 -8.27'></a-box>
-
-        <!-- Cover -->
-        <a-box constraint="target: #folder2; maxForce: 5e8; type: hinge; pivot: -0.12 0 0; targetPivot: 0.12 0 0; axis: 0 1 0; targetAxis: 0 1 0;" id="folder1" material='color: #fffbb5; src: #help-manual-cover; flatShading: true;' class="grabbable" rotation='0 0 0' width='0.2413' height='0.295275' depth='0.006' position='0 1.22 -8.25' dynamic-body="mass: 0.02"></a-box>
-
-        <a-box id="folder2" material='color: #fffbb5; src: #help-manual-cover; flatShading: true;' class="grabbable" rotation='0 0 0' width='0.2413' height='0.295275' depth='0.006' position='0 1.2 -8.25' dynamic-body="mass: 0.02"></a-box>
-      </a-entity>
-
       <!-- Define Scene Room -->
       <a-entity id="replayRoom" scenery="room: replay;">
         <!-- signs -->
@@ -170,14 +154,6 @@
         <a-plane material="src: #floor-texture;" static-body position="0 3 20" rotation="0 180 0" width="20" height="2" color="#007eb0"></a-plane>
         <a-plane material="src: #floor-texture;" static-body position="10 3 15" rotation="0 -90 0" width="10" height="2" color="#007eb0"></a-plane>
         <a-plane material="src: #floor-texture;" static-body position="-10 3 15" rotation="0 90 0" width="10" height="2" color="#007eb0"></a-plane>
-        <!-- height board -->
-        <a-plane static-body position="0 1.75 19.98" rotation="-180 0 0" width="8" height="3" color="#FFFFFF"></a-plane>
-        <a-plane static-body position="2 1.75 19.95" rotation="-180 0 180" width="2" height="2" material="src: #text-logo; alphaTest: 0.5;"></a-plane>
-        <a-plane static-body position="-2 1.75 19.95" rotation="-180 0 180" width="2" height="2" material="src: #text-logo; alphaTest: 0.5;"></a-plane>
-        <!-- dumpster -->
-        <a-box material="src: #floor-texture; color:#005703;" position="5 0.75 17.5" width="2" height="2" depth="3"></a-box>
-        <a-box rotation="0 0 110" position="5.6 2.7 16.75" width="2" height="0.15" depth="1.5" material="color:black"></a-box>
-        <a-box position="5 1.825 18.25" width="2" height="0.15" depth="1.5" material="color:black"></a-box>
         <!-- robot machine -->
         <a-box material="src: #floor-texture;" position="-9 1.5 15" width="3" height="3" depth="2"></a-box>
         <a-entity id="machine-entrance" position="0 1.25 0">
